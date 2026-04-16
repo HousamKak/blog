@@ -3,81 +3,275 @@ title: "Hello World: Building This Blog"
 description: "A walkthrough of how I built this personal blog from scratch using Astro 5, Tailwind CSS v4, and MDX."
 pubDate: 2026-04-16
 tags: ["astro", "web-dev", "meta"]
-heroImage: "/media/images/placeholder.svg"
 ---
 
-This is the first post on my blog. I built this entire thing from scratch using Astro 5, Tailwind CSS v4, MDX, and TypeScript.
+This is the first post on my blog. I built the whole thing from scratch — no templates, no CMS, no starter kits. Just Astro 5, Tailwind CSS v4, MDX, and TypeScript. The source lives in a single repo, content is file-based, and it deploys to GitHub Pages on every push.
+
+This post walks through the architecture and the decisions behind it.
 
 ## Why Astro?
 
-Astro ships **zero JavaScript** by default. Pages are rendered as static HTML at build time. When I need interactivity — like a 3D viewer — I use React as an "island" that hydrates only where needed.
+Astro ships **zero JavaScript** by default. Every page is rendered as static HTML at build time. When I need interactivity — a GPU fractal viewer, a 3D model — I drop in a React component as an "island" that hydrates only where it appears. The rest of the page stays inert.
 
-The result: fast pages, clean architecture, full control.
+This is a meaningful distinction. Most React-based frameworks ship the entire runtime to every page. Astro doesn't. A blog post about math renders as pure HTML with KaTeX markup. A post with an interactive shader gets one React island. Nothing more.
 
-## Code Highlighting
+The result: fast pages, clean architecture, full control over what runs in the browser.
 
-Shiki is built into Astro and supports dual themes for light/dark mode:
+## Project Structure
+
+```
+src/
+├── components/       # Astro + React components
+├── content/          # MDX content collections
+│   ├── posts/        # Blog posts
+│   ├── papers/       # Paper summaries with PDF embeds
+│   ├── notes/        # Short-form notes
+│   └── renders/      # 3D renders and visual work
+├── layouts/          # BaseLayout, PostLayout, PaperLayout
+├── pages/            # File-based routing
+│   ├── posts/[...id].astro
+│   ├── papers/[...id].astro
+│   ├── notes/[...id].astro
+│   ├── renders/[...id].astro
+│   ├── tags/[tag].astro
+│   └── rss.xml.ts
+└── styles/
+    └── global.css    # Design tokens + prose typography
+```
+
+Astro's file-based routing maps cleanly onto the content model. Each collection gets a listing page, a dynamic `[...id].astro` route, and a card component. Tags aggregate across all four collections.
+
+## Content Collections
+
+Astro 5 has a content layer that validates frontmatter with Zod schemas at build time. If I misspell a field or pass the wrong type, the build fails. Each collection defines its own schema:
 
 ```typescript
-interface BlogPost {
-  title: string;
-  pubDate: Date;
-  tags: string[];
-  draft: boolean;
-}
+const posts = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    heroImage: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    draft: z.boolean().default(false),
+    theme: themeEnum,
+  }),
+});
+```
 
-function sortByDate(posts: BlogPost[]): BlogPost[] {
-  return posts.toSorted(
-    (a, b) => b.pubDate.valueOf() - a.pubDate.valueOf()
-  );
+The `draft: true` flag hides posts from listings and feeds without deleting them. The `theme` field controls per-post visual theming — more on that below.
+
+Papers get extra fields like `authors`, `venue`, `doi`, and `pdfUrl`. Renders track `mediaType` (2D vs 3D) and `mediaUrl` for the embedded viewer. All of this is type-safe end to end.
+
+## The Design Token System
+
+Instead of hardcoding colors and spacing, the entire UI is driven by CSS custom properties defined in a single file. Every component references tokens like `var(--color-accent)` and `var(--color-surface)` rather than literal values:
+
+```css
+:root {
+  --color-bg: #fafafa;
+  --color-text: #18181b;
+  --color-muted: #71717a;
+  --color-border: #e4e4e7;
+  --color-accent: #2563eb;
+  --color-surface: #f4f4f5;
+
+  --radius-lg: 0.75rem;
+  --border-w: 1px;
+  --shadow-card: none;
+  --font-heading: system-ui, -apple-system, sans-serif;
 }
 ```
 
-And here's some Python:
+Dark mode overrides the same variables:
 
-```python
-def collatz(n: int) -> list[int]:
-    seq = [n]
-    while n != 1:
-        n = n // 2 if n % 2 == 0 else 3 * n + 1
-        seq.append(n)
-    return seq
+```css
+html.dark {
+  --color-bg: #09090b;
+  --color-text: #e4e4e7;
+  --color-accent: #3b82f6;
+  --color-surface: #18181b;
+}
 ```
 
-## Math Support
+This means dark mode is free — no conditional classes, no `dark:` variants scattered across templates. Components just reference tokens, and the tokens change.
 
-Inline math works: $E = mc^2$ and $\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}$.
+## Per-Post Theming
 
-Display math renders with KaTeX at build time — no client-side JavaScript:
+Every content item has an optional `theme` field. The layout reads it and applies a CSS class to `<html>`:
+
+```astro
+---
+const themeClass = theme !== 'default' ? `theme-${theme}` : '';
+---
+<html lang="en" class={themeClass} data-page-theme={theme}>
+```
+
+A theme is just a block of CSS that overrides the design tokens. The `pixel` theme, for example, swaps in a bitmap font, kills all border radii, adds offset drop shadows, and turns code blocks green-on-black:
+
+```css
+html.theme-pixel {
+  --color-bg: #d2c4a0;
+  --color-accent: #d32f2f;
+  --radius-lg: 0;
+  --border-w: 3px;
+  --shadow-card: 4px 4px 0 var(--color-text);
+  --font-heading: 'Press Start 2P', monospace;
+  font-size: 12px;
+  image-rendering: pixelated;
+}
+```
+
+Adding a new theme means adding a CSS block and a value to the Zod enum. No component changes needed.
+
+## Dark Mode
+
+Dark mode runs without any framework. A small inline script in `<head>` reads `localStorage` and applies the `dark` class before first paint — no flash of wrong theme:
+
+```javascript
+function applyDarkMode() {
+  var mode = localStorage.getItem('theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark' : 'light');
+  document.documentElement.classList.toggle('dark', mode === 'dark');
+}
+applyDarkMode();
+document.addEventListener('astro:after-swap', applyDarkMode);
+```
+
+The `astro:after-swap` listener re-applies the mode after view transitions swap the DOM. The toggle button flips the class and persists to `localStorage`. That's the entire implementation.
+
+## Interactive Islands
+
+Some posts need real interactivity. The [Julia sets post](/posts/interactive-julia-sets/) embeds a GPU-accelerated fractal viewer built with Wilson. It's a React component that hydrates as an Astro island:
+
+```jsx
+<WilsonGPUApplet
+  client:load
+  shader={`...GLSL fragment shader...`}
+  uniforms={{ c: [0, 1] }}
+  draggables={{ c: [0, 1] }}
+  onDrag={`
+    wilson.setUniforms({ c: [x, y] });
+    wilson.drawFrame();
+  `}
+/>
+```
+
+The `client:load` directive tells Astro to hydrate this component on page load. Everything else on the page — the header, the prose, the math — stays as static HTML. The component dynamically imports the Wilson library at runtime, bypassing Vite's bundler:
+
+```typescript
+const wilsonUrl = new URL('/lib/wilson/wilson.js', window.location.origin).href;
+const { WilsonGPU } = await import(wilsonUrl);
+```
+
+The same island pattern works for 3D model viewers (Three.js + react-three-fiber), video players, or any React component that needs client-side state.
+
+## Math and Code
+
+Math is rendered at build time with KaTeX via remark/rehype plugins. No JavaScript ships to the client for math rendering:
+
+```javascript
+// astro.config.mjs
+markdown: {
+  remarkPlugins: [remarkMath],
+  rehypePlugins: [rehypeKatex],
+}
+```
+
+Inline math: $\nabla \times \mathbf{B} = \mu_0 \mathbf{J} + \mu_0 \varepsilon_0 \frac{\partial \mathbf{E}}{\partial t}$
+
+Display math:
 
 $$
-\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+\mathcal{L} = \int \left( \frac{1}{2} \partial_\mu \phi \, \partial^\mu \phi - V(\phi) \right) d^4x
 $$
 
-The Euler identity:
+Code highlighting uses Shiki with dual themes — `github-light` and `github-dark`. Astro embeds both color sets as CSS variables in the generated HTML. A single CSS rule swaps them:
 
-$$
-e^{i\pi} + 1 = 0
-$$
+```css
+html.dark .astro-code,
+html.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+```
 
-A matrix:
+Example:
 
-$$
-\begin{pmatrix}
-a & b \\
-c & d
-\end{pmatrix}
-\begin{pmatrix}
-x \\
-y
-\end{pmatrix}
-=
-\begin{pmatrix}
-ax + by \\
-cx + dy
-\end{pmatrix}
-$$
+```typescript
+async function init(canvas: HTMLCanvasElement) {
+  const { WilsonGPU } = await import('/lib/wilson/wilson.js');
+
+  const wilson = new WilsonGPU(canvas, {
+    shader: fragmentShader,
+    canvasWidth: 1000,
+    uniforms: { time: 0 },
+  });
+
+  function animate(t: number) {
+    wilson.setUniforms({ time: t / 1000 });
+    wilson.drawFrame();
+    requestAnimationFrame(animate);
+  }
+
+  requestAnimationFrame(animate);
+}
+```
+
+## Layout and Typography
+
+The page uses a 3-column CSS grid. Content sits in the center column (max `48rem`). On wide screens, the side gutters become visible — the right gutter holds a sticky table of contents on post pages:
+
+```css
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 48rem) 1fr;
+}
+
+@media (min-width: 1280px) {
+  .post-with-toc {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 2rem;
+  }
+
+  .toc-sidebar {
+    position: sticky;
+    top: 5rem;
+  }
+}
+```
+
+On mobile, the table of contents collapses into an inline box above the content. The TOC auto-generates from h2/h3 headings extracted during the MDX render pass.
+
+Prose typography is hand-tuned in a `.prose` class — no Tailwind typography plugin. Headings use the theme's heading font, paragraphs are `1.0625rem` at `1.8` line height, code blocks get borders and shadows from design tokens. Everything adapts when the theme changes.
+
+## Build and Deploy
+
+The site builds with `pnpm build` and deploys to GitHub Pages via a GitHub Actions workflow:
+
+```yaml
+steps:
+  - uses: actions/checkout@v4
+  - uses: pnpm/action-setup@v4
+  - uses: actions/setup-node@v4
+    with:
+      node-version: 22
+      cache: pnpm
+  - run: pnpm install --frozen-lockfile
+  - run: pnpm build
+  - uses: actions/upload-pages-artifact@v3
+    with:
+      path: dist/
+  - uses: actions/deploy-pages@v4
+```
+
+Push to `main`, wait ~30 seconds, and the site is live. The custom domain (`blog.housamkak.com`) is configured via a `CNAME` file in `public/` and DNS pointing to GitHub's IPs.
+
+Astro also generates a sitemap and an RSS feed automatically via integrations.
 
 ## What's Next
 
-More posts about rendering, papers, and creative work.
+More posts about rendering, math, and research. The content system is ready for papers with PDF embeds, notes for short-form writing, and renders for visual work. The per-post theming opens the door for posts that feel different from each other — not just different content, but different aesthetics.
