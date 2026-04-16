@@ -2,6 +2,7 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 const themeEnum = z.enum(['default', 'pixel']).default('default');
+const langEnum = z.enum(['en', 'ar']).default('en');
 
 const posts = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/posts' }),
@@ -12,6 +13,7 @@ const posts = defineCollection({
     updatedDate: z.coerce.date().optional(),
     heroImage: z.string().optional(),
     tags: z.array(z.string()).default([]),
+    lang: langEnum,
     draft: z.boolean().default(false),
     theme: themeEnum,
   }),
@@ -28,6 +30,7 @@ const papers = defineCollection({
     tags: z.array(z.string()).default([]),
     venue: z.string().optional(),
     doi: z.string().optional(),
+    lang: langEnum,
     draft: z.boolean().default(false),
     theme: themeEnum,
   }),
@@ -40,6 +43,7 @@ const notes = defineCollection({
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     tags: z.array(z.string()).default([]),
+    lang: langEnum,
     draft: z.boolean().default(false),
     theme: themeEnum,
   }),
@@ -56,6 +60,7 @@ const renders = defineCollection({
     mediaUrl: z.string(),
     tags: z.array(z.string()).default([]),
     software: z.string().optional(),
+    lang: langEnum,
     draft: z.boolean().default(false),
     theme: themeEnum,
   }),

@@ -362,6 +362,32 @@ html.theme-pixel .prose {
 }
 
 /* ──────────────────────────────────────
+   RTL / Arabic support
+   ────────────────────────────────────── */
+html[dir="rtl"] .prose {
+  direction: rtl;
+  text-align: right;
+}
+
+html[dir="rtl"] .prose blockquote {
+  border-left: none;
+  border-right: 3px solid var(--color-accent);
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+html[dir="rtl"] .prose ul,
+html[dir="rtl"] .prose ol {
+  padding-left: 0;
+  padding-right: 1.5em;
+}
+
+html[dir="rtl"] .prose pre {
+  direction: ltr;
+  text-align: left;
+}
+
+/* ──────────────────────────────────────
    Ambient pixel decoration
    ────────────────────────────────────── */
 .pixel-ambient {

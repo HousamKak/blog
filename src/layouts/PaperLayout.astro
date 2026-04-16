@@ -14,11 +14,12 @@ interface Props {
   doi?: string;
   tags: string[];
   theme?: 'default' | 'pixel';
+  lang?: 'en' | 'ar';
 }
 
-const { title, description, pubDate, authors, pdfUrl, venue, doi, tags, theme } = Astro.props;
+const { title, description, pubDate, authors, pdfUrl, venue, doi, tags, theme, lang } = Astro.props;
 ---
-<BaseLayout title={title} description={description} theme={theme}>
+<BaseLayout title={title} description={description} theme={theme} lang={lang}>
   <article class="py-4">
     <header class="mb-8">
       <h1 class="mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl">

@@ -16,11 +16,11 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, description, pubDate, mediaType, mediaUrl, thumbnail, software, tags, theme } = entry.data;
+const { title, description, pubDate, mediaType, mediaUrl, thumbnail, software, tags, theme, lang } = entry.data;
 
 const isVideo = mediaUrl.match(/\.(mp4|webm|mov)$/i);
 ---
-<BaseLayout title={title} description={description} ogImage={thumbnail} theme={theme}>
+<BaseLayout title={title} description={description} ogImage={thumbnail} theme={theme} lang={lang}>
   <article class="py-4">
     <header class="mb-8">
       <h1 class="mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl">

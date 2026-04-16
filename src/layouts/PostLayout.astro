@@ -13,11 +13,12 @@ interface Props {
   tags: string[];
   headings: { depth: number; slug: string; text: string }[];
   theme?: 'default' | 'pixel';
+  lang?: 'en' | 'ar';
 }
 
-const { title, description, pubDate, updatedDate, heroImage, tags, headings, theme } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags, headings, theme, lang } = Astro.props;
 ---
-<BaseLayout title={title} description={description} ogImage={heroImage} theme={theme}>
+<BaseLayout title={title} description={description} ogImage={heroImage} theme={theme} lang={lang}>
   <div class="post-with-toc">
     <article class="py-4">
       {heroImage && (

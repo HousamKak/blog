@@ -9,15 +9,17 @@ interface Props {
   description?: string;
   ogImage?: string;
   theme?: 'default' | 'pixel';
+  lang?: 'en' | 'ar';
 }
 
-const { title, description = "Housam's personal blog", ogImage, theme = 'default' } = Astro.props;
+const { title, description = "Housam's personal blog", ogImage, theme = 'default', lang = 'en' } = Astro.props;
+const dir = lang === 'ar' ? 'rtl' : 'ltr';
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const pageTitle = title === 'Home' ? "Housam's Blog" : `${title} | Housam`;
 const themeClass = theme !== 'default' ? `theme-${theme}` : '';
 ---
 <!doctype html>
-<html lang="en" class={themeClass} data-page-theme={theme}>
+<html lang={lang} dir={dir} class={themeClass} data-page-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
