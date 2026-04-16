@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RenderCard from '../../components/RenderCard.astro';
+
+const renders = (await getCollection('renders'))
+  .filter(render => !render.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<BaseLayout title="Renders" description="2D and 3D render showcases.">
+  <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Renders</h1>
+  {renders.length === 0 ? (
+    <p class="text-[var(--color-muted)]">No renders yet.</p>
+  ) : (
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {renders.map(render => (
+        <RenderCard
+          id={render.id}
+          title={render.data.title}
+          thumbnail={render.data.thumbnail}
+          mediaType={render.data.mediaType}
+          software={render.data.software}
+        />
+      ))}
+    </div>
+  )}
+</BaseLayout>

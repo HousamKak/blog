@@ -1,0 +1,19 @@
+---
+interface Props {
+  src: string;
+  poster?: string;
+}
+
+const { src, poster } = Astro.props;
+---
+<div class="my-6 overflow-hidden rounded-xl border border-[var(--color-border)]">
+  <video
+    controls
+    preload="metadata"
+    poster={poster}
+    class="w-full"
+  >
+    <source src={src} />
+    Your browser does not support the video tag.
+  </video>
+</div>

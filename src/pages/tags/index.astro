@@ -1,0 +1,40 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('posts');
+const allPapers = await getCollection('papers');
+const allNotes = await getCollection('notes');
+const allRenders = await getCollection('renders');
+
+const tagCounts = new Map<string, number>();
+[...allPosts, ...allPapers, ...allNotes, ...allRenders]
+  .filter(item => !item.data.draft)
+  .forEach(item => {
+    item.data.tags.forEach((tag: string) => {
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+    });
+  });
+
+const sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
+---
+<BaseLayout title="Tags" description="Browse all tags.">
+  <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Tags</h1>
+  {sortedTags.length === 0 ? (
+    <p class="text-[var(--color-muted)]">No tags yet.</p>
+  ) : (
+    <div class="flex flex-wrap gap-2">
+      {sortedTags.map(([tag, count]) => (
+        <a
+          href={`/tags/${tag}/`}
+          class="inline-flex items-center gap-1.5 rounded-lg border border-[var(--color-border)] px-3 py-1.5 text-sm font-medium transition-colors hover:border-[var(--color-muted)] hover:bg-[var(--color-surface)]"
+        >
+          {tag}
+          <span class="rounded-full bg-[var(--color-surface)] px-1.5 py-0.5 text-xs text-[var(--color-muted)]">
+            {count}
+          </span>
+        </a>
+      ))}
+    </div>
+  )}
+</BaseLayout>

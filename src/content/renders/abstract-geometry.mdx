@@ -1,0 +1,27 @@
+---
+title: "Abstract Geometry Study"
+description: "An exploration of parametric surfaces rendered in Blender using geometry nodes."
+pubDate: 2026-03-20
+thumbnail: "/media/images/placeholder.svg"
+mediaType: "3d"
+mediaUrl: "/media/renders/scene.glb"
+tags: ["3d", "blender", "geometry"]
+software: "Blender 4.1"
+---
+
+## Process
+
+This piece was created using Blender's geometry nodes to generate parametric surfaces. The surface is defined by the equation:
+
+$$
+\mathbf{r}(u, v) = \begin{pmatrix} (2 + \cos v) \cos u \\ (2 + \cos v) \sin u \\ \sin v \end{pmatrix}
+$$
+
+where $u, v \in [0, 2\pi)$.
+
+## Technical Details
+
+- Geometry nodes for surface generation
+- Principled BSDF with metallic finish
+- HDRI environment lighting
+- Exported as GLB for web viewing

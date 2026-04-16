@@ -1,0 +1,39 @@
+---
+title: "Useful Git Commands I Keep Forgetting"
+pubDate: 2026-04-10
+tags: ["git", "tooling"]
+theme: pixel
+---
+
+## Interactive Rebase
+
+```bash
+git rebase -i HEAD~3
+```
+
+## Stash with a Name
+
+```bash
+git stash push -m "work in progress on feature X"
+```
+
+## See What Changed in a File
+
+```bash
+git log --follow -p -- path/to/file
+```
+
+## Undo Last Commit (Keep Changes)
+
+```bash
+git reset --soft HEAD~1
+```
+
+## Find Which Commit Introduced a Bug
+
+```bash
+git bisect start
+git bisect bad          # current commit is broken
+git bisect good abc123  # this commit was working
+# git will binary search — mark each as good/bad
+```

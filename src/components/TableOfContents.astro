@@ -1,0 +1,34 @@
+---
+interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+  sidebar?: boolean;
+}
+
+const { headings, sidebar = false } = Astro.props;
+const filtered = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+---
+{filtered.length > 1 && (
+  <nav
+    class={sidebar ? 'toc-sidebar' : 'toc-inline'}
+    style={!sidebar ? `border: var(--border-w) solid var(--color-border); border-radius: var(--radius-xl); box-shadow: var(--shadow-card);` : ''}
+  >
+    <div class={sidebar ? '' : 'p-5'}>
+      <h2 class="mb-3 text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]" style="font-family: var(--font-heading);">
+        Contents
+      </h2>
+      <ul class={`space-y-1.5 text-sm ${sidebar ? 'text-xs' : ''}`}>
+        {filtered.map(heading => (
+          <li style={heading.depth === 3 ? 'padding-left: 0.75rem;' : ''}>
+            <a
+              href={`#${heading.slug}`}
+              class="text-[var(--color-muted)] transition-colors hover:text-[var(--color-accent)]"
+              data-toc-link={heading.slug}
+            >
+              {heading.text}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+)}

@@ -1,0 +1,38 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import TagList from './TagList.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+  heroImage?: string;
+  tags: string[];
+}
+
+const { id, title, description, pubDate, heroImage, tags } = Astro.props;
+---
+<article class="group border p-5 transition-colors hover:border-[var(--color-muted)]" style={`border-color: var(--color-border); border-width: var(--border-w); border-radius: var(--radius-xl); box-shadow: var(--shadow-card);`}>
+  <a href={`/posts/${id}/`} class="block">
+    {heroImage && (
+      <img
+        src={heroImage}
+        alt=""
+        class="mb-4 aspect-[2/1] w-full object-cover"
+        style="border-radius: var(--radius-lg);"
+        loading="lazy"
+      />
+    )}
+    <h3 class="mb-1.5 text-lg font-semibold transition-colors group-hover:text-[var(--color-accent)]">
+      {title}
+    </h3>
+    <p class="mb-3 text-sm text-[var(--color-muted)] line-clamp-2">{description}</p>
+  </a>
+  <div class="flex items-center justify-between gap-3">
+    <span class="text-xs text-[var(--color-muted)]">
+      <FormattedDate date={pubDate} />
+    </span>
+    <TagList tags={tags} />
+  </div>
+</article>

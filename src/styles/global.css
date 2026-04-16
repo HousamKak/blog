@@ -1,0 +1,380 @@
+@import "tailwindcss";
+@import "katex/dist/katex.min.css";
+
+/* Tell Tailwind v4 to use class-based dark mode (html.dark) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Dark mode Shiki dual-theme support */
+html.dark .astro-code,
+html.dark .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* ──────────────────────────────────────
+   Design tokens — default (clean) theme
+   ────────────────────────────────────── */
+:root {
+  --color-bg: #fafafa;
+  --color-text: #18181b;
+  --color-muted: #71717a;
+  --color-border: #e4e4e7;
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+  --color-surface: #f4f4f5;
+  --color-surface-hover: #e4e4e7;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --border-w: 1px;
+  --shadow-card: none;
+  --font-body: system-ui, -apple-system, sans-serif;
+  --font-heading: system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Code', 'Fira Code', monospace;
+}
+
+/* Default dark */
+html.dark {
+  --color-bg: #09090b;
+  --color-text: #e4e4e7;
+  --color-muted: #a1a1aa;
+  --color-border: #27272a;
+  --color-accent: #3b82f6;
+  --color-accent-hover: #60a5fa;
+  --color-surface: #18181b;
+  --color-surface-hover: #27272a;
+}
+
+/* ──────────────────────────────────────
+   Pixel theme — 8-bit retro
+   ────────────────────────────────────── */
+html.theme-pixel {
+  --color-bg: #d2c4a0;
+  --color-text: #2b2b2b;
+  --color-muted: #5a5a5a;
+  --color-border: #2b2b2b;
+  --color-accent: #d32f2f;
+  --color-accent-hover: #b71c1c;
+  --color-surface: #c4b690;
+  --color-surface-hover: #b6a880;
+
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --border-w: 3px;
+  --shadow-card: 4px 4px 0 var(--color-text);
+  --font-body: 'Press Start 2P', monospace;
+  --font-heading: 'Press Start 2P', monospace;
+  --font-mono: 'Press Start 2P', monospace;
+}
+
+html.theme-pixel.dark {
+  --color-bg: #0a0a1a;
+  --color-text: #c8c8dc;
+  --color-muted: #7878a0;
+  --color-border: #3a3a5c;
+  --color-accent: #ffcc00;
+  --color-accent-hover: #ffe066;
+  --color-surface: #14142a;
+  --color-surface-hover: #1e1e3a;
+  --shadow-card: 4px 4px 0 var(--color-border);
+}
+
+/* Pixel theme: structural overrides */
+html.theme-pixel {
+  font-size: 12px;
+  line-height: 2;
+  image-rendering: pixelated;
+}
+
+html.theme-pixel *,
+html.theme-pixel *::before,
+html.theme-pixel *::after {
+  border-radius: 0 !important;
+}
+
+html.theme-pixel .prose ul {
+  list-style-type: '▸ ';
+}
+
+html.theme-pixel .prose pre {
+  background: #0a0a0a !important;
+  color: #33ff33 !important;
+  border-color: var(--color-border);
+}
+
+html.theme-pixel .prose pre code,
+html.theme-pixel .prose pre span {
+  color: inherit !important;
+}
+
+html.theme-pixel.dark .prose pre {
+  background: #000011 !important;
+  color: #00ff88 !important;
+}
+
+/* ──────────────────────────────────────
+   Base styles
+   ────────────────────────────────────── */
+html {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ──────────────────────────────────────
+   3-column layout grid (xl+ screens)
+   ────────────────────────────────────── */
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 48rem) 1fr;
+  flex: 1;
+}
+
+.layout-grid > .layout-content {
+  grid-column: 2;
+  padding: 2rem 1rem;
+  min-width: 0;
+}
+
+.layout-grid > .layout-gutter-left,
+.layout-grid > .layout-gutter-right {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .layout-grid > .layout-gutter-left,
+  .layout-grid > .layout-gutter-right {
+    display: block;
+    position: relative;
+    overflow: hidden;
+  }
+}
+
+/* ──────────────────────────────────────
+   Post layout with TOC sidebar
+   ────────────────────────────────────── */
+.post-with-toc {
+  display: block;
+}
+
+.toc-sidebar {
+  display: none;
+}
+
+.toc-inline {
+  display: block;
+}
+
+@media (min-width: 1280px) {
+  .post-with-toc {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .toc-sidebar {
+    display: block;
+    position: sticky;
+    top: 5rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+  }
+
+  .toc-inline {
+    display: none;
+  }
+}
+
+/* ──────────────────────────────────────
+   Prose: typography for rendered MDX
+   ────────────────────────────────────── */
+.prose {
+  max-width: 65ch;
+  line-height: 1.8;
+  font-size: 1.0625rem;
+}
+
+html.theme-pixel .prose {
+  font-size: 0.875rem;
+  line-height: 2.2;
+}
+
+.prose h1 {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 800;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
+}
+
+.prose h2 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 2.5em;
+  margin-bottom: 0.75em;
+  letter-spacing: -0.02em;
+  border-bottom: var(--border-w) solid var(--color-border);
+  padding-bottom: 0.3em;
+}
+
+.prose h3 {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 2em;
+  margin-bottom: 0.5em;
+}
+
+.prose h4 {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+.prose p {
+  margin-bottom: 1.25em;
+}
+
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose a:hover {
+  color: var(--color-accent-hover);
+}
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose img {
+  border-radius: var(--radius-md);
+  margin: 1.5em 0;
+  max-width: 100%;
+  height: auto;
+}
+
+.prose pre {
+  font-family: var(--font-mono);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  overflow-x: auto;
+  margin: 1.5em 0;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border: var(--border-w) solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.prose code:not(pre code) {
+  font-family: var(--font-mono);
+  background-color: var(--color-surface);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  font-size: 0.875em;
+  font-weight: 500;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1em;
+  color: var(--color-muted);
+  margin: 1.5em 0;
+  font-style: italic;
+}
+
+.prose ul {
+  list-style-type: disc;
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  padding-left: 1.5em;
+  margin-bottom: 1.25em;
+}
+
+.prose li {
+  margin-bottom: 0.35em;
+}
+
+.prose li > ul,
+.prose li > ol {
+  margin-top: 0.35em;
+  margin-bottom: 0;
+}
+
+.prose hr {
+  border: none;
+  border-top: var(--border-w) solid var(--color-border);
+  margin: 2em 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5em 0;
+  font-size: 0.9375rem;
+}
+
+.prose th {
+  border: var(--border-w) solid var(--color-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+  font-weight: 600;
+  background-color: var(--color-surface);
+}
+
+.prose td {
+  border: var(--border-w) solid var(--color-border);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+
+.prose .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5em 0;
+}
+
+.prose .katex {
+  font-size: 1.1em;
+}
+
+/* ──────────────────────────────────────
+   Ambient pixel decoration
+   ────────────────────────────────────── */
+.pixel-ambient {
+  display: none;
+}
+
+html.theme-pixel .pixel-ambient {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}

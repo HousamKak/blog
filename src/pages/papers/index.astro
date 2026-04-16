@@ -1,0 +1,30 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PaperCard from '../../components/PaperCard.astro';
+
+const papers = (await getCollection('papers'))
+  .filter(paper => !paper.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<BaseLayout title="Papers" description="Research papers and technical documents.">
+  <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Papers</h1>
+  {papers.length === 0 ? (
+    <p class="text-[var(--color-muted)]">No papers yet.</p>
+  ) : (
+    <div class="grid gap-4">
+      {papers.map(paper => (
+        <PaperCard
+          id={paper.id}
+          title={paper.data.title}
+          description={paper.data.description}
+          pubDate={paper.data.pubDate}
+          authors={paper.data.authors}
+          venue={paper.data.venue}
+          pdfUrl={paper.data.pdfUrl}
+          tags={paper.data.tags}
+        />
+      ))}
+    </div>
+  )}
+</BaseLayout>

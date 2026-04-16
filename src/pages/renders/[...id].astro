@@ -1,0 +1,59 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import TagList from '../../components/TagList.astro';
+import VideoPlayer from '../../components/VideoPlayer.astro';
+import ThreeViewer from '../../components/ThreeViewer.tsx';
+
+export async function getStaticPaths() {
+  const renders = await getCollection('renders');
+  return renders.map(entry => ({
+    params: { id: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, pubDate, mediaType, mediaUrl, thumbnail, software, tags, theme } = entry.data;
+
+const isVideo = mediaUrl.match(/\.(mp4|webm|mov)$/i);
+---
+<BaseLayout title={title} description={description} ogImage={thumbnail} theme={theme}>
+  <article class="py-4">
+    <header class="mb-8">
+      <h1 class="mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
+        {title}
+      </h1>
+      <div class="flex flex-wrap items-center gap-3 text-sm text-[var(--color-muted)]">
+        <FormattedDate date={pubDate} />
+        {software && <span>&mdash; {software}</span>}
+        <span class="rounded-md bg-[var(--color-surface)] px-2 py-0.5 text-xs font-medium uppercase">
+          {mediaType}
+        </span>
+      </div>
+      <div class="mt-3">
+        <TagList tags={tags} />
+      </div>
+    </header>
+
+    <div class="mb-8">
+      {mediaType === '3d' ? (
+        <ThreeViewer client:load modelUrl={mediaUrl} />
+      ) : isVideo ? (
+        <VideoPlayer src={mediaUrl} poster={thumbnail} />
+      ) : (
+        <img
+          src={mediaUrl}
+          alt={title}
+          class="w-full rounded-xl"
+        />
+      )}
+    </div>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>

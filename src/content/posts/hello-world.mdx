@@ -1,0 +1,83 @@
+---
+title: "Hello World: Building This Blog"
+description: "A walkthrough of how I built this personal blog from scratch using Astro 5, Tailwind CSS v4, and MDX."
+pubDate: 2026-04-16
+tags: ["astro", "web-dev", "meta"]
+heroImage: "/media/images/placeholder.svg"
+---
+
+This is the first post on my blog. I built this entire thing from scratch using Astro 5, Tailwind CSS v4, MDX, and TypeScript.
+
+## Why Astro?
+
+Astro ships **zero JavaScript** by default. Pages are rendered as static HTML at build time. When I need interactivity — like a 3D viewer — I use React as an "island" that hydrates only where needed.
+
+The result: fast pages, clean architecture, full control.
+
+## Code Highlighting
+
+Shiki is built into Astro and supports dual themes for light/dark mode:
+
+```typescript
+interface BlogPost {
+  title: string;
+  pubDate: Date;
+  tags: string[];
+  draft: boolean;
+}
+
+function sortByDate(posts: BlogPost[]): BlogPost[] {
+  return posts.toSorted(
+    (a, b) => b.pubDate.valueOf() - a.pubDate.valueOf()
+  );
+}
+```
+
+And here's some Python:
+
+```python
+def collatz(n: int) -> list[int]:
+    seq = [n]
+    while n != 1:
+        n = n // 2 if n % 2 == 0 else 3 * n + 1
+        seq.append(n)
+    return seq
+```
+
+## Math Support
+
+Inline math works: $E = mc^2$ and $\nabla \cdot \mathbf{E} = \frac{\rho}{\varepsilon_0}$.
+
+Display math renders with KaTeX at build time — no client-side JavaScript:
+
+$$
+\int_{-\infty}^{\infty} e^{-x^2} \, dx = \sqrt{\pi}
+$$
+
+The Euler identity:
+
+$$
+e^{i\pi} + 1 = 0
+$$
+
+A matrix:
+
+$$
+\begin{pmatrix}
+a & b \\
+c & d
+\end{pmatrix}
+\begin{pmatrix}
+x \\
+y
+\end{pmatrix}
+=
+\begin{pmatrix}
+ax + by \\
+cx + dy
+\end{pmatrix}
+$$
+
+## What's Next
+
+More posts about rendering, papers, and creative work.

@@ -1,0 +1,24 @@
+---
+import FormattedDate from './FormattedDate.astro';
+import TagList from './TagList.astro';
+
+interface Props {
+  id: string;
+  title: string;
+  pubDate: Date;
+  tags: string[];
+}
+
+const { id, title, pubDate, tags } = Astro.props;
+---
+<article class="group flex items-start justify-between gap-4 border px-4 py-3 transition-colors hover:border-[var(--color-muted)]" style={`border-color: var(--color-border); border-width: var(--border-w); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);`}>
+  <a href={`/notes/${id}/`} class="block min-w-0 flex-1">
+    <h3 class="font-medium transition-colors group-hover:text-[var(--color-accent)]">
+      {title}
+    </h3>
+    <span class="text-xs text-[var(--color-muted)]">
+      <FormattedDate date={pubDate} />
+    </span>
+  </a>
+  <TagList tags={tags} />
+</article>
