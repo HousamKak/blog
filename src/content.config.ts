@@ -66,4 +66,18 @@ const renders = defineCollection({
   }),
 });
 
-export const collections = { posts, papers, notes, renders };
+const library = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/library' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    thumbnail: z.string(),
+    tags: z.array(z.string()).default([]),
+    lang: langEnum,
+    draft: z.boolean().default(false),
+    theme: themeEnum,
+  }),
+});
+
+export const collections = { posts, papers, notes, renders, library };

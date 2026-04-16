@@ -6,9 +6,10 @@ const allPosts = await getCollection('posts');
 const allPapers = await getCollection('papers');
 const allNotes = await getCollection('notes');
 const allRenders = await getCollection('renders');
+const allLibrary = await getCollection('library');
 
 const tagCounts = new Map<string, number>();
-[...allPosts, ...allPapers, ...allNotes, ...allRenders]
+[...allPosts, ...allPapers, ...allNotes, ...allRenders, ...allLibrary]
   .filter(item => !item.data.draft)
   .forEach(item => {
     item.data.tags.forEach((tag: string) => {

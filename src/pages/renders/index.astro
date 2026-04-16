@@ -2,12 +2,17 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import RenderCard from '../../components/RenderCard.astro';
+import LibraryCard from '../../components/LibraryCard.astro';
 
 const renders = (await getCollection('renders'))
   .filter(render => !render.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const libraryItems = (await getCollection('library'))
+  .filter(item => !item.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
-<BaseLayout title="Renders" description="2D and 3D render showcases.">
+<BaseLayout title="Renders" description="Renders, visuals, and interactive applets.">
   <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Renders</h1>
   {renders.length === 0 ? (
     <p class="text-[var(--color-muted)]">No renders yet.</p>
@@ -20,6 +25,22 @@ const renders = (await getCollection('renders'))
           thumbnail={render.data.thumbnail}
           mediaType={render.data.mediaType}
           software={render.data.software}
+        />
+      ))}
+    </div>
+  )}
+
+  <h2 class="mb-6 mt-16 text-2xl font-bold tracking-tight" style="font-family: var(--font-heading); border-bottom: var(--border-w) solid var(--color-border); padding-bottom: 0.3em;">Library</h2>
+  {libraryItems.length === 0 ? (
+    <p class="text-[var(--color-muted)]">Nothing here yet.</p>
+  ) : (
+    <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {libraryItems.map(item => (
+        <LibraryCard
+          id={item.id}
+          title={item.data.title}
+          description={item.data.description}
+          thumbnail={item.data.thumbnail}
         />
       ))}
     </div>
