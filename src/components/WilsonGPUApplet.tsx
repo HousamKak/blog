@@ -146,7 +146,13 @@ export default function WilsonGPUApplet({
 
       options.onResizeCanvas = () => drawFrame?.();
 
-      const wilson = new WilsonGPU(canvas, options);
+      let wilson: any;
+      try {
+        wilson = new WilsonGPU(canvas, options);
+      } catch (e) {
+        console.error('[WilsonGPUApplet] init failed:', e);
+        return;
+      }
       wilsonRef.current = wilson;
 
       drawFrame = () => {
