@@ -1,5 +1,15 @@
 import { useEffect, useRef } from 'react';
 
+// MDX HTML-encodes <, >, & in string props. Undo that so GLSL compiles.
+function unescapeHtml(s: string): string {
+  return s
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
 interface WilsonGPUAppletProps {
   /** GLSL fragment shader source */
   shader: string;
@@ -77,7 +87,7 @@ export default function WilsonGPUApplet({
       if (destroyed) return;
 
       const options: any = {
-        shader,
+        shader: unescapeHtml(shader),
         canvasWidth: resolution,
 
         ...(worldWidth != null && { worldWidth }),
