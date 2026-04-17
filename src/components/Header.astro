@@ -1,4 +1,6 @@
 ---
+import BroadsheetClock from './BroadsheetClock.astro';
+
 interface Props {
   currentPath: string;
 }
@@ -36,8 +38,7 @@ const iso = now.toISOString().slice(0, 10);
   <!-- Masthead title -->
   <div class="masthead-title-row">
     <div class="masthead-title-flank left">
-      <div class="flank-label">THE HOUSAM</div>
-      <div class="flank-sub">DESK &bull; BEIRUT</div>
+      <BroadsheetClock />
     </div>
     <a href="/" class="masthead-title">The Housam <span class="masthead-amp">&amp;</span> Review</a>
     <div class="masthead-title-flank right">
@@ -77,9 +78,16 @@ const iso = now.toISOString().slice(0, 10);
 
 <script is:inline>
   (function() {
+    // Clear any stale inline CSS variables written by the old dev tuner.
+    try { localStorage.removeItem('title-knobs-v1'); } catch (e) {}
+    var root = document.documentElement;
+    root.style.removeProperty('--title-word-spacing');
+    root.style.removeProperty('--title-amp-pad');
+    root.style.removeProperty('--title-amp-size');
+
     if (window.__headerInitDone) return;
     window.__headerInitDone = true;
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       var target = e.target.closest('[data-dark-toggle]');
       if (target) {
         var h = document.documentElement;

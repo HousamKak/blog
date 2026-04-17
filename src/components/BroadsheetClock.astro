@@ -1,0 +1,134 @@
+---
+interface Props {
+  size?: number;
+}
+
+const { size = 108 } = Astro.props;
+
+const numerals = [
+  { n: 'XII', a: 0 },
+  { n: 'I',   a: 30 },
+  { n: 'II',  a: 60 },
+  { n: 'III', a: 90 },
+  { n: 'IV',  a: 120 },
+  { n: 'V',   a: 150 },
+  { n: 'VI',  a: 180 },
+  { n: 'VII', a: 210 },
+  { n: 'VIII', a: 240 },
+  { n: 'IX',  a: 270 },
+  { n: 'X',   a: 300 },
+  { n: 'XI',  a: 330 },
+];
+
+const numeralR = 35;
+const numerals_positioned = numerals.map(({ n, a }) => {
+  const rad = (a * Math.PI) / 180;
+  const x = numeralR * Math.sin(rad);
+  const y = -numeralR * Math.cos(rad);
+  return { n, x, y };
+});
+
+// Hour + minute tick marks
+const hourTicks = Array.from({ length: 12 }, (_, i) => i * 30);
+const minuteTicks = Array.from({ length: 60 }, (_, i) => i * 6).filter(a => a % 30 !== 0);
+---
+<svg
+  class="broadsheet-clock"
+  viewBox="-50 -50 100 100"
+  width={size}
+  height={size}
+  aria-label="Clock"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- Outer double ring (newspaper rule) -->
+  <circle cx="0" cy="0" r="47" fill="var(--color-paper, var(--color-bg))" stroke="var(--color-text)" stroke-width="1.5" />
+  <circle cx="0" cy="0" r="43.5" fill="none" stroke="var(--color-text)" stroke-width="0.4" />
+
+  <!-- Minute ticks -->
+  <g stroke="var(--color-text)" stroke-width="0.4" stroke-linecap="round">
+    {minuteTicks.map(a => (
+      <line x1="0" y1="-42.5" x2="0" y2="-41" transform={`rotate(${a})`} />
+    ))}
+  </g>
+
+  <!-- Hour ticks -->
+  <g stroke="var(--color-text)" stroke-width="1" stroke-linecap="round">
+    {hourTicks.map(a => (
+      <line x1="0" y1="-42.5" x2="0" y2="-39" transform={`rotate(${a})`} />
+    ))}
+  </g>
+
+  <!-- Roman numerals -->
+  <g font-family="'EB Garamond', 'Playfair Display', Georgia, serif" font-size="8" font-weight="600" fill="var(--color-text)" text-anchor="middle" dominant-baseline="central">
+    {numerals_positioned.map(({ n, x, y }) => (
+      <text x={x} y={y}>{n}</text>
+    ))}
+  </g>
+
+  <!-- Hour hand -->
+  <line class="clock-hour"
+        x1="0" y1="5" x2="0" y2="-22"
+        stroke="var(--color-text)"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        transform="rotate(0)" />
+
+  <!-- Minute hand -->
+  <line class="clock-minute"
+        x1="0" y1="6" x2="0" y2="-34"
+        stroke="var(--color-text)"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        transform="rotate(0)" />
+
+  <!-- Second hand -->
+  <line class="clock-second"
+        x1="0" y1="10" x2="0" y2="-37"
+        stroke="var(--color-accent)"
+        stroke-width="0.8"
+        stroke-linecap="round"
+        transform="rotate(0)" />
+
+  <!-- Center boss -->
+  <circle cx="0" cy="0" r="2.2" fill="var(--color-text)" />
+  <circle cx="0" cy="0" r="0.9" fill="var(--color-accent)" />
+</svg>
+
+<script is:inline>
+  (function () {
+    function tick() {
+      var clocks = document.querySelectorAll('.broadsheet-clock');
+      if (!clocks.length) return;
+      var now = new Date();
+      var h = now.getHours() % 12;
+      var m = now.getMinutes();
+      var s = now.getSeconds();
+      var hDeg = (h + m / 60) * 30;
+      var mDeg = (m + s / 60) * 6;
+      var sDeg = s * 6;
+      clocks.forEach(function (c) {
+        var hh = c.querySelector('.clock-hour');
+        var mh = c.querySelector('.clock-minute');
+        var sh = c.querySelector('.clock-second');
+        if (hh) hh.setAttribute('transform', 'rotate(' + hDeg + ')');
+        if (mh) mh.setAttribute('transform', 'rotate(' + mDeg + ')');
+        if (sh) sh.setAttribute('transform', 'rotate(' + sDeg + ')');
+      });
+    }
+
+    function start() {
+      tick();
+      if (window.__broadsheetClockInterval) clearInterval(window.__broadsheetClockInterval);
+      // Tick on the second boundary for classical feel
+      var msUntilNextSecond = 1000 - (new Date()).getMilliseconds();
+      setTimeout(function () {
+        tick();
+        window.__broadsheetClockInterval = setInterval(tick, 1000);
+      }, msUntilNextSecond);
+    }
+
+    if (document.readyState !== 'loading') start();
+    else document.addEventListener('DOMContentLoaded', start);
+    document.addEventListener('astro:page-load', start);
+  })();
+</script>

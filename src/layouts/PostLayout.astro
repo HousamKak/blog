@@ -21,54 +21,121 @@ const { title, description, pubDate, updatedDate, heroImage, tags, headings, the
 
 const kicker = tags.length > 0 ? tags.slice(0, 2).join(' • ').toUpperCase() : 'CORRESPONDENCE';
 const dateLabel = pubDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
+const tocHeadings = headings.filter(h => h.depth >= 2 && h.depth <= 3);
+const isHelloWorld = Astro.url.pathname.startsWith('/posts/hello-world');
 ---
 <BaseLayout title={title} description={description} ogImage={heroImage} theme={theme} lang={lang}>
   <article class="broadsheet-article">
-    <BackLink href={backHref} label={backLabel} />
+    <div class="article-grid">
+      <div class="article-main">
+        <BackLink href={backHref} label={backLabel} />
 
-    <div class="article-kicker">{kicker}</div>
+        <div class="article-kicker">{kicker}</div>
 
-    <h1 class="article-headline">{title}</h1>
+        <h1 class:list={['article-headline', isHelloWorld && 'article-headline--blackletter']}>{title}</h1>
 
-    <p class="article-deck">{description}</p>
+        <p class="article-deck">{description}</p>
 
-    <div class="article-byline">
-      <span class="byline-by">BY</span>
-      <span class="byline-author">HOUSAM KAK</span>
-      <span class="byline-sep">—</span>
-      <span class="byline-date">{dateLabel}</span>
-      {updatedDate && (
-        <span class="byline-update"> &nbsp;&bull;&nbsp; Revised <FormattedDate date={updatedDate} /></span>
+        <div class="article-byline">
+          <span class="byline-by">BY</span>
+          <span class="byline-author">HOUSAM KAK</span>
+          <span class="byline-sep">—</span>
+          <span class="byline-date">{dateLabel}</span>
+          {updatedDate && (
+            <span class="byline-update"> &nbsp;&bull;&nbsp; Revised <FormattedDate date={updatedDate} /></span>
+          )}
+        </div>
+
+        {heroImage && (
+          <figure class="article-hero">
+            <img src={heroImage} alt="" transition:name={`hero-${Astro.url.pathname}`} />
+            <figcaption>{description}</figcaption>
+          </figure>
+        )}
+
+        <div class="article-columns prose">
+          <slot />
+        </div>
+
+        <div class="article-footer">
+          <div class="footer-rule"></div>
+          <div class="footer-tags">FILED UNDER — {tags.map(t => t.toUpperCase()).join(' • ')}</div>
+        </div>
+      </div>
+
+      {tocHeadings.length > 0 && (
+        <aside class="article-toc-aside" data-toc>
+          <div class="toc-label">In this edition</div>
+          <ul>
+            {tocHeadings.map(h => (
+              <li class:list={[`toc-depth-${h.depth}`]}>
+                <a href={`#${h.slug}`} data-toc-link={h.slug}>{h.text}</a>
+              </li>
+            ))}
+          </ul>
+        </aside>
       )}
-    </div>
-
-    {heroImage && (
-      <figure class="article-hero">
-        <img src={heroImage} alt="" transition:name={`hero-${Astro.url.pathname}`} />
-        <figcaption>{description}</figcaption>
-      </figure>
-    )}
-
-    <div class="article-columns prose">
-      <slot />
-    </div>
-
-    {headings.length > 0 && (
-      <aside class="article-toc-aside">
-        <div class="toc-label">In this edition</div>
-        <ul>
-          {headings.filter(h => h.depth >= 2 && h.depth <= 3).map(h => (
-            <li class:list={[`toc-depth-${h.depth}`]}>
-              <a href={`#${h.slug}`}>{h.text}</a>
-            </li>
-          ))}
-        </ul>
-      </aside>
-    )}
-
-    <div class="article-footer">
-      <div class="footer-rule"></div>
-      <div class="footer-tags">FILED UNDER — {tags.map(t => t.toUpperCase()).join(' • ')}</div>
     </div>
   </article>
 </BaseLayout>
+
+<script>
+  // TOC scrollspy — highlight the link for the section currently in view.
+  (function() {
+    function init() {
+      const toc = document.querySelector('[data-toc]') as HTMLElement | null;
+      if (!toc) return;
+
+      const links = Array.from(toc.querySelectorAll('[data-toc-link]')) as HTMLAnchorElement[];
+      if (links.length === 0) return;
+
+      const bySlug = new Map<string, HTMLAnchorElement>();
+      const targets: HTMLElement[] = [];
+      for (const a of links) {
+        const slug = a.getAttribute('data-toc-link');
+        if (!slug) continue;
+        const el = document.getElementById(slug);
+        if (!el) continue;
+        bySlug.set(slug, a);
+        targets.push(el);
+      }
+
+      let currentSlug: string | null = null;
+
+      function setCurrent(slug: string | null) {
+        if (slug === currentSlug) return;
+        currentSlug = slug;
+        for (const a of links) a.classList.remove('is-current');
+        if (slug) {
+          const a = bySlug.get(slug);
+          if (a) a.classList.add('is-current');
+        }
+      }
+
+      function update() {
+        // Pick the heading whose top is closest to but above the viewport's top-third line.
+        const line = window.innerHeight * 0.25;
+        let best: { el: HTMLElement; top: number } | null = null;
+        for (const el of targets) {
+          const rect = el.getBoundingClientRect();
+          if (rect.top <= line) {
+            if (!best || rect.top > best.top) best = { el, top: rect.top };
+          }
+        }
+        if (!best && targets.length > 0) {
+          setCurrent(targets[0].id);
+        } else if (best) {
+          setCurrent(best.el.id);
+        }
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      window.addEventListener('resize', update);
+      update();
+    }
+
+    document.addEventListener('astro:page-load', init);
+    if (document.readyState !== 'loading') init();
+    else document.addEventListener('DOMContentLoaded', init);
+  })();
+</script>
