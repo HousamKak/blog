@@ -1,8 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import TagList from '../components/TagList.astro';
-import TableOfContents from '../components/TableOfContents.astro';
 import BackLink from '../components/BackLink.astro';
 
 interface Props {
@@ -20,53 +18,57 @@ interface Props {
 }
 
 const { title, description, pubDate, updatedDate, heroImage, tags, headings, theme, lang, backHref = '/posts/', backLabel = 'All posts' } = Astro.props;
+
+const kicker = tags.length > 0 ? tags.slice(0, 2).join(' • ').toUpperCase() : 'CORRESPONDENCE';
+const dateLabel = pubDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
 ---
 <BaseLayout title={title} description={description} ogImage={heroImage} theme={theme} lang={lang}>
-  <div class="post-with-toc">
-    <article class="py-4">
-      <BackLink href={backHref} label={backLabel} />
-      {heroImage && (
-        <img
-          src={heroImage}
-          alt=""
-          class="mb-8 aspect-[2/1] w-full object-cover"
-          style="border-radius: var(--radius-xl);"
-          transition:name={`hero-${Astro.url.pathname}`}
-        />
+  <article class="broadsheet-article">
+    <BackLink href={backHref} label={backLabel} />
+
+    <div class="article-kicker">{kicker}</div>
+
+    <h1 class="article-headline">{title}</h1>
+
+    <p class="article-deck">{description}</p>
+
+    <div class="article-byline">
+      <span class="byline-by">BY</span>
+      <span class="byline-author">HOUSAM KAK</span>
+      <span class="byline-sep">—</span>
+      <span class="byline-date">{dateLabel}</span>
+      {updatedDate && (
+        <span class="byline-update"> &nbsp;&bull;&nbsp; Revised <FormattedDate date={updatedDate} /></span>
       )}
+    </div>
 
-      <header class="mb-8">
-        <h1 class="mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl" style="font-family: var(--font-heading);" transition:name={`title-${Astro.url.pathname}`}>
-          {title}
-        </h1>
-        <div class="flex flex-wrap items-center gap-3 text-sm text-[var(--color-muted)]">
-          <FormattedDate date={pubDate} />
-          {updatedDate && (
-            <span>
-              (updated <FormattedDate date={updatedDate} />)
-            </span>
-          )}
-        </div>
-        <div class="mt-3">
-          <TagList tags={tags} />
-        </div>
-      </header>
-
-      <!-- Inline TOC (visible on smaller screens) -->
-      {headings.length > 0 && (
-        <div class="mb-8">
-          <TableOfContents headings={headings} />
-        </div>
-      )}
-
-      <div class="prose">
-        <slot />
-      </div>
-    </article>
-
-    <!-- Sidebar TOC (visible on xl+ screens) -->
-    {headings.length > 0 && (
-      <TableOfContents headings={headings} sidebar />
+    {heroImage && (
+      <figure class="article-hero">
+        <img src={heroImage} alt="" transition:name={`hero-${Astro.url.pathname}`} />
+        <figcaption>{description}</figcaption>
+      </figure>
     )}
-  </div>
+
+    <div class="article-columns prose">
+      <slot />
+    </div>
+
+    {headings.length > 0 && (
+      <aside class="article-toc-aside">
+        <div class="toc-label">In this edition</div>
+        <ul>
+          {headings.filter(h => h.depth >= 2 && h.depth <= 3).map(h => (
+            <li class:list={[`toc-depth-${h.depth}`]}>
+              <a href={`#${h.slug}`}>{h.text}</a>
+            </li>
+          ))}
+        </ul>
+      </aside>
+    )}
+
+    <div class="article-footer">
+      <div class="footer-rule"></div>
+      <div class="footer-tags">FILED UNDER — {tags.map(t => t.toUpperCase()).join(' • ')}</div>
+    </div>
+  </article>
 </BaseLayout>

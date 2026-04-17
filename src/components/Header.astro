@@ -17,98 +17,74 @@ function isActive(href: string, current: string): boolean {
   if (href === '/') return current === '/';
   return current.startsWith(href);
 }
----
-<header class="sticky top-0 z-50 bg-[var(--color-bg)]/80 backdrop-blur-lg" style={`border-bottom: var(--border-w) solid var(--color-border);`}>
-  <nav class="mx-auto flex max-w-4xl items-center justify-between px-4 py-3">
-    <a href="/" class="font-bold tracking-tight transition-colors hover:text-[var(--color-accent)]" style="font-family: var(--font-heading); font-size: 1.125rem;">
-      Housam
-    </a>
 
-    <!-- Desktop nav -->
-    <div class="hidden items-center gap-1 sm:flex">
+const now = new Date();
+const dateLong = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
+const vol = 'VOL. I — NO. 01';
+const iso = now.toISOString().slice(0, 10);
+---
+<header class="broadsheet-masthead">
+  <!-- Top metadata strip -->
+  <div class="masthead-topbar">
+    <div class="topbar-left">{dateLong} &bull; BROADSHEET EDITION</div>
+    <div class="topbar-center">§ THE HOUSAM LEDGER &bull; CORRESPONDENCE &bull; ISSUE 01</div>
+    <div class="topbar-right">
+      <em>"Patience Compounds"</em>
+    </div>
+  </div>
+
+  <!-- Masthead title -->
+  <div class="masthead-title-row">
+    <div class="masthead-title-flank left">
+      <div class="flank-label">THE HOUSAM</div>
+      <div class="flank-sub">DESK &bull; BEIRUT</div>
+    </div>
+    <a href="/" class="masthead-title">The Housam <span class="masthead-amp">&amp;</span> Review</a>
+    <div class="masthead-title-flank right">
+      <div class="flank-label">VOLATILITY DESK</div>
+      <div class="flank-sub">{vol} &bull; {iso}</div>
+      <div class="flank-sub">EST. MMXXVI &bull; $4.00</div>
+    </div>
+  </div>
+
+  <!-- Rule below title -->
+  <div class="masthead-rule"></div>
+
+  <!-- Nav bar -->
+  <nav class="masthead-nav">
+    <div class="nav-links">
       {navLinks.map(link => (
         <a
           href={link.href}
-          class:list={[
-            'px-3 py-1.5 text-sm font-medium transition-colors',
-            isActive(link.href, currentPath)
-              ? 'bg-[var(--color-surface)] text-[var(--color-text)]'
-              : 'text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]',
-          ]}
-          style="border-radius: var(--radius-md);"
+          class:list={['nav-link', isActive(link.href, currentPath) && 'is-active']}
         >
           {link.label}
         </a>
       ))}
-
-      <!-- Dark mode toggle -->
-      <button type="button" aria-label="Toggle dark mode" class="cursor-pointer p-2 transition-colors hover:bg-[var(--color-surface-hover)]" style="border-radius: var(--radius-md);" data-dark-toggle>
-        <svg class="hidden h-5 w-5 dark:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-        </svg>
-        <svg class="block h-5 w-5 dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-        </svg>
-      </button>
     </div>
-
-    <!-- Mobile: dark toggle + hamburger -->
-    <div class="flex items-center gap-1 sm:hidden">
-      <button type="button" aria-label="Toggle dark mode" class="cursor-pointer p-2" data-dark-toggle>
-        <svg class="hidden h-5 w-5 dark:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+    <div class="nav-actions">
+      <button type="button" aria-label="Toggle dark mode" class="dark-toggle" data-dark-toggle>
+        <svg class="hidden h-4 w-4 dark:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
         </svg>
-        <svg class="block h-5 w-5 dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <svg class="block h-4 w-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-        </svg>
-      </button>
-      <button type="button" aria-label="Toggle menu" class="cursor-pointer p-2" data-mobile-menu-btn>
-        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
       </button>
     </div>
   </nav>
-
-  <!-- Mobile nav -->
-  <div data-mobile-menu class="hidden sm:hidden" style={`border-top: var(--border-w) solid var(--color-border);`}>
-    <div class="flex flex-col gap-1 px-4 py-3">
-      {navLinks.map(link => (
-        <a
-          href={link.href}
-          class:list={[
-            'px-3 py-2 text-sm font-medium transition-colors',
-            isActive(link.href, currentPath)
-              ? 'bg-[var(--color-surface)] text-[var(--color-text)]'
-              : 'text-[var(--color-muted)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text)]',
-          ]}
-          style="border-radius: var(--radius-md);"
-        >
-          {link.label}
-        </a>
-      ))}
-    </div>
-  </div>
 </header>
 
 <script is:inline>
   (function() {
     if (window.__headerInitDone) return;
     window.__headerInitDone = true;
-
     document.addEventListener('click', function(e) {
       var target = e.target.closest('[data-dark-toggle]');
       if (target) {
         var h = document.documentElement;
         h.classList.toggle('dark');
         localStorage.setItem('theme', h.classList.contains('dark') ? 'dark' : 'light');
-        return;
-      }
-
-      target = e.target.closest('[data-mobile-menu-btn]');
-      if (target) {
-        target.closest('header').querySelector('[data-mobile-menu]').classList.toggle('hidden');
-        return;
       }
     });
   })();
