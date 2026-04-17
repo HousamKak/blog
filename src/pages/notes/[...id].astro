@@ -22,6 +22,8 @@ const { Content, headings } = await render(note);
   headings={headings}
   theme={note.data.theme}
   lang={note.data.lang}
+  backHref="/notes/"
+  backLabel="All notes"
 >
   <Content />
 </PostLayout>

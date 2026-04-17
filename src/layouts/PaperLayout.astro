@@ -3,6 +3,12 @@ import BaseLayout from './BaseLayout.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import TagList from '../components/TagList.astro';
 import PdfEmbed from '../components/PdfEmbed.astro';
+import BackLink from '../components/BackLink.astro';
+
+interface Publication {
+  name: string;
+  url?: string;
+}
 
 interface Props {
   title: string;
@@ -12,15 +18,17 @@ interface Props {
   pdfUrl: string;
   venue?: string;
   doi?: string;
+  publications?: Publication[];
   tags: string[];
   theme?: 'default' | 'pixel';
   lang?: 'en' | 'ar';
 }
 
-const { title, description, pubDate, authors, pdfUrl, venue, doi, tags, theme, lang } = Astro.props;
+const { title, description, pubDate, authors, pdfUrl, venue, doi, publications = [], tags, theme, lang } = Astro.props;
 ---
 <BaseLayout title={title} description={description} theme={theme} lang={lang}>
   <article class="py-4">
+    <BackLink href="/papers/" label="All papers" />
     <header class="mb-8">
       <h1 class="mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
         {title}
@@ -50,6 +58,32 @@ const { title, description, pubDate, authors, pdfUrl, venue, doi, tags, theme, l
     <section class="mb-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
       <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]">Abstract</h2>
       <p class="text-[var(--color-text)]">{description}</p>
+    </section>
+
+    <section class="mb-8 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-5">
+      <h2 class="mb-2 text-sm font-semibold uppercase tracking-wide text-[var(--color-muted)]">Publications</h2>
+      {publications.length === 0 ? (
+        <p class="text-[var(--color-muted)]">None yet.</p>
+      ) : (
+        <ul class="space-y-1 text-[var(--color-text)]">
+          {publications.map(pub => (
+            <li>
+              {pub.url ? (
+                <a
+                  href={pub.url}
+                  target="_blank"
+                  rel="noopener"
+                  class="text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]"
+                >
+                  {pub.name}
+                </a>
+              ) : (
+                <span>{pub.name}</span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
 
     <PdfEmbed url={pdfUrl} title={title} />

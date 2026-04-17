@@ -5,6 +5,7 @@ import FormattedDate from '../../components/FormattedDate.astro';
 import TagList from '../../components/TagList.astro';
 import VideoPlayer from '../../components/VideoPlayer.astro';
 import ThreeViewer from '../../components/ThreeViewer.tsx';
+import BackLink from '../../components/BackLink.astro';
 
 export async function getStaticPaths() {
   const renders = await getCollection('renders');
@@ -22,6 +23,7 @@ const isVideo = mediaUrl.match(/\.(mp4|webm|mov)$/i);
 ---
 <BaseLayout title={title} description={description} ogImage={thumbnail} theme={theme} lang={lang}>
   <article class="py-4">
+    <BackLink href="/renders/" label="All renders" />
     <header class="mb-8">
       <h1 class="mb-3 text-3xl font-extrabold tracking-tight sm:text-4xl">
         {title}

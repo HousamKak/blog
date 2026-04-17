@@ -30,6 +30,10 @@ const papers = defineCollection({
     tags: z.array(z.string()).default([]),
     venue: z.string().optional(),
     doi: z.string().optional(),
+    publications: z.array(z.object({
+      name: z.string(),
+      url: z.string().optional(),
+    })).default([]),
     lang: langEnum,
     draft: z.boolean().default(false),
     theme: themeEnum,
