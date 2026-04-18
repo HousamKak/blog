@@ -177,5 +177,10 @@ const themeClass = theme !== 'default' ? `theme-${theme}` : '';
         setTimeout(initPixelAmbient, 50);
       });
     </script>
+
+    <!-- UIpen dev overlay (dev only) -->
+    {import.meta.env.DEV && (
+      <script is:inline src="http://127.0.0.1:8787/overlay.js" async></script>
+    )}
   </body>
 </html>

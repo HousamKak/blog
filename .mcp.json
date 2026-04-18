@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "uipen": {
+      "command": "C:/Users/houss/.bun/bin/bun.exe",
+      "args": ["run", "D:/dev/UIpen/server.ts"]
+    }
+  }
+}
