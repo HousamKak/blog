@@ -12,21 +12,16 @@ interface Props {
 
 const { editionLabel, editionTitle, editionTagline, editionDate } = Astro.props;
 
-const recentPosts = (await getCollection('posts'))
-  .filter(p => !p.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+// Sort: date desc, then reverse-alphabetical id for ties (matches deployed order)
+const byDateDesc = (a: any, b: any) => {
+  const d = b.data.pubDate.valueOf() - a.data.pubDate.valueOf();
+  return d !== 0 ? d : b.id.localeCompare(a.id);
+};
 
-const recentPapers = (await getCollection('papers'))
-  .filter(p => !p.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-
-const recentLibrary = (await getCollection('library'))
-  .filter(i => !i.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-
-const recentNotes = (await getCollection('notes'))
-  .filter(n => !n.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const recentPosts = (await getCollection('posts')).filter(p => !p.data.draft).sort(byDateDesc);
+const recentPapers = (await getCollection('papers')).filter(p => !p.data.draft).sort(byDateDesc);
+const recentLibrary = (await getCollection('library')).filter(i => !i.data.draft).sort(byDateDesc);
+const recentNotes = (await getCollection('notes')).filter(n => !n.data.draft).sort(byDateDesc);
 
 const lede = recentPosts[0];
 const secondary = recentPosts[1];
@@ -130,7 +125,7 @@ const classifieds = [
   </aside>
 
   {secondary && (
-    <article class="chaos-card chaos-row-split-7 tilted-r" style="padding: 1.2rem 1.35rem;">
+    <article class="chaos-card chaos-row-split-7 tilted-r" style="padding: 1.2rem 1.35rem; display: flex; flex-direction: column;">
       <span class="tape bl" aria-hidden="true"></span>
       <span class="pushpin" aria-hidden="true"></span>
       <div class="chaos-kicker yellow">Section II &bull; Feature</div>
@@ -138,13 +133,26 @@ const classifieds = [
         <a href={`/posts/${secondary.id}/`} style="color: inherit; text-decoration: none;">{secondary.data.title}</a>
       </h2>
       <p class="chaos-deck">{secondary.data.description}</p>
-      <div class="chaos-byline">By Housam Kak &bull; <FormattedDate date={secondary.data.pubDate} /></div>
+
+      {secondary.data.heroImage ? (
+        <figure style="margin: 0.25rem 0 0.5rem;">
+          <img src={secondary.data.heroImage} alt="" style="width: 100%; height: auto; display: block; filter: sepia(0.12) saturate(0.9); border: 1px solid var(--color-hairline);" />
+        </figure>
+      ) : (
+        <div style="margin: 0.25rem 0 0.5rem; padding: 0.85rem 1rem; border: 1px solid var(--color-hairline); background: var(--paper-aged); font-family: var(--font-typewriter); font-size: 0.85rem; line-height: 1.45; color: var(--ink-sumi);">
+          <span style="font-family: var(--font-smallcaps); font-size: 0.65rem; letter-spacing: 0.15em; color: var(--ink-red);">EDITOR'S NOTE &mdash;&nbsp;</span>
+          Filed under {(secondary.data.tags || []).map((t: string) => t.toUpperCase()).join(' · ') || 'CORRESPONDENCE'}. Turn inside for the full dispatch.
+        </div>
+      )}
+
+      <div style="flex: 1;"></div>
+      <div class="chaos-byline" style="margin-top: 0.5rem;">By Housam Kak &bull; <FormattedDate date={secondary.data.pubDate} /></div>
     </article>
   )}
 
   <div class="chaos-row-split-5" style="display: flex; flex-direction: column; gap: 1rem;">
     <div class="polaroid" style="transform: rotate(2.5deg);">
-      <div class="polaroid-img"></div>
+      <img src="/media/images/julia-sets-preview.png" alt="Julia set fractal" class="polaroid-img" style="object-fit: cover; filter: sepia(0.08) saturate(0.95);" />
       <div class="polaroid-caption">"the julia set, tuesday afternoon"</div>
     </div>
     <blockquote class="chaos-card tilted-l" style="padding: 1rem 1.15rem; font-family: var(--font-display); font-style: italic; font-weight: 500; font-size: 1.3rem; line-height: 1.4; margin: 0; position: relative;">
