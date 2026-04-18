@@ -133,6 +133,7 @@ body {
   display: inline-flex; gap: 2.5rem;
   white-space: nowrap;
   animation: ticker-scroll 55s linear infinite;
+  will-change: transform;
   padding-left: 100%;
 }
 .chaos-ticker-item::before { content: "◆"; color: var(--ink-red); margin-right: 0.6em; }
@@ -422,6 +423,7 @@ body {
   to   { offset-distance: 100%; }
 }
 @media (prefers-reduced-motion: reduce) { .paper-plane { display: none; } }
+@media (max-width: 768px) { .paper-plane { display: none; } }
 
 /* ──────────────────────────────────────
    Post / article
