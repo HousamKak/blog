@@ -1,29 +1,163 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BackLink from '../components/BackLink.astro';
 ---
 <BaseLayout title="About" description="About Housam.">
-  <article class="prose">
-    <h1>About</h1>
-    <p>
-      I'm Housam. I write about code, math, research, and creative work.
-    </p>
-    <p>
-      This blog is my personal publishing tool — built from scratch with
-      <a href="https://astro.build">Astro</a>, TypeScript, Tailwind CSS, and MDX.
-      No CMS, no database, no dependencies I don't control.
-    </p>
 
-    <h2>What you'll find here</h2>
-    <ul>
-      <li><strong>Posts</strong> — articles about programming, systems, and ideas</li>
-      <li><strong>Papers</strong> — research papers with summaries, abstracts, and downloadable PDFs</li>
-      <li><strong>Notes</strong> — short-form notes, snippets, and references</li>
-      <li><strong>Renders</strong> — 2D and 3D visual work with interactive viewers</li>
-    </ul>
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/" label="Back to the front page" />
+  </div>
 
-    <h2>Contact</h2>
-    <p>
-      You can reach me by email at <a href="mailto:housam.kak20@gmail.com">housam.kak20@gmail.com</a>.
+  <!-- Section header: big masthead-like row -->
+  <header style="margin: 0 0 1.5rem; padding-bottom: 1rem; border-bottom: 4px double var(--ink-sumi); position: relative;">
+    <div class="chaos-kicker" style="margin-bottom: 0.5rem;">Masthead · Correspondence</div>
+    <h1 style="font-family: var(--font-masthead); font-weight: 400; font-size: clamp(3rem, 6.5vw, 5rem); line-height: 1.1; margin: 0 0 0.4rem;">About the Editor</h1>
+    <p style="font-family: var(--font-body); font-style: italic; font-size: 1.25rem; line-height: 1.45; color: var(--ink-muted); max-width: 44rem; margin: 0;">
+      A blog, a newspaper, a notebook, a filing cabinet. Run by one person. Edited by no one.
     </p>
-  </article>
+    <span class="marginalia" style="position: absolute; top: -0.5rem; right: 1rem; rotate: 6deg;">you are here &rarr;</span>
+  </header>
+
+  <!-- Chaos collage -->
+  <section class="chaos-front">
+
+    <!-- LEAD BIO CARD -->
+    <article class="chaos-card chaos-lede tilted-l" style="padding: 1.5rem 1.75rem;">
+      <span class="tape tl" aria-hidden="true"></span>
+      <span class="tape tr" aria-hidden="true"></span>
+
+      <div class="chaos-kicker">The writer</div>
+      <h2 class="chaos-head-xl" style="font-family: var(--font-display); font-weight: 900;">I'm Housam.</h2>
+
+      <p style="font-family: var(--font-body); font-size: 1.1rem; line-height: 1.75; margin: 0 0 0.9em;">
+        I write about <span class="highlight">code</span>, <span class="highlight">math</span>, <span class="highlight">research</span>, and whatever else takes up enough space in my head to deserve a page.
+      </p>
+
+      <p style="font-family: var(--font-body); font-size: 1.05rem; line-height: 1.7; margin: 0 0 0.9em;">
+        This site is my personal publishing tool — built from scratch with
+        <a href="https://astro.build" style="color: var(--ink-red); border-bottom: 1px dotted var(--ink-red); text-decoration: none;">Astro</a>,
+        TypeScript, Tailwind CSS, and MDX. No CMS, no database, no dependencies I don't control. Content lives in MDX files in a git repo and deploys to GitHub Pages on every push. I wanted to own every millimetre of it.
+      </p>
+
+      <div class="continued">Continues across the page</div>
+    </article>
+
+    <!-- SIDEBAR: contact card + fake ad -->
+    <aside class="chaos-aside-stack">
+
+      <div class="chaos-card tilted-r" style="padding: 1rem 1.15rem;">
+        <span class="pushpin" aria-hidden="true"></span>
+        <div class="chaos-kicker">Contact the desk</div>
+        <p style="font-family: var(--font-typewriter); font-size: 0.9rem; line-height: 1.65; margin: 0 0 0.5em;">
+          Email is the most reliable way to reach me.
+        </p>
+        <a href="mailto:housam.kak20@gmail.com" style="font-family: var(--font-typewriter); font-size: 0.95rem; color: var(--ink-red); border-bottom: 1px dashed var(--ink-red); text-decoration: none; word-break: break-all;">
+          housam.kak20@gmail.com
+        </a>
+        <p style="font-family: var(--font-handwriting); font-size: 1rem; color: var(--ink-sumi); margin: 0.8em 0 0; transform: rotate(-1deg);">
+          I read everything. I reply to most of it.
+        </p>
+      </div>
+
+      <div class="chaos-card tilted-l" style="padding: 1rem 1.15rem;">
+        <span class="tape tr" aria-hidden="true"></span>
+        <div class="chaos-kicker blue">Also on file</div>
+        <ul style="list-style: none; padding: 0; margin: 0; font-family: var(--font-typewriter); font-size: 0.9rem; line-height: 1.75;">
+          <li style="padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);">
+            <a href="https://github.com/HousamKak/blog" target="_blank" rel="noopener" style="color: var(--ink-sumi); border-bottom: 1px dotted var(--ink-red); text-decoration: none;">github.com/HousamKak &nbsp;↗</a>
+          </li>
+          <li style="padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);">
+            <a href="/rss.xml" style="color: var(--ink-sumi); border-bottom: 1px dotted var(--ink-red); text-decoration: none;">RSS feed</a>
+          </li>
+          <li style="padding: 0.2rem 0;">
+            <a href="/tags/" style="color: var(--ink-sumi); border-bottom: 1px dotted var(--ink-red); text-decoration: none;">All tags</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="chaos-ad">
+        <div class="chaos-ad-sub">correspondence · 1:1</div>
+        <div class="chaos-ad-title">by mail</div>
+        <div class="chaos-ad-sub">Beirut · the world</div>
+        <div style="margin-top: 0.4rem; font-family: var(--font-handwriting); color: var(--ink-red); font-size: 1.25rem;">"usually within a week"</div>
+      </div>
+
+    </aside>
+
+    <!-- WHAT YOU'LL FIND HERE — wide card -->
+    <article class="chaos-card chaos-full tilted-r" style="padding: 1.2rem 1.5rem;">
+      <span class="tape bl" aria-hidden="true"></span>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div class="chaos-head-script">What you'll find here</div>
+        <div class="chaos-byline" style="margin: 0;">Six desks. Six rhythms.</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem;">
+        <a href="/posts/" style="text-decoration: none; color: inherit; border-top: 2px solid var(--ink-sumi); padding-top: 0.5rem;">
+          <div style="font-family: var(--font-smallcaps); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--ink-red);">DESK I</div>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin: 0.1rem 0 0.25rem;">Posts</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0; color: var(--ink-sumi);">Longform articles. Programming, systems, ideas, obsessions.</p>
+        </a>
+        <a href="/papers/" style="text-decoration: none; color: inherit; border-top: 2px solid var(--ink-sumi); padding-top: 0.5rem;">
+          <div style="font-family: var(--font-smallcaps); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--ink-red);">DESK II</div>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin: 0.1rem 0 0.25rem;">Papers</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0;">Research with summaries, abstracts, embedded PDFs.</p>
+        </a>
+        <a href="/notes/" style="text-decoration: none; color: inherit; border-top: 2px solid var(--ink-sumi); padding-top: 0.5rem;">
+          <div style="font-family: var(--font-smallcaps); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--ink-red);">DESK III</div>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin: 0.1rem 0 0.25rem;">Notes</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0;">Snippets, references, margin scribbles.</p>
+        </a>
+        <a href="/renders/" style="text-decoration: none; color: inherit; border-top: 2px solid var(--ink-sumi); padding-top: 0.5rem;">
+          <div style="font-family: var(--font-smallcaps); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--ink-red);">DESK IV</div>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin: 0.1rem 0 0.25rem;">Renders</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0;">2D, 3D, and interactive visual work. Three.js + Wilson.</p>
+        </a>
+        <a href="/frontpages/" style="text-decoration: none; color: inherit; border-top: 2px solid var(--ink-sumi); padding-top: 0.5rem;">
+          <div style="font-family: var(--font-smallcaps); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--ink-red);">DESK V</div>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin: 0.1rem 0 0.25rem;">Frontpages</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0;">Every front page, archived. Clip &amp; frame.</p>
+        </a>
+        <a href="/projects/" style="text-decoration: none; color: inherit; border-top: 2px solid var(--ink-sumi); padding-top: 0.5rem;">
+          <div style="font-family: var(--font-smallcaps); font-size: 0.72rem; letter-spacing: 0.2em; color: var(--ink-red);">DESK VI</div>
+          <h3 style="font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; margin: 0.1rem 0 0.25rem;">Projects</h3>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0;">Built, shipping, abandoned, or still loud about it.</p>
+        </a>
+      </div>
+    </article>
+
+    <!-- COLOPHON / DESIGN NOTE — 5 col -->
+    <article class="chaos-card chaos-row-split-5 tilted-l" style="padding: 1.2rem 1.4rem;">
+      <span class="tape tr" aria-hidden="true"></span>
+      <div class="chaos-kicker yellow">Colophon</div>
+      <h3 class="chaos-head-md" style="font-family: var(--font-display); font-weight: 900;">A note on the design</h3>
+      <p style="font-family: var(--font-body); font-size: 1rem; line-height: 1.7; margin: 0;">
+        Styled as a chaotic broadsheet — a <strong>scrolling ticker</strong>, an <strong>ornate blackletter masthead</strong>, a <strong>working analog clock</strong>, <strong>typewriter classifieds</strong>, <strong>horoscopes for programmers</strong>, <strong>obituaries for dead web technologies</strong>, and an <strong>absurdist weather forecast</strong>. Roughly a dozen clashing faces on purpose. The ampersand comes from a font designed for exactly that glyph.
+      </p>
+      <p style="font-family: var(--font-handwriting); color: var(--ink-red); font-size: 1.2rem; margin: 0.6rem 0 0; transform: rotate(-1.5deg);">
+        If this looks like a lot, it is. That's the point.
+      </p>
+    </article>
+
+    <!-- OBSERVATIONS / ASIDES — 7 col -->
+    <article class="chaos-card chaos-row-split-7 tilted-r" style="padding: 1.2rem 1.4rem;">
+      <span class="pushpin" aria-hidden="true"></span>
+      <div class="chaos-kicker blue">Standing instructions</div>
+      <h3 class="chaos-head-md" style="font-family: var(--font-display); font-weight: 900;">How to read this site</h3>
+      <ul style="font-family: var(--font-body); font-size: 1rem; line-height: 1.7; padding-left: 1.3em; margin: 0;">
+        <li>The homepage is the latest <em>edition</em>. It changes as new posts arrive.</li>
+        <li>Every past edition lives in <a href="/frontpages/" style="color: var(--ink-red); border-bottom: 1px dotted var(--ink-red); text-decoration: none;">Frontpages</a>. Each is a snapshot of this collage as it was.</li>
+        <li>Tags cross-index everything. Start from <a href="/tags/" style="color: var(--ink-red); border-bottom: 1px dotted var(--ink-red); text-decoration: none;">the index</a>.</li>
+        <li>The paper plane that drifts across the page is not a bug. It is the editor going home.</li>
+      </ul>
+    </article>
+
+    <!-- Footer rule + tags -->
+    <div class="chaos-full" style="margin-top: 1rem;">
+      <div class="footer-rule"></div>
+      <div class="footer-tags">FILED UNDER — MASTHEAD · CORRESPONDENCE · HOUSAM KAK · EST. MMXXVI</div>
+    </div>
+
+  </section>
+
 </BaseLayout>

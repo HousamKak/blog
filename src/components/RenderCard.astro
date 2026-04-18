@@ -3,11 +3,12 @@ interface Props {
   id: string;
   title: string;
   thumbnail: string;
-  mediaType: '2d' | '3d';
+  mediaType: '2d' | '3d' | 'interactive';
   software?: string;
 }
 
 const { id, title, thumbnail, mediaType, software } = Astro.props;
+const badge = mediaType === 'interactive' ? 'LIVE' : mediaType.toUpperCase();
 ---
 <a href={`/renders/${id}/`} class="group block overflow-hidden border transition-colors hover:border-[var(--color-muted)]" style={`border-color: var(--color-border); border-width: var(--border-w); border-radius: var(--radius-xl); box-shadow: var(--shadow-card);`}>
   <div class="relative aspect-square overflow-hidden bg-[var(--color-surface)]">
@@ -18,7 +19,7 @@ const { id, title, thumbnail, mediaType, software } = Astro.props;
       loading="lazy"
     />
     <span class="absolute right-2 top-2 rounded-md bg-black/60 px-2 py-0.5 text-xs font-medium uppercase text-white backdrop-blur-sm">
-      {mediaType}
+      {badge}
     </span>
   </div>
   <div class="p-3">

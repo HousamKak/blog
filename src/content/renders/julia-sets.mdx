@@ -3,6 +3,8 @@ title: "Julia Set Explorer"
 description: "Interactive GPU-accelerated Julia set viewer. Drag the point to change c, scroll to zoom, drag to pan."
 pubDate: 2026-04-16
 thumbnail: "/media/images/julia-sets-preview.png"
+mediaType: "interactive"
+software: "Wilson · WebGL"
 tags: ["math", "interactive", "webgl", "wilson"]
 ---
 
@@ -71,3 +73,22 @@ import WilsonGPUApplet from '../../components/WilsonGPUApplet.tsx';
     wilson.drawFrame();
   `}
 />
+
+## How to use
+
+- **Drag the white dot** to change the constant $c$ and watch the fractal morph
+- **Scroll** to zoom into any region
+- **Drag the background** to pan across the complex plane
+- **Double-click** to reset the view
+
+## Notable values of *c*
+
+| *c* | Shape |
+|-----|-------|
+| $0 + 0i$ | Unit circle |
+| $-0.7 + 0.27i$ | Spiral galaxy |
+| $0.285 + 0.01i$ | Dendrite |
+| $-0.8 + 0.156i$ | Connected fractal |
+| $-1.476 + 0i$ | Cauliflower |
+
+See the [full post](/posts/interactive-julia-sets/) for the maths and the shader.

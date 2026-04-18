@@ -60,24 +60,10 @@ const renders = defineCollection({
     description: z.string(),
     pubDate: z.coerce.date(),
     thumbnail: z.string(),
-    mediaType: z.enum(['2d', '3d']),
-    mediaUrl: z.string(),
+    mediaType: z.enum(['2d', '3d', 'interactive']),
+    mediaUrl: z.string().optional(), // optional for interactive (MDX body is the media)
     tags: z.array(z.string()).default([]),
     software: z.string().optional(),
-    lang: langEnum,
-    draft: z.boolean().default(false),
-    theme: themeEnum,
-  }),
-});
-
-const library = defineCollection({
-  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/library' }),
-  schema: z.object({
-    title: z.string(),
-    description: z.string(),
-    pubDate: z.coerce.date(),
-    thumbnail: z.string(),
-    tags: z.array(z.string()).default([]),
     lang: langEnum,
     draft: z.boolean().default(false),
     theme: themeEnum,
@@ -117,4 +103,4 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { posts, papers, notes, renders, library, frontpages, projects };
+export const collections = { posts, papers, notes, renders, frontpages, projects };

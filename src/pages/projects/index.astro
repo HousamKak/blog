@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
+import BackLink from '../../components/BackLink.astro';
 
 const projects = (await getCollection('projects'))
   .filter(p => !p.data.draft)
@@ -15,6 +16,9 @@ const statusColor = {
 };
 ---
 <BaseLayout title="Projects" description="Things I'm building, have built, or have loudly abandoned.">
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/" label="Back to the front page" />
+  </div>
   <header style="margin-bottom: 2rem;">
     <div class="chaos-kicker" style="margin-bottom: 0.75rem;">The Docket</div>
     <h1 style="font-family: var(--font-display); font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05; margin: 0 0 0.5rem;">Projects</h1>

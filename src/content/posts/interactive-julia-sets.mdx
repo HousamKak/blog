@@ -80,10 +80,10 @@ The applet below renders a Julia set in real time on the GPU. **Drag the point**
 
 The fragment shader runs **per pixel**. For each pixel, we:
 
-1. Map its screen coordinates to a complex number $z_0$
-2. Iterate $z_{n+1} = z_n^2 + c$ up to 200 times
-3. Accumulate $\sum e^{-|z_n|}$ as a smooth brightness measure
-4. Color based on the escape trajectory
+- Map its screen coordinates to a complex number $z_0$
+- Iterate $z_{n+1} = z_n^2 + c$ up to 200 times
+- Accumulate $\sum e^{-|z_n|}$ as a smooth brightness measure
+- Color based on the escape trajectory
 
 The constant $c$ comes from the draggable point. Wilson passes it as a GLSL uniform that updates in real time.
 

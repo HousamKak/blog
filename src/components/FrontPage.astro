@@ -20,7 +20,8 @@ const byDateDesc = (a: any, b: any) => {
 
 const recentPosts = (await getCollection('posts')).filter(p => !p.data.draft).sort(byDateDesc);
 const recentPapers = (await getCollection('papers')).filter(p => !p.data.draft).sort(byDateDesc);
-const recentLibrary = (await getCollection('library')).filter(i => !i.data.draft).sort(byDateDesc);
+const recentRenders = (await getCollection('renders')).filter(r => !r.data.draft).sort(byDateDesc);
+const interactiveRenders = recentRenders.filter(r => r.data.mediaType === 'interactive');
 const recentNotes = (await getCollection('notes')).filter(n => !n.data.draft).sort(byDateDesc);
 
 const lede = recentPosts[0];
@@ -101,7 +102,7 @@ const classifieds = [
         <li style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);"><span>Posts published</span><span>{recentPosts.length}</span></li>
         <li style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);"><span>Papers filed</span><span>{recentPapers.length}</span></li>
         <li style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);"><span>Notes scribbled</span><span>{recentNotes.length}</span></li>
-        <li style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);"><span>Applets in the library</span><span>{recentLibrary.length}</span></li>
+        <li style="display: flex; justify-content: space-between; padding: 0.2rem 0; border-bottom: 1px dotted var(--color-hairline);"><span>Interactive renders</span><span>{interactiveRenders.length}</span></li>
         <li style="display: flex; justify-content: space-between; padding: 0.2rem 0;"><span>Regrets</span><span>0</span></li>
       </ul>
     </div>
@@ -184,7 +185,7 @@ const classifieds = [
     ))}
   </div>
 
-  {(recentPapers[0] || recentLibrary[0]) && (
+  {recentPapers[0] && (
     <article class="chaos-card chaos-third tilted-more" style="padding: 1rem 1.15rem;">
       <span class="tape tr" aria-hidden="true"></span>
       {recentPapers[0] && (

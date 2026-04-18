@@ -2,12 +2,16 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
+import BackLink from '../../components/BackLink.astro';
 
 const editions = (await getCollection('frontpages'))
   .filter(f => !f.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 <BaseLayout title="Frontpages" description="The archive of every front page of The Housam & Review — every edition preserved.">
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/" label="Back to the front page" />
+  </div>
   <header style="margin-bottom: 2rem;">
     <div class="chaos-kicker" style="margin-bottom: 0.75rem;">The Archive</div>
     <h1 style="font-family: var(--font-display); font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05; margin: 0 0 0.5rem;">Frontpages</h1>
@@ -19,9 +23,20 @@ const editions = (await getCollection('frontpages'))
   ) : (
     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem;">
       {editions.map((ed, i) => (
-        <a href={`/frontpages/${ed.id}/`} style="text-decoration: none; color: inherit;" class:list={['chaos-card', i % 2 === 0 ? 'tilted-l' : 'tilted-r']}>
+        <a href={`/frontpages/${ed.id}/`} class:list={['chaos-card frontpage-archive-card', i % 2 === 0 ? 'tilted-l' : 'tilted-r']}>
           <span class={`tape ${i % 2 === 0 ? 'tl' : 'tr'}`} aria-hidden="true"></span>
-          <img src={ed.data.thumbnail} alt={`${ed.data.title} front page`} style="width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); margin-bottom: 0.75rem; filter: sepia(0.08);" />
+          <div class="frontpage-preview-frame">
+            <iframe
+              class="frontpage-preview-iframe"
+              src={`/frontpages/${ed.id}/`}
+              title={`${ed.data.title} — preview`}
+              scrolling="no"
+              loading="lazy"
+              aria-hidden="true"
+              tabindex="-1"
+            />
+            <span class="frontpage-preview-mask" aria-hidden="true"></span>
+          </div>
           <div class="chaos-kicker" style="margin-bottom: 0.35rem; padding-bottom: 0.25rem;">{ed.data.edition}</div>
           <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 1.4rem; line-height: 1.1; margin: 0 0 0.35rem;">{ed.data.title}</h2>
           {ed.data.tagline && (
@@ -33,3 +48,53 @@ const editions = (await getCollection('frontpages'))
     </div>
   )}
 </BaseLayout>
+
+<style>
+  .frontpage-archive-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .frontpage-preview-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    border: 1px solid var(--color-hairline);
+    background: var(--paper-cream);
+    margin-bottom: 0.75rem;
+    box-shadow: 2px 3px 0 rgba(26, 18, 8, 0.12);
+  }
+  .frontpage-preview-iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    /* Render the iframe at 1400px wide, then scale it to 25% (=350px).
+       The card is narrower than 350px so we rely on the frame's overflow: hidden
+       to crop. This shows the top-left corner of the actual frontpage. */
+    width: 1400px;
+    height: 1050px;
+    border: 0;
+    transform: scale(0.25);
+    transform-origin: top left;
+    pointer-events: none;
+  }
+  /* Transparent mask so the whole card remains clickable as a link */
+  .frontpage-preview-mask {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+  }
+  .frontpage-archive-card:hover .frontpage-preview-frame {
+    box-shadow: 4px 6px 0 rgba(26, 18, 8, 0.18);
+  }
+
+  /* Tighter scale on small cards — improves perceived crispness on narrow widths */
+  @media (max-width: 600px) {
+    .frontpage-preview-iframe {
+      width: 1200px;
+      height: 900px;
+      transform: scale(0.3);
+    }
+  }
+</style>

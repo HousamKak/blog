@@ -1,15 +1,15 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import BackLink from '../../components/BackLink.astro';
 
 const allPosts = await getCollection('posts');
 const allPapers = await getCollection('papers');
 const allNotes = await getCollection('notes');
 const allRenders = await getCollection('renders');
-const allLibrary = await getCollection('library');
 
 const tagCounts = new Map<string, number>();
-[...allPosts, ...allPapers, ...allNotes, ...allRenders, ...allLibrary]
+[...allPosts, ...allPapers, ...allNotes, ...allRenders]
   .filter(item => !item.data.draft)
   .forEach(item => {
     item.data.tags.forEach((tag: string) => {
@@ -20,6 +20,9 @@ const tagCounts = new Map<string, number>();
 const sortedTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
 ---
 <BaseLayout title="Tags" description="Browse all tags.">
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/" label="Back to the front page" />
+  </div>
   <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Tags</h1>
   {sortedTags.length === 0 ? (
     <p class="text-[var(--color-muted)]">No tags yet.</p>

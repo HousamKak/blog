@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "katex/dist/katex.min.css";
-@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Special+Elite&family=Rozha+One&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=Cinzel:wght@400;500;600;700;800;900&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Homemade+Apple&family=Permanent+Marker&family=Shadows+Into+Light&family=JetBrains+Mono:wght@400;500&display=swap");
+/* Google Fonts are preloaded via a <link> in BaseLayout head to avoid
+   the PostCSS @import-must-come-first warning. */
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -550,10 +551,45 @@ body { min-height: 100dvh; display: flex; flex-direction: column; }
 
 .article-columns ul, .article-columns ol { padding-left: 1.5em; margin: 0 0 1.1em; }
 .article-columns ul { list-style-type: square; }
-.article-columns li::marker { color: var(--ink-red); }
+.article-columns ol { list-style-type: decimal; }
+.article-columns li { margin-bottom: 0.4em; line-height: 1.65; }
+.article-columns li::marker { color: var(--ink-red); font-weight: 700; }
 
 .article-columns hr { border: none; text-align: center; height: auto; margin: 2.5em 0; }
 .article-columns hr::before { content: "✷ ✷ ✷"; color: var(--ink-red); font-size: 1.125rem; letter-spacing: 0.6em; }
+
+/* Tables — newspaper-style with top/bottom rules */
+.article-columns table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.6em 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.article-columns thead tr { border-top: 3px double var(--ink-sumi); border-bottom: 1px solid var(--ink-sumi); }
+.article-columns tbody tr { border-bottom: 1px dotted var(--color-hairline); }
+.article-columns tbody tr:last-child { border-bottom: 3px double var(--ink-sumi); }
+.article-columns th {
+  text-align: left;
+  padding: 0.55em 0.75em;
+  font-family: var(--font-smallcaps);
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-red);
+  font-weight: 700;
+}
+.article-columns td {
+  padding: 0.55em 0.75em;
+  vertical-align: baseline;
+}
+.article-columns td:first-child {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  color: var(--ink-sumi);
+  white-space: nowrap;
+}
 
 .article-footer { margin-top: 3rem; }
 .footer-rule { height: 0; border-top: 1px solid var(--ink-sumi); border-bottom: 4px solid var(--ink-sumi); padding-top: 3px; margin-bottom: 1rem; }

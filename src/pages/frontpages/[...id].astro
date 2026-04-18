@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import FrontPage from '../../components/FrontPage.astro';
+import BackLink from '../../components/BackLink.astro';
 
 export async function getStaticPaths() {
   const editions = await getCollection('frontpages');
@@ -15,6 +16,9 @@ const { edition } = Astro.props;
 const { title, edition: editionLabel, pubDate, description, tagline } = edition.data;
 ---
 <BaseLayout title={`${editionLabel} — ${title}`} description={description}>
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/frontpages/" label="All frontpages" />
+  </div>
   <FrontPage
     editionLabel={editionLabel}
     editionTitle={title}

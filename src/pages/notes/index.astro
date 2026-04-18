@@ -2,12 +2,16 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import NoteCard from '../../components/NoteCard.astro';
+import BackLink from '../../components/BackLink.astro';
 
 const notes = (await getCollection('notes'))
   .filter(note => !note.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 <BaseLayout title="Notes" description="Quick notes and snippets.">
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/" label="Back to the front page" />
+  </div>
   <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Notes</h1>
   {notes.length === 0 ? (
     <p class="text-[var(--color-muted)]">No notes yet.</p>

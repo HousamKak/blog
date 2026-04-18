@@ -5,16 +5,14 @@ import PostCard from '../../components/PostCard.astro';
 import NoteCard from '../../components/NoteCard.astro';
 import PaperCard from '../../components/PaperCard.astro';
 import RenderCard from '../../components/RenderCard.astro';
-import LibraryCard from '../../components/LibraryCard.astro';
 
 export async function getStaticPaths() {
   const allPosts = await getCollection('posts');
   const allPapers = await getCollection('papers');
   const allNotes = await getCollection('notes');
   const allRenders = await getCollection('renders');
-  const allLibrary = await getCollection('library');
 
-  const allItems = [...allPosts, ...allPapers, ...allNotes, ...allRenders, ...allLibrary]
+  const allItems = [...allPosts, ...allPapers, ...allNotes, ...allRenders]
     .filter(item => !item.data.draft);
 
   const tags = [...new Set(allItems.flatMap(item => item.data.tags))];
@@ -31,13 +29,11 @@ export async function getStaticPaths() {
         .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
       renders: allRenders.filter(r => !r.data.draft && r.data.tags.includes(tag))
         .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
-      library: allLibrary.filter(l => !l.data.draft && l.data.tags.includes(tag))
-        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
     },
   }));
 }
 
-const { tag, posts, papers, notes, renders, library } = Astro.props;
+const { tag, posts, papers, notes, renders } = Astro.props;
 ---
 <BaseLayout title={`Tag: ${tag}`} description={`Content tagged with "${tag}".`}>
   <h1 class="mb-8 text-3xl font-extrabold tracking-tight">
@@ -115,19 +111,4 @@ const { tag, posts, papers, notes, renders, library } = Astro.props;
     </section>
   )}
 
-  {library.length > 0 && (
-    <section class="mb-10">
-      <h2 class="mb-4 text-xl font-bold">Library</h2>
-      <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-        {library.map((item: any) => (
-          <LibraryCard
-            id={item.id}
-            title={item.data.title}
-            description={item.data.description}
-            thumbnail={item.data.thumbnail}
-          />
-        ))}
-      </div>
-    </section>
-  )}
 </BaseLayout>

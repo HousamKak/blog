@@ -2,12 +2,16 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import BackLink from '../../components/BackLink.astro';
 
 const posts = (await getCollection('posts'))
   .filter(post => !post.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 <BaseLayout title="Posts" description="All blog posts.">
+  <div style="padding: 1rem 0 0;">
+    <BackLink href="/" label="Back to the front page" />
+  </div>
   <h1 class="mb-8 text-3xl font-extrabold tracking-tight">Posts</h1>
   {posts.length === 0 ? (
     <p class="text-[var(--color-muted)]">No posts yet.</p>
