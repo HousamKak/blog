@@ -12,6 +12,8 @@ const navLinks = [
   { href: '/papers/', label: 'Papers' },
   { href: '/notes/', label: 'Notes' },
   { href: '/renders/', label: 'Renders' },
+  { href: '/frontpages/', label: 'Frontpages' },
+  { href: '/projects/', label: 'Projects' },
   { href: '/about/', label: 'About' },
 ];
 
@@ -22,68 +24,125 @@ function isActive(href: string, current: string): boolean {
 
 const now = new Date();
 const dateLong = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
-const vol = 'VOL. I — NO. 01';
 const iso = now.toISOString().slice(0, 10);
+
+const ticker = [
+  'Stop the presses — a new dispatch has entered the ledger',
+  'Weather: fog over Beirut, scattered cursor movements',
+  'Volatility desk reports anomalous calm',
+  'A reader has complained about the drop cap. The drop cap is winning',
+  'Classifieds open — submit your regrets by fax',
+  'Julia set spotted misbehaving in section C',
+  '404s down 12% month on month. Apparently',
+  'The ampersand refuses to be italicised',
+  'Editor-in-chief seen muttering about kerning',
+  'Incoming: another post that is definitely not a draft',
+];
 ---
-<header class="broadsheet-masthead">
-  <!-- Top metadata strip -->
-  <div class="masthead-topbar">
-    <div class="topbar-left">{dateLong} &bull; BROADSHEET EDITION</div>
-    <div class="topbar-center">§ THE HOUSAM LEDGER &bull; CORRESPONDENCE &bull; ISSUE 01</div>
-    <div class="topbar-right">
-      <em>"Patience Compounds"</em>
-    </div>
+<div class="chaos-ticker" aria-label="Newswire">
+  <div class="chaos-ticker-track">
+    {ticker.map(item => (<span class="chaos-ticker-item">{item}</span>))}
+    {ticker.map(item => (<span class="chaos-ticker-item">{item}</span>))}
+  </div>
+</div>
+
+<header class="chaos-masthead">
+  <div class="chaos-masthead-top">
+    <div class="left">{dateLong} &bull; CHAOS EDITION</div>
+    <div class="center">"Patience Compounds — Chaos Pays Dividends"</div>
+    <div class="right">VOL. ∞ &bull; NO. 00 &bull; {iso}</div>
   </div>
 
-  <!-- Masthead title -->
-  <div class="masthead-title-row">
-    <div class="masthead-title-flank left">
+  <div class="chaos-title-row">
+    <div class="chaos-title-flank left">
       <BroadsheetClock />
     </div>
-    <a href="/" class="masthead-title">The Housam <span class="masthead-amp">&amp;</span> Review</a>
-    <div class="masthead-title-flank right">
-      <div class="flank-label">VOLATILITY DESK</div>
-      <div class="flank-sub">{vol} &bull; {iso}</div>
-      <div class="flank-sub">EST. MMXXVI &bull; $4.00</div>
+    <a href="/" class="chaos-masthead-title">The Housam <span class="chaos-masthead-amp">&amp;</span> Review</a>
+    <div class="chaos-title-flank right">
+      <div class="flank-label">NEWSWIRE</div>
+      <div>FREE WITH ALL DOUBTS</div>
+      <div>EST. MMXXVI</div>
     </div>
   </div>
 
-  <!-- Rule below title -->
-  <div class="masthead-rule"></div>
+  <div class="chaos-masthead-rule"></div>
 
-  <!-- Nav bar -->
-  <nav class="masthead-nav">
-    <div class="nav-links">
+  <nav class="chaos-nav">
+    <div class="links">
       {navLinks.map(link => (
-        <a
-          href={link.href}
-          class:list={['nav-link', isActive(link.href, currentPath) && 'is-active']}
-        >
-          {link.label}
-        </a>
+        <a href={link.href} class:list={[isActive(link.href, currentPath) && 'is-active']}>{link.label}</a>
       ))}
     </div>
-    <div class="nav-actions">
-      <button type="button" aria-label="Toggle dark mode" class="dark-toggle" data-dark-toggle>
-        <svg class="hidden h-4 w-4 dark:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-        </svg>
-        <svg class="block h-4 w-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-        </svg>
-      </button>
-    </div>
+    <button type="button" aria-label="Toggle dark mode" class="dark-toggle" data-dark-toggle>
+      <svg class="hidden h-4 w-4 dark:block" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+      </svg>
+      <svg class="block h-4 w-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+      </svg>
+    </button>
   </nav>
 </header>
 
+<svg class="paper-plane" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+  <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
+</svg>
+
 <script is:inline>
-  (function() {
-    // Clear any stale inline CSS variables written by the old dev tuner.
-    try { localStorage.removeItem('title-knobs-v1'); } catch (e) {}
-    var root = document.documentElement;
-    root.style.removeProperty('--title-word-spacing');
-    root.style.removeProperty('--title-amp-pad');
-    root.style.removeProperty('--title-amp-size');
+  (function () {
+    // Generate a smooth random path for the paper plane.
+    // Monotonically advancing in x (no backwards) and generally rising in y,
+    // with small random perturbations so every visit is different.
+    function randomPlanePath() {
+      var segments = 8 + Math.floor(Math.random() * 4);    // 8–11 waypoints
+      var totalX   = 2000 + Math.random() * 1200;           // overall horizontal travel (px)
+      var totalY   = 400 + Math.random() * 500;             // overall upward travel (px)
+      var segLen   = totalX / segments;
+
+      var px = 0, py = 0;
+      // Seed with a sensible initial control point so the first Q curves nicely
+      var path = 'M 0 0';
+
+      for (var i = 1; i <= segments; i++) {
+        // Advance x monotonically with small jitter (never negative step)
+        var nextX = segLen * i + (Math.random() - 0.5) * segLen * 0.25;
+
+        // Rise linearly with wavy offset
+        var baseY = -(totalY * (i / segments));
+        var nextY = baseY + Math.sin(i * 1.1 + Math.random()) * 70 + (Math.random() - 0.5) * 60;
+
+        if (i === 1) {
+          // Quadratic with a control point slightly up and forward
+          var cx = (px + nextX) / 2 + (Math.random() - 0.5) * 150;
+          var cy = (py + nextY) / 2 - 100 + (Math.random() - 0.5) * 80;
+          path += ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + nextX.toFixed(1) + ' ' + nextY.toFixed(1);
+        } else {
+          // Smooth continuation — each T reflects the previous control point
+          path += ' T ' + nextX.toFixed(1) + ' ' + nextY.toFixed(1);
+        }
+
+        px = nextX;
+        py = nextY;
+      }
+      return path;
+    }
+
+    function applyPlanePath() {
+      var plane = document.querySelector('.paper-plane');
+      if (!plane) return;
+      var p = randomPlanePath();
+      plane.style.offsetPath = 'path("' + p + '")';
+      plane.style.webkitOffsetPath = 'path("' + p + '")';
+      // Restart the animation cleanly
+      plane.style.animation = 'none';
+      // Force reflow
+      /* jshint unused:false */
+      plane.offsetHeight;
+      plane.style.animation = '';
+    }
+
+    applyPlanePath();
+    document.addEventListener('astro:page-load', applyPlanePath);
 
     if (window.__headerInitDone) return;
     window.__headerInitDone = true;

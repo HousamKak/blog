@@ -1,0 +1,46 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+const projects = (await getCollection('projects'))
+  .filter(p => !p.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+const statusColor = {
+  active: 'var(--ink-red)',
+  shipped: 'var(--ink-blue)',
+  archived: 'var(--ink-muted)',
+  wip: 'var(--ink-red)',
+};
+---
+<BaseLayout title="Projects" description="Things I'm building, have built, or have loudly abandoned.">
+  <header style="margin-bottom: 2rem;">
+    <div class="chaos-kicker" style="margin-bottom: 0.75rem;">The Docket</div>
+    <h1 style="font-family: var(--font-display); font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05; margin: 0 0 0.5rem;">Projects</h1>
+    <p style="font-family: var(--font-body); font-style: italic; font-size: 1.15rem; color: var(--ink-muted); max-width: 40rem;">Active, shipped, archived, or still a work in progress. Disclosure: some of these are the same project in different moods.</p>
+  </header>
+
+  {projects.length === 0 ? (
+    <p style="font-family: var(--font-body); color: var(--ink-muted);">Docket empty. For now.</p>
+  ) : (
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+      {projects.map((p, i) => (
+        <a href={`/projects/${p.id}/`} style="text-decoration: none; color: inherit;" class:list={['chaos-card', i % 2 === 0 ? 'tilted-r' : 'tilted-l']}>
+          {p.data.thumbnail && (
+            <img src={p.data.thumbnail} alt={p.data.title} style="width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); margin-bottom: 0.75rem; filter: sepia(0.08);" />
+          )}
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.35rem; align-items: center;">
+            <span class="ribbon" style={`background: ${statusColor[p.data.status] || 'var(--ink-sumi)'};`}>{p.data.status}</span>
+            <div class="chaos-byline" style="margin: 0;"><FormattedDate date={p.data.pubDate} /></div>
+          </div>
+          <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 1.45rem; line-height: 1.1; margin: 0 0 0.35rem;">{p.data.title}</h2>
+          <p style="font-family: var(--font-body); font-size: 0.95rem; line-height: 1.5; margin: 0 0 0.5rem;">{p.data.description}</p>
+          {p.data.tags.length > 0 && (
+            <div style="font-family: var(--font-smallcaps); font-size: 0.68rem; letter-spacing: 0.14em; color: var(--ink-muted); text-transform: uppercase;">{p.data.tags.join(' · ')}</div>
+          )}
+        </a>
+      ))}
+    </div>
+  )}
+</BaseLayout>

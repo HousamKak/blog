@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+const editions = (await getCollection('frontpages'))
+  .filter(f => !f.data.draft)
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+---
+<BaseLayout title="Frontpages" description="The archive of every front page of The Housam & Review — every edition preserved.">
+  <header style="margin-bottom: 2rem;">
+    <div class="chaos-kicker" style="margin-bottom: 0.75rem;">The Archive</div>
+    <h1 style="font-family: var(--font-display); font-weight: 900; font-size: clamp(2.5rem, 5vw, 4rem); line-height: 1.05; margin: 0 0 0.5rem;">Frontpages</h1>
+    <p style="font-family: var(--font-body); font-style: italic; font-size: 1.15rem; color: var(--ink-muted); max-width: 40rem;">Every front page we have ever printed. Clip them. Frame them. Send them to relatives.</p>
+  </header>
+
+  {editions.length === 0 ? (
+    <p style="font-family: var(--font-body); color: var(--ink-muted);">No editions printed yet. The presses are being oiled.</p>
+  ) : (
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem;">
+      {editions.map((ed, i) => (
+        <a href={`/frontpages/${ed.id}/`} style="text-decoration: none; color: inherit;" class:list={['chaos-card', i % 2 === 0 ? 'tilted-l' : 'tilted-r']}>
+          <span class={`tape ${i % 2 === 0 ? 'tl' : 'tr'}`} aria-hidden="true"></span>
+          <img src={ed.data.thumbnail} alt={`${ed.data.title} front page`} style="width: 100%; height: auto; display: block; border: 1px solid var(--color-hairline); margin-bottom: 0.75rem; filter: sepia(0.08);" />
+          <div class="chaos-kicker" style="margin-bottom: 0.35rem; padding-bottom: 0.25rem;">{ed.data.edition}</div>
+          <h2 style="font-family: var(--font-display); font-weight: 900; font-size: 1.4rem; line-height: 1.1; margin: 0 0 0.35rem;">{ed.data.title}</h2>
+          {ed.data.tagline && (
+            <p style="font-family: var(--font-body); font-style: italic; font-size: 0.9rem; color: var(--ink-muted); margin: 0 0 0.5rem;">&ldquo;{ed.data.tagline}&rdquo;</p>
+          )}
+          <div class="chaos-byline"><FormattedDate date={ed.data.pubDate} /></div>
+        </a>
+      ))}
+    </div>
+  )}
+</BaseLayout>

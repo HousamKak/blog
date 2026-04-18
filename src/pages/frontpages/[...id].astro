@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FrontPage from '../../components/FrontPage.astro';
+
+export async function getStaticPaths() {
+  const editions = await getCollection('frontpages');
+  return editions.map(ed => ({
+    params: { id: ed.id },
+    props: { edition: ed },
+  }));
+}
+
+const { edition } = Astro.props;
+const { title, edition: editionLabel, pubDate, description, tagline } = edition.data;
+---
+<BaseLayout title={`${editionLabel} — ${title}`} description={description}>
+  <FrontPage
+    editionLabel={editionLabel}
+    editionTitle={title}
+    editionTagline={tagline}
+    editionDate={pubDate}
+  />
+</BaseLayout>

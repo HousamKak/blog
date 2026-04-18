@@ -84,4 +84,37 @@ const library = defineCollection({
   }),
 });
 
-export const collections = { posts, papers, notes, renders, library };
+const frontpages = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/frontpages' }),
+  schema: z.object({
+    title: z.string(),
+    edition: z.string(),              // "Vol. I", "Vol. II", etc.
+    pubDate: z.coerce.date(),
+    description: z.string(),
+    thumbnail: z.string(),            // snapshot image of the frontpage
+    tagline: z.string().optional(),   // a line printed under the title
+    tags: z.array(z.string()).default([]),
+    lang: langEnum,
+    draft: z.boolean().default(false),
+    theme: themeEnum,
+  }),
+});
+
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    updatedDate: z.coerce.date().optional(),
+    thumbnail: z.string().optional(),
+    url: z.string().url().optional(),        // external repo or live link
+    status: z.enum(['active', 'shipped', 'archived', 'wip']).default('active'),
+    tags: z.array(z.string()).default([]),
+    lang: langEnum,
+    draft: z.boolean().default(false),
+    theme: themeEnum,
+  }),
+});
+
+export const collections = { posts, papers, notes, renders, library, frontpages, projects };

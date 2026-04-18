@@ -1,0 +1,54 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import BackLink from '../../components/BackLink.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projects');
+  return projects.map(p => ({
+    params: { id: p.id },
+    props: { project: p },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, description, pubDate, updatedDate, thumbnail, url, status, tags } = project.data;
+---
+<BaseLayout title={title} description={description} ogImage={thumbnail}>
+  <article class="chaos-article">
+    <div class="article-main">
+      <BackLink href="/projects/" label="All projects" />
+
+      <div class="article-kicker">Project &bull; <span style="text-transform: uppercase;">{status}</span></div>
+      <h1 class="article-headline">{title}</h1>
+      <p class="article-deck">{description}</p>
+      <div class="article-byline">
+        <span class="byline-author">HOUSAM KAK</span>
+        <span class="byline-sep">&mdash;</span>
+        <FormattedDate date={pubDate} />
+        {updatedDate && (<span> &bull; Revised <FormattedDate date={updatedDate} /></span>)}
+        {url && (<>
+          <span class="byline-sep">&mdash;</span>
+          <a href={url} target="_blank" rel="noopener" style="color: var(--ink-red); text-decoration: none; border-bottom: 1px dotted var(--ink-red);">Live link &rarr;</a>
+        </>)}
+      </div>
+
+      {thumbnail && (
+        <figure class="article-hero">
+          <img src={thumbnail} alt={title} />
+        </figure>
+      )}
+
+      <div class="article-columns prose">
+        <Content />
+      </div>
+
+      <div class="article-footer">
+        <div class="footer-rule"></div>
+        <div class="footer-tags">FILED UNDER &mdash; {(tags || []).map(t => t.toUpperCase()).join(' &bull; ')}</div>
+      </div>
+    </div>
+  </article>
+</BaseLayout>
