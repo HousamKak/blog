@@ -104,7 +104,13 @@ html {
   scroll-behavior: smooth;
 }
 
-body { min-height: 100dvh; display: flex; flex-direction: column; }
+body {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  /* Prevent card tilts and the paper plane from producing horizontal scroll */
+  overflow-x: hidden;
+}
 
 /* Pixel starfield canvas from BaseLayout — not used in chaos theme */
 .pixel-ambient { display: none; }
@@ -602,19 +608,164 @@ body { min-height: 100dvh; display: flex; flex-direction: column; }
 .prose img { max-width: 100%; height: auto; margin: 1.5em 0; }
 
 /* Mobile */
+/* ──────────────────────────────────────
+   Mobile (≤720px)
+   ────────────────────────────────────── */
 @media (max-width: 720px) {
+  /* Outer layout */
+  .layout-grid > .layout-content { padding: 1.25rem 1rem 3rem; }
+
+  /* Masthead */
   .chaos-masthead { padding: 0.6rem 1rem 0.35rem; }
-  .chaos-masthead-top { grid-template-columns: 1fr; gap: 0.15rem; text-align: center; font-size: 0.58rem; padding-bottom: 0.4rem; margin-bottom: 0.6rem; }
+  .chaos-masthead-top { grid-template-columns: 1fr; gap: 0.2rem; text-align: center; font-size: 0.72rem; padding-bottom: 0.4rem; margin-bottom: 0.6rem; }
   .chaos-masthead-top .left, .chaos-masthead-top .right, .chaos-masthead-top .center { text-align: center; }
+  .chaos-masthead-top .center { font-size: 0.78rem; }
   .chaos-title-row { grid-template-columns: 1fr; gap: 0.5rem; padding: 0.25rem 0 0.4rem; }
   .chaos-title-flank.right, .chaos-title-flank.left { display: none; }
-  .chaos-masthead-title { font-size: clamp(2rem, 12vw, 3.5rem); white-space: normal; line-height: 1.05; padding: 0; }
-  .chaos-stamp.chaos-stamp-edition { top: -0.8rem; right: 0; font-size: 0.7rem; }
-  .chaos-stamp.chaos-stamp-urgent { display: none; }
-  .chaos-nav .links { gap: 0.75rem; overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
-  .chaos-nav .links::-webkit-scrollbar { display: none; }
-  .chaos-nav a { font-size: 0.6rem; letter-spacing: 0.12em; white-space: nowrap; }
-  .classified { column-count: 1; }
+  .chaos-masthead-title { font-size: clamp(1.85rem, 11vw, 3.25rem); white-space: normal; line-height: 1.1; padding: 0.1em 0; }
+  .chaos-masthead-rule { margin: 0.2rem 0; }
+
+  /* Nav — wrap all items onto multiple lines instead of scrolling so
+     nothing is ever hidden. position: static so the absolutely-positioned
+     dark toggle escapes the nav and resolves to the masthead. */
+  .chaos-nav {
+    position: static;
+    padding: 0.25rem 0;
+    justify-content: center;
+  }
+  .chaos-nav .links {
+    display: flex;
+    gap: 0.25rem 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    padding: 0.2rem 0.25rem;
+    overflow-x: visible;
+  }
+  .chaos-nav a {
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    white-space: nowrap;
+    padding: 0.7rem 0.6rem;   /* larger tap area */
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  /* Dark toggle: top-right corner of the masthead (just below the ticker),
+     above everything else in the masthead — well clear of the nav and title. */
+  .chaos-masthead { position: relative; }
+  .chaos-nav .dark-toggle {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.5rem;
+    z-index: 5;
+    transform: none;
+    padding: 0.35rem;
+    min-width: 34px;
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--paper-cream);
+    border: 1.5px solid var(--ink-sumi);
+    box-shadow: 1px 2px 0 rgba(26, 18, 8, 0.18);
+  }
+  .chaos-nav .dark-toggle svg { width: 1rem; height: 1rem; }
+  .chaos-nav .dark-toggle:hover { background: var(--ink-sumi); color: var(--paper-cream); }
+
+  /* Reserve space on the right of the top strip so the toggle doesn't
+     overlap the metadata text. */
+  .chaos-masthead-top { padding-right: 3rem; }
+  .chaos-masthead-top .right { font-size: 0.68rem; }
+
+  /* Ticker */
+  .chaos-ticker { font-size: 0.82rem; padding: 0.4rem 0; letter-spacing: 0.04em; }
+
+  /* Flatten tilts on mobile — tilting causes horizontal overflow + visual clutter */
+  .chaos-card.tilted-l,
+  .chaos-card.tilted-r,
+  .chaos-card.tilted-more { transform: none; }
+  .chaos-card { padding: 1rem 1.1rem; }
+
+  /* Front-page grid (already collapses at 900 but re-assert) */
+  .chaos-front { gap: 1rem; }
+
+  /* Headlines */
+  .chaos-head-xl { font-size: clamp(1.8rem, 7vw, 2.5rem); }
+  .chaos-head-lg { font-size: clamp(1.35rem, 5.5vw, 1.75rem); }
+  .chaos-head-md { font-size: 1.15rem; }
+  .chaos-deck { font-size: 1rem; line-height: 1.55; }
+
+  /* Article reading surface */
+  .article-columns { font-size: 1rem; line-height: 1.7; }
+  .article-headline { font-size: clamp(1.85rem, 8vw, 2.6rem); line-height: 1.1; }
+  .article-deck { font-size: 1.15rem; line-height: 1.5; }
+  .article-byline { font-size: 0.78rem; letter-spacing: 0.12em; line-height: 1.55; }
+  .article-kicker { font-size: 0.72rem; letter-spacing: 0.18em; }
+
+  /* Tables: scroll horizontally if wider than viewport */
+  .article-columns table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+  .article-columns table th,
+  .article-columns table td { white-space: nowrap; }
+
+  /* Drop cap smaller on mobile */
+  .article-columns > p:first-of-type::first-letter { font-size: 3em; }
+
+  /* Classifieds: single column + smaller padding */
+  .classified { column-count: 1; font-size: 0.95rem; padding: 0.5rem 0.3rem; }
+
+  /* Polaroid shadow softer and not tilted far */
+  .polaroid { transform: rotate(1deg) !important; padding: 0.6rem 0.6rem 1.4rem; }
+  .polaroid-caption { font-size: 1rem; }
+
+  /* Kickers + bylines */
+  .chaos-kicker { font-size: 0.78rem; letter-spacing: 0.18em; }
+  .chaos-byline { font-size: 0.8rem; letter-spacing: 0.12em; }
+
+  /* Weather cards — keep 2 cols not 4 */
+  .chaos-card.chaos-full > div[style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Frontpage archive preview iframe — tighter scale */
+  .frontpage-preview-iframe {
+    width: 1200px;
+    height: 900px;
+    transform: scale(0.28);
+  }
+
+  /* Paper meta grid stacks */
+  .paper-meta-grid { grid-template-columns: 1fr !important; gap: 1rem; }
+
+  /* Hide the floating paper plane — fun on desktop, distraction on mobile */
+  .paper-plane { display: none; }
+
+  /* Back link: larger hit area */
+  a[class*="back"], .article-main > a:first-of-type { min-height: 44px; display: inline-flex; align-items: center; }
+
+  /* Disable marginalia that floats off-card on mobile (overflow) */
+  .marginalia { display: none; }
+
+  /* About desks grid tighter */
+  .chaos-card h3.chaos-head-md { font-size: 1.15rem; }
+}
+
+@media (max-width: 480px) {
+  .chaos-masthead-top { font-size: 0.64rem; }
+  .chaos-masthead-title { font-size: clamp(1.6rem, 10vw, 2.5rem); }
+  .chaos-nav a { font-size: 0.76rem; padding: 0.65rem 0.45rem; letter-spacing: 0.1em; }
+  .chaos-ticker { font-size: 0.76rem; }
+  .chaos-card { padding: 0.85rem 1rem; }
+  .article-columns { font-size: 0.98rem; }
+  .chaos-head-xl { font-size: clamp(1.6rem, 8vw, 2.1rem); }
+  .article-headline { font-size: clamp(1.7rem, 8.5vw, 2.25rem); }
 }
 
 html[dir="rtl"] .article-columns { direction: rtl; text-align: right; }
