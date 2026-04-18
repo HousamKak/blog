@@ -282,7 +282,8 @@ body {
 .chaos-card.tilted-l { transform: rotate(-0.5deg); }
 .chaos-card.tilted-r { transform: rotate(0.6deg); }
 .chaos-card.tilted-more { transform: rotate(-1.3deg); }
-.chaos-card:hover { z-index: 10; }
+.chaos-card:hover { z-index: 3; }
+.chaos-card.chaos-lede { z-index: 5; }
 
 .tape {
   position: absolute;

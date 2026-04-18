@@ -4,18 +4,38 @@ import BackLink from '../components/BackLink.astro';
 ---
 <BaseLayout title="About" description="About Housam.">
 
-  <div style="padding: 1rem 0 0;">
+  <div style="padding: 1rem 0 0; position: relative;">
     <BackLink href="/" label="Back to the front page" />
   </div>
 
   <!-- Section header: big masthead-like row -->
-  <header style="margin: 0 0 1.5rem; padding-bottom: 1rem; border-bottom: 4px double var(--ink-sumi); position: relative;">
+  <header id="about-header" style="margin: 0 0 1.5rem; padding-bottom: 1rem; border-bottom: 4px double var(--ink-sumi); position: relative;">
+    <span id="you-are-here" class="marginalia" style="
+      position: absolute;
+      white-space: nowrap;
+      font-size: 1.1rem;
+      line-height: 1;
+      transform: rotate(-7deg);
+      opacity: 0;
+      transition: opacity 0.3s;
+    ">
+      <svg width="60" height="50" viewBox="0 0 60 50" fill="none" style="
+        position: absolute;
+        left: -0.5rem;
+        top: -2.75rem;
+        overflow: visible;
+        pointer-events: none;
+      ">
+        <path d="M40 42 C24 26, 58 19, 23 0" stroke="var(--ink-blue, #4a7ab5)" stroke-width="1.5" fill="none" stroke-linecap="round" />
+        <path d="M23 0 L29.7 0.3 L26.9 5.5 Z" fill="var(--ink-blue, #4a7ab5)" />
+      </svg>
+      you are here
+    </span>
     <div class="chaos-kicker" style="margin-bottom: 0.5rem;">Masthead · Correspondence</div>
     <h1 style="font-family: var(--font-masthead); font-weight: 400; font-size: clamp(3rem, 6.5vw, 5rem); line-height: 1.1; margin: 0 0 0.4rem;">About the Editor</h1>
     <p style="font-family: var(--font-body); font-style: italic; font-size: 1.25rem; line-height: 1.45; color: var(--ink-muted); max-width: 44rem; margin: 0;">
       A blog, a newspaper, a notebook, a filing cabinet. Run by one person. Edited by no one.
     </p>
-    <span class="marginalia" style="position: absolute; top: -0.5rem; right: 1rem; rotate: 6deg;">you are here &rarr;</span>
   </header>
 
   <!-- Chaos collage -->
@@ -161,3 +181,30 @@ import BackLink from '../components/BackLink.astro';
   </section>
 
 </BaseLayout>
+
+<script>
+  function positionMarginalia() {
+    const aboutLink = document.querySelector<HTMLElement>('.chaos-nav a.is-active');
+    const header = document.getElementById('about-header');
+    const note = document.getElementById('you-are-here');
+    if (!aboutLink || !header || !note) return;
+
+    const linkRect = aboutLink.getBoundingClientRect();
+    const headerRect = header.getBoundingClientRect();
+
+    const linkCenterX = linkRect.left + linkRect.width / 2;
+    const linkBottom = linkRect.bottom;
+
+    const noteLeft = linkCenterX - headerRect.left + 25;
+    const noteTop = linkBottom - headerRect.top + 27;
+
+    note.style.left = noteLeft + 'px';
+    note.style.top = noteTop + 'px';
+    note.style.right = 'auto';
+    note.style.opacity = '1';
+  }
+
+  positionMarginalia();
+  window.addEventListener('resize', positionMarginalia);
+  document.addEventListener('astro:after-swap', positionMarginalia);
+</script>

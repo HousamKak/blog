@@ -72,7 +72,7 @@ const classifieds = [
         <div class="chaos-kicker" style="border: none; margin: 0; padding: 0;">{(lede.data.tags || []).slice(0,2).join(' · ').toUpperCase() || 'DISPATCH'}</div>
       </div>
 
-      <h1 class="chaos-head-xl">
+      <h1 class="chaos-head-xl" id="lede-title">
         <a href={`/posts/${lede.id}/`} style="color: inherit; text-decoration: none;">{lede.data.title}</a>
       </h1>
 
@@ -88,8 +88,6 @@ const classifieds = [
       )}
 
       <div class="chaos-byline">By Housam Kak &bull; <FormattedDate date={lede.data.pubDate} /></div>
-
-      <span class="marginalia" style="position: absolute; top: 1.5rem; right: -3.5rem; max-width: 90px; rotate: -8deg;">read this<br/>twice &rarr;</span>
 
       <div class="continued">Continues on page 2</div>
     </article>
