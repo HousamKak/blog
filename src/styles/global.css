@@ -486,6 +486,12 @@ body {
 .article-hero img { width: 100%; height: auto; display: block; filter: sepia(0.1) saturate(0.9); }
 .article-hero figcaption { font-family: var(--font-smallcaps); font-size: 0.68rem; letter-spacing: 0.15em; color: var(--ink-muted); padding-top: 0.65rem; text-align: center; }
 
+/* Inline body figures — same broadsheet register as the hero, a touch tighter */
+.article-columns figure { margin: 2em 0 2.25em; padding-bottom: 0.9rem; border-bottom: 1px solid var(--color-hairline); }
+.article-columns figure img { width: 100%; height: auto; display: block; border: 1px solid var(--ink-sumi); filter: sepia(0.06) saturate(0.95); box-shadow: 3px 4px 0 rgba(26,18,8,0.08); }
+.article-columns figure figcaption { font-family: var(--font-smallcaps); font-size: 0.68rem; letter-spacing: 0.14em; color: var(--ink-muted); padding-top: 0.65rem; text-align: center; line-height: 1.5; }
+.article-columns figure figcaption em { font-family: var(--font-body); font-style: italic; letter-spacing: 0; text-transform: none; font-size: 0.95rem; color: var(--ink-sumi); display: block; margin-top: 0.3rem; }
+
 .article-toc-aside {
   max-width: 48rem; margin: 0 0 2rem;
   padding: 1rem 1.25rem;

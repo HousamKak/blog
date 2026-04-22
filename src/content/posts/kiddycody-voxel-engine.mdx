@@ -1,0 +1,205 @@
+---
+title: "From a logo brief to a voxel engine"
+description: "My brother asked for a logo for his kids' coding academy. I ended up refactoring the logo into SVG blocks, wiring a CLI to an LLM, and deciding to rewrite the whole thing in C++."
+pubDate: 2026-04-22
+heroImage: "/media/posts/kiddycody/kiddycody-final-logo.png"
+tags: ["logo-design", "svg", "voxel", "gamedev", "story"]
+---
+
+It is Saturday morning, I wake up with a decision not to do anything today. The weather was amazing and there has been this cool breath outside welcoming a fabulous walk, and then there's my brother, who decided to open a business that day.
+My brother Mahdi, on that splendid fabulous amazingly cool of a day, decided that the best thing to do was starting a tutoring academy that teaches kids how to code. He's calling it **KiddyCody**. "So, Housam, _Brathar_. WE NEED A LOGO."
+
+That was the whole ask. Fine, one morning of work, _in theory_. It turned into adventurous side quests and a C++ rewrite.
+
+## The wrong tool (which turned out to be the right one)
+
+A while ago, I had this specific tool in mind, the kind of tool that can make me free. Everyone nowadays frees themselves with gpt, talking nonstop and exploring the world. But why would I be free in 1D while I can be free in 2D? That time I created a canvas where you lay prompts out in space, and each one becomes a branch you can explore.
+
+Here's roughly how it works:
+
+- You start with a **seed prompt**, which is really a template. For logos the template was something like \_"Generate a logo for [___], colors [...], themes [...], style [...]."\_
+- A `list` command chews on that template and spits out variants of the seed. Each variant is a branch on the canvas.
+- So now I've got, let's say, 10 variants of the same prompt, each one filled in slightly differently.
+- I hit the image-gen button on each. Out come 10 logo concepts.
+
+It isn't really a logo tool. It's a general exploration thing whose whole point is generating "applets", and an applet can be basically anything, by my definition of course. So in any day was Whatever I needed. That day I wanted logos.
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/canvas-branched-variants.png"
+    alt="The canvas mid run, with one seed prompt branched into dozens of variants, each with its own generated logo thumbnail."
+  />
+  <figcaption>
+    FIG. 1. THE CANVAS, MID RUN
+    <em>
+      One seed prompt, branched into dozens of variants. Each one with its own
+      generated thumbnail.
+    </em>
+  </figcaption>
+</figure>
+
+## We picked one, and then hit the wall
+
+Out of the ten _(maybe 20? I don't recall)_, one concept clicked. We liked it enough to refine it directly in GPT and Gemini.
+
+Then the problem showed up.
+
+You can't actually control image generated assets the way a logo needs you to. I wanted to edit it granularly, change individual shapes. Resize cleanly, for favicons, hero banners, a t-shirt later. Repaint specific parts without regenerating everything and losing the bits I liked.
+
+And I'm not a graphic designer. I don't know Illustrator. There are a few ways to do this properly with actual design tools, and I didn't have the patience for any of them _(This is a lie, I grinded the entire day learning an editing app that I ended up ditching after maybe 5 hours)_.
+
+Hmmmmmmmmmmmm. Didn't work. That was it, am gonna program something that does.
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/raster-concept-card.png"
+    alt="The raster concept we picked and tried to refine in GPT and Gemini. Looks nice on screen, impossible to edit granularly."
+  />
+  <figcaption>
+    FIG. 2. THE CHOSEN RASTER CONCEPT
+    <em>
+      Looks nice on screen. Impossible to edit in pieces without losing the
+      rest.
+    </em>
+  </figcaption>
+</figure>
+
+## SVG blocks, with Claude Code
+
+So I opened Claude Code and we rebuilt the concept as composable **SVG blocks**. A vector file, not an image.
+
+The moment the logo existed as SVG, everything opened up. I could read the code. I could drop in new blocks wherever. Recolor one piece without touching the others. Resize with no fidelity loss.
+
+I ran a few sample variants to sanity check it, and it was obvious right away that this was the right substrate.
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/svg-refactor-brand-panel.png"
+    alt="The rebuilt logo as SVG blocks, next to a brand panel with five colors, hex codes, base isometric units, a core diamond, and a color stack."
+  />
+  <figcaption>
+    FIG. 3. SVG REFACTOR, WITH A BRAND PANEL
+    <em>
+      Five colors, the hex codes, base isometric units, a core diamond, a color
+      stack. Everything keyed to blocks I could reuse.
+    </em>
+  </figcaption>
+</figure>
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/svg-variant-k.png"
+    alt="One sample variant, same block vocabulary, different assembly."
+  />
+  <figcaption>
+    FIG. 4. A SAMPLE VARIANT
+    <em>
+      Same block vocabulary, different assembly. The K falls out of the grammar.
+      Not a redraw.
+    </em>
+  </figcaption>
+</figure>
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/brand-system-sheet.png"
+    alt="The full brand system page: Block A with base isometric units snapping to a 35 by 20 grid, instantiated via SVG use tags, Block C being the diamond core, and the assembled brand mark."
+  />
+  <figcaption>
+    FIG. 5. THE BRAND SYSTEM ONCE IT SETTLED
+    <em>
+      Block A, base isometric units snapping to a 35×20 grid, instantiated via
+      SVG <code>&lt;use&gt;</code>. Block C, the diamond core. And the assembled
+      mark.
+    </em>
+  </figcaption>
+</figure>
+
+## Wait. Why stop at a logo?
+
+Controlling SVG blocks from code was so frictionless it made me ask a different question. Why not build an engine that manipulates these blocks generally? Place them, remove them, rearrange them, whatever I want?
+
+I handed Mahdi his final logo _(which looked cool honestly, after a very long endavour)_ and got pulled into the serious work.
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/kiddycody-final-logo.png"
+    alt="The final delivered KiddyCody logo."
+  />
+  <figcaption>
+    FIG. 6. THE FINAL KIDDYCODY LOGO
+    <em>
+      Shipped. Mahdi has what he needed. The side quest started right here.
+    </em>
+  </figcaption>
+</figure>
+
+## The engine, a CLI, and a loop with the LLM
+
+I went all in on the engine. Started small. Nine colored blocks in a palette along the bottom, an isometric grid, click to place, right click to remove, Ctrl+Z to undo. Nothing fancy. Just enough to prove the grammar that worked in 2D still worked when I dragged it into 3D. I then out of not knowing what to do next, I built manually, block by block, a cozy house like we do in minecraft. I really enjoyed that, wait..... MY SECOND ahaaaaaaaaaaaaaa!!
+
+I am lazy, so let me make an LLM do it for me.
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/engine-manual-placement.png"
+    alt="The engine in its earliest state, a dark isometric grid with a small tower of colored cubes in the middle, one stray red cube off to the right, and a numbered block palette (1 through 9) along the bottom."
+  />
+  <figcaption>
+    FIG. 7. THE ENGINE, EARLY DAYS
+    <em>
+      Nine blocks in the palette, click to place, right click to remove, Ctrl+Z
+      to undo. Everything that comes later is built on top of this loop.
+    </em>
+  </figcaption>
+</figure>
+
+Then the trick. Wire the CLI up to an LLM.
+
+Give the LLM a library of building blocks and it can generate basically any structure you describe. You say what you want, the CLI composes blocks to build it. That's when it stopped being "a logo tool" and started feeling like a general structural composer. I decided after all this to adopt this as a long term project, and I will have future updates on its progress.
+
+You can see in here how I generated a terrain with grass, cliffs, water, and trees, all from the block library and the CLI + LLM loop. I loved the isometric view of it, it really made the structure pop, and I intend to keep it that way.
+
+<figure>
+  <img
+    src="/media/posts/kiddycody/voxel-engine-cli.png"
+    alt="The engine rendering a roughly 36,000 block isometric world generated via the CLI, with grass terrain, trees, water, cliffs, and a block palette along the bottom."
+  />
+  <figcaption>
+    FIG. 8. ~36,000 BLOCKS, FROM THE CLI
+    <em>
+      Grass, trees, water, cliffs, a palette along the bottom. All composed from
+      the block library by the CLI + LLM loop.
+    </em>
+  </figcaption>
+</figure>
+
+## Performance. The web hit its ceiling.
+
+From SVG blocks I went Into 3D. Into a 3D viewer. Into a first person mode. Slowly wanting to turn this into a game.
+
+And then the web hit back. Bottlenecks everywhere. Render budget, memory, draw call dispatch, the usual story when you push a browser past what it was built for. I did every optimization I could reasonably do inside the browser.
+
+It wasn't going to be enough.
+
+## The call: rewrite in C++
+
+So I made the call. Move to C++. Rebuild the engine properly. Do the research on Minecraft style optimizations (greedy meshing, chunk LOD, streaming, occlusion, the whole checklist) before writing another line of code. This trial is still ongoing and will need some more time to mature, but I aim to go the same route minecraft went, into this rabbit
+hole.
+
+## ENDING
+
+I loved this. It felt like marching towards a real adventure into the voxel world. I have always wanted a touch into a Minecraft that I own, as I was always captivated by the infinitism it can provide, and the playability and emersion it can offer. Coding things with one's hands and shaping them into life is an art of its own, one that can't be understood unless practiced, and can't be comprehended unless touched. It really isn't about the keystrokes typed on the keyboard, but about the ideas and freedom one's own thoughts provide.
+
+---
+
+## A few things I keep coming back to
+
+- The tool shapes the output. A canvas that lets you branch prompts in space gave me better exploration than any single chat I've ever had.
+- Vectors beat pixels the moment you need to iterate on a brand asset. The SVG block pivot saved this whole thing.
+- Good tools keep begging to be extended. If manipulating blocks with code is this easy for logos, it's this easy for anything structural.
+- Know when to leave the browser. I like the web. But when you're chasing game grade performance, the right answer is a better runtime, not more optimization gymnastics.
+
+---
+
+_Mahdi, logo's yours. Kids go learn to code. I'll be over here writing a voxel engine._
