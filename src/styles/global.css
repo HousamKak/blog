@@ -691,6 +691,19 @@ body {
   /* Ticker */
   .chaos-ticker { font-size: 0.82rem; padding: 0.4rem 0; letter-spacing: 0.04em; }
 
+  /* MOBILE SCROLL PERF — kill the two biggest drag-lag culprits.
+     1) The SVG turbulence paper-noise + gradients + background-attachment:fixed on <html>
+        force a full-viewport repaint every scroll frame on iOS/Android. Swap to a flat
+        paper color on mobile. Desktop keeps the texture.
+     2) The sticky masthead ticker animates translateX forever; each scroll frame also
+        repaints the ticker. Stop the animation on mobile. */
+  html {
+    background-image: none;
+    background-attachment: scroll;
+    background-color: var(--paper-cream);
+  }
+  .chaos-ticker-track { animation: none; will-change: auto; }
+
   /* Flatten tilts on mobile — tilting causes horizontal overflow + visual clutter */
   .chaos-card.tilted-l,
   .chaos-card.tilted-r,
