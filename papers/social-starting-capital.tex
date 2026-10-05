@@ -1,0 +1,1278 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs,longtable,array}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{
+  pdftitle={From Unequal Beginnings to Social Starting Capital},
+  pdfauthor={Housam Kak},
+  pdfsubject={A normative and budget-closed framework for common inheritance, child development, and protected capital},
+  pdfkeywords={social starting capital, common inheritance, child accounts, inequality, intergenerational justice}
+}
+\Urlmuskip=0mu plus 1mu\relax
+
+\newtheorem{definition}{Definition}[section]
+\newtheorem{proposition}[definition]{Proposition}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{remark}[definition]{Remark}
+\newtheorem{assumption}[definition]{Assumption}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\pos}[1]{\left[#1\right]_{+}}
+\newcommand{\clamp}[1]{\operatorname{clamp}_{[0,1]}\!\left(#1\right)}
+
+\title{From Unequal Beginnings to Social Starting Capital\\
+\large A Normative and Budget-Closed Framework for Common Inheritance,\\
+Child Development, and Protected Capital}
+\author{Housam Kak}
+\date{October 2026}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+People do not choose the families, assets, legal systems, public institutions, or
+historical circumstances into which they are born. Yet those conditions shape their
+capabilities long before individual effort can plausibly explain the resulting
+differences. This paper argues that part of a society's productive inheritance---the
+value attributable to nature, accumulated knowledge, public institutions, social
+cooperation, and historically created scarcity rents---may legitimately finance a
+material starting stake for every child. It then develops the Social Starting Capital
+Framework (SSCF), a policy architecture with three distinct functions: a universal
+child-development floor, supplementary household support, and an independently owned
+birthright capital account.
+
+The formal model is designed to be budget-closed. Every newborn receives an equal,
+strictly positive statutory base grant. Family size affects supplementary household
+support, not the child's independent capital right. All discretionary bonuses and
+progressive top-ups are normalized to explicit pools, so realized expenditure cannot
+exceed the authorized budget when births or household composition differ from
+forecasts. The model distinguishes maximum spending capacity from actual spending,
+specifies the split between current revenue and fund withdrawals, includes withdrawals
+in child-account dynamics, and states an exact condition for preserving the social
+wealth fund in real per-capita terms. A fiscal backstop makes the claimed minimum a
+genuine guarantee rather than a residual aspiration. A calibration and demographic
+stress test illustrate the system.
+
+The proposal is neither a theory of equal outcomes nor a substitute for public
+services, private saving, or claims of historical rectification. It is a pre-
+distributional institution: each generation inherits a protected material foothold in
+a social world it did not create but must be able to enter as an agent.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\part{The Normative Case}
+
+\section{Introduction}
+
+The conditions of birth are unchosen, but they are not inconsequential. A child may be
+born into secure housing, educated networks, inherited assets, political stability,
+and ready access to credit. Another may be born into debt, displacement, dangerous
+housing, weak public services, or legal insecurity. Neither child authored that initial
+position. By the time conventional accounts of merit begin measuring effort, the two
+children may already differ in health, vocabulary, confidence, time horizon, and the
+range of choices they can safely make.
+
+This fact does not imply that every later inequality is unjust. Differences can arise
+from effort, preference, innovation, luck, care obligations, and voluntary exchange.
+The narrower claim defended here is that a political order cannot treat radically
+unequal starting power as morally irrelevant and then describe the resulting
+competition as equal opportunity. Formal permission is not the same as effective
+freedom. A right to study, move, refuse an abusive employer, or start an enterprise is
+thin when a person lacks the health, time, security, and assets required to exercise it.
+
+The empirical background is severe. The \emph{World Inequality Report 2022} estimates
+that the richest tenth of the global population receives roughly 52 percent of global
+income and owns roughly 76 percent of global wealth, while the poorest half receives
+8.5 percent of income and owns about 2 percent of wealth \cite{wir2022}. Land---a
+finite and politically constituted asset---is also highly concentrated; in the most
+unequal regions, the top tenth of landowners controls as much as three quarters of
+agricultural land \cite{bauluz2020}. Measures of intergenerational mobility differ by
+country and by whether one studies income, education, absolute mobility, or relative
+mobility, but family background remains a powerful predictor of later outcomes
+\cite{vanderweide2024}.
+
+The policy response developed in this paper begins from a concept of \emph{common
+inheritance}. Each generation receives natural resources, scientific knowledge,
+language, infrastructure, legal forms, monetary institutions, and productive
+organizations that it did not build from nothing. Those inheritances do not make all
+wealth collective. They do, however, weaken the claim that the entire social product is
+morally exhausted by present private title.
+
+The Social Starting Capital Framework (SSCF) turns that moral observation into an
+institution with three separate layers:
+
+\begin{enumerate}[label=\arabic*.]
+  \item a universal child-development floor, delivered primarily through services or
+  guaranteed provision;
+  \item supplementary household support, recognizing that care occurs in families and
+  has both fixed and variable costs; and
+  \item a protected capital account owned by the child, containing an equal statutory
+  base grant and, where authorized, budget-normalized additions.
+\end{enumerate}
+
+Separating these layers is essential. Services cannot provide the bargaining power of
+an owned asset. A capital account cannot replace nutrition, healthcare, safe housing,
+or schools. Household assistance is necessary, but a payment controlled entirely by
+parents is not the same institution as capital legally owned by the child.
+
+The remainder of Part I develops the moral argument and its limits. Part II provides a
+complete accounting model. Part III gives a calibration, stress test, governance rules,
+and limitations.
+
+\section{Unequal beginnings and effective freedom}
+
+The metaphor of the birth lottery is useful because it identifies a boundary of
+responsibility. No one chooses their parents, citizenship, childhood neighborhood,
+inherited health, first language, or initial balance sheet. Rawls treats natural and
+social starting positions as morally arbitrary for the purpose of choosing principles
+for the basic structure \cite{rawls1971}. Sen shifts attention from formal holdings to
+capabilities: what a person is substantively able to be and do \cite{sen1999}. Van
+Parijs similarly distinguishes formal freedom from the resources required for real
+freedom \cite{vanparijs1995}.
+
+Capital matters within this framework for reasons different from income. Income meets
+recurrent needs. Public services create capabilities and insure risks. Capital adds a
+stock of option value. It can finance relocation, education, tools, a housing deposit,
+or a period of search. It can make refusal possible. An individual with a modest asset
+buffer can reject a predatory loan or dangerous job in a way that an otherwise equal
+individual living at the edge of subsistence cannot.
+
+This paper therefore uses \emph{starting capital} in the financial and institutional
+sense. It should not be confused with the sociological concept of \emph{social capital},
+which normally refers to relationships, networks, trust, and norms. Networks are part
+of unequal beginnings, but the SSCF is a proposal for social starting \emph{capital}:
+a publicly constituted material stake.
+
+\section{Property, history, and common inheritance}
+
+Modern holdings did not emerge on an empty field. They are the result of labor and
+exchange, but also of inheritance, enclosure, conquest, slavery, colonial extraction,
+state-building, technological accumulation, and legal decisions about which claims the
+state will enforce. Recognizing this history does not establish that every present title
+is invalid. It establishes that present title cannot be the only premise in a theory of
+distribution.
+
+Locke's labor theory of appropriation remains important because effort and personal
+projects deserve protection. Yet Lockean appropriation is constrained by the proviso
+that enough and as good remain for others \cite{locke1689}. Once land and resources are
+scarce and legally enclosed, latecomers encounter neither open nature nor a blank slate.
+Rousseau emphasizes that civil inequality is institutional, not merely a reflection of
+natural difference \cite{rousseau1755}. Paine argues that private cultivation can be
+recognized while those excluded from the earth's original common condition receive
+compensation \cite{paine1797}. George makes a related distinction between productive
+effort and land rent generated by scarcity and surrounding social development
+\cite{george1879}.
+
+Marx's account of primitive accumulation and Polanyi's account of land, labor, and
+money as politically constructed commodities place market exchange within a prior
+history of institutional change \cite{marx1867,polanyi1944}. Their analyses need not
+be accepted in full to recognize that markets depend on law, public authority,
+infrastructure, money, and accumulated knowledge.
+
+Nozick's entitlement theory offers the strongest warning against treating persons and
+their holdings as instruments of a preferred pattern. Just holdings acquired and
+transferred legitimately deserve protection \cite{nozick1974}. But the historical
+principle also makes acquisition and rectification unavoidable questions. A society
+with layered dispossession, inherited legal privilege, and uncompensated externalities
+cannot simply assume the clean history that gives the entitlement argument its greatest
+force.
+
+The conclusion is limited but significant: a defined portion of economic flows can be
+treated as socially claimable without treating all property or production as collective.
+The relevant base is not ``everything the state can tax.'' It is a transparent set of
+revenues connected to common assets, inherited transfers, publicly created value,
+external costs, and collectively owned capital.
+
+This conclusion is strengthened by two further observations. First, wealth can compound
+across generations and become increasingly important to stratification when returns on
+owned assets outpace the growth of ordinary incomes \cite{piketty2014}. Second,
+recognizing a common claim does not require a choice between atomized private ownership
+and unrestricted central control. Ostrom's work demonstrates that shared resources can
+be governed through durable, rule-bound institutions under the right conditions
+\cite{ostrom1990}. The design question is therefore not simply public versus private,
+but which rights, duties, boundaries, and monitoring arrangements fit the resource.
+
+\section{Three arguments that must remain distinct}
+
+Several arguments for redistribution are often blended together. They should be
+separated because they imply different allocation rules.
+
+\subsection{Common inheritance}
+
+If every member of a generation is a co-beneficiary of natural, institutional, and
+knowledge inheritances, the common-inheritance argument supports a universal claim.
+The equal base grant in this paper rests primarily on that argument.
+
+\subsection{Capability and priority}
+
+Equal nominal grants do not equalize substantive freedom. Disability, regional prices,
+discrimination, care burdens, and household poverty affect what the same amount can do.
+Capability and prioritarian arguments therefore support progressive or needs-based
+top-ups. Those additions should be explicit and separately budgeted rather than hidden
+inside the universal claim.
+
+\subsection{Rectification}
+
+Historical injustice can generate claims for groups or persons who suffered or inherit
+the consequences of a specific wrong. Such claims may be larger, differently funded,
+or differently governed than a universal starting stake. A universal SSCF must not be
+presented as extinguishing claims for reparations, restitution, indigenous sovereignty,
+or other forms of rectification.
+
+This separation improves both philosophy and policy. Universality, progressivity, and
+rectification can coexist, but one does not silently substitute for another.
+
+\section{Intellectual and institutional lineage}
+
+The proposal belongs to a long family of arguments. Paine proposed a national fund that
+would pay a capital sum at adulthood \cite{paine1797}. More recent proposals include
+stakeholder grants, minimum inheritance, and asset-building policies
+\cite{ackerman1999,atkinson2015,sherraden1991}. Hamilton and Darity's baby-bonds work
+shows how progressively funded child accounts can address entrenched wealth gaps
+\cite{hamilton2010}.
+
+Public wealth funds provide a second lineage. Norway's Government Pension Fund turns
+petroleum revenue into long-term public saving and explicitly links its management to
+intergenerational considerations \cite{norwayfund}. These examples do not by themselves
+justify the SSCF, nor are they institutionally identical to it. They establish that
+public ownership, professional asset management, and intergenerational distribution are
+practical institutional categories rather than conceptual impossibilities.
+
+The SSCF's contribution is architectural. It integrates present capabilities, family
+care, individually owned capital, explicit fiscal priority, and a fund rule in one
+budget-closed model. Its novelty claim is therefore about the combination and the
+formal separation of functions, not the invention of child accounts or public funds.
+
+\section{Normative principles}
+
+The framework is governed by seven principles.
+
+\begin{description}[style=nextline]
+  \item[P1. Common inheritance.] A defined part of social wealth is attributable to
+  nature, inherited institutions, public action, and cumulative cooperation rather than
+  current private effort alone.
+
+  \item[P2. Independent child standing.] The child is a rights-bearing unit. Every
+  eligible newborn receives an equal, strictly positive base capital grant that is not
+  reduced by sibling count, parental income, or module completion.
+
+  \item[P3. Capability before discretion.] Essential childhood development has fiscal
+  priority over optional distributions.
+
+  \item[P4. Family agency without substitution.] Families receive room and support to
+  care, but household transfers neither replace the child-development floor nor absorb
+  the child's capital right.
+
+  \item[P5. Exact budget closure.] Every variable expenditure is assigned to a defined
+  pool. Forecast errors may change bonuses, but cannot create unauthorized expenditure.
+
+  \item[P6. Intergenerational reciprocity.] Fund policy is evaluated in real per-capita
+  terms, not merely by nominal non-decline.
+
+  \item[P7. Non-forfeiture and proportionate protection.] Education may affect the form
+  and timing of early access, but never ownership. Restrictions expire and are subject
+  to due process.
+\end{description}
+
+\part{The Formal Framework}
+
+\section{Timing, populations, and notation}
+
+Time is discrete and indexed by fiscal years $t=0,1,2,\ldots$. All transfers for birth
+cohort $t$ are finalized after the eligible births in that cohort have been registered.
+A provisional account may be opened at birth, but the final annual bonus is credited
+only after the realized cohort is known. This convention eliminates the use of future
+or unobserved population values in current grants.
+
+Let:
+
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.18\textwidth}p{0.72\textwidth}}
+\toprule
+Symbol & Meaning \\
+\midrule
+$N_t$ & reference population at the start of year $t$ \\
+$\mathcal F_t$ & set of eligible households during year $t$ \\
+$K_{f,t}$ & number of eligible dependent children in household $f$ \\
+$\mathcal C_t$ & set of all eligible dependent children \\
+$\mathcal B_t$ & finalized set of eligible newborns in cohort $t$ \\
+$B_t$ & realized births, $B_t=|\mathcal B_t|$ \\
+$Y_t$ & net, non-overlapping socially claimable inflow \\
+$W_t$ & market value of the social wealth fund at the start of year $t$ \\
+$r_t$ & net nominal return on the fund during year $t$ \\
+$P_t$ & general price index, used only for real-value comparisons \\
+$U_t$ & expenditure on the universal child-development floor \\
+$G_t^{\min}$ & aggregate statutory newborn base grants \\
+$H_t$ & actual supplementary household allocation \\
+$G_t^{+}$ & cohort bonus above the statutory base \\
+$T_t$ & progressive top-up pool for existing child accounts \\
+$V_t$ & optional adult or transition distribution \\
+$D_t$ & actual total program distribution \\
+$D_t^Y,D_t^W$ & actual distribution funded from current resources and the fund \\
+$Z_t$ & transparent general-revenue backstop for mandatory child claims \\
+$A_{c,s}$ & total account assets owned by child $c$ at date $s$ \\
+\bottomrule
+\end{longtable}
+
+We assume $N_t>0$, $P_t>0$, $W_t\ge 0$, and $B_t\ge 0$. Every formula that divides by
+$B_t$ includes a separate zero-birth convention.
+
+\section{The revenue base and social wealth fund}
+
+\begin{definition}[Socially claimable inflow]
+The net inflow dedicated to the framework is
+\begin{equation}
+  Y_t=Y_t^{\mathrm{res}}+Y_t^{\mathrm{land}}+Y_t^{\mathrm{inh}}
+      +Y_t^{\mathrm{pub}}+Y_t^{\mathrm{eco}}+Y_t^{\mathrm{other}},
+\end{equation}
+where the terms denote, respectively, net resource rents, land-value revenue, dedicated
+inheritance and gift taxation, distributable profit from public assets, ecological
+charges, and other legislatively designated revenue.
+\end{definition}
+
+The components must be measured net of collection costs, rebates, and prior legal
+claims. They must also be non-overlapping. In particular, $Y_t^{\mathrm{pub}}$ excludes
+returns already counted in $r_tW_t$, and ecological charges exclude resource royalties
+already counted as resource rents. This restriction prevents the same economic flow
+from financing the model twice.
+
+Let $\phi_t\in[0,1]$ be the minimum saving share of $Y_t$. Let $\widetilde W_t$ be a
+prudential reference value known at the start of the year, such as the lesser of current
+fund value and a trailing multi-year average. With draw-rate parameter
+$\gamma_t\in[0,1)$, the maximum authorized fund draw is
+\begin{equation}
+  \overline d_t=\min\{\gamma_t\widetilde W_t,W_t\}.
+\end{equation}
+The use of a predetermined reference value avoids making current entitlements depend on
+an end-of-year return that is not yet known.
+
+Before the statutory backstop is applied, maximum current-year spending capacity is
+\begin{equation}
+  C_t^0=(1-\phi_t)Y_t+\overline d_t.
+\end{equation}
+This is capacity, not actual expenditure and not an instruction to take the full draw.
+
+\section{Mandatory child claims and the fiscal backstop}
+
+Let $u_{c,t}\ge0$ be the cost of the guaranteed development package for child $c$. It
+may reflect disability, regional cost, or age while preserving a common service
+standard. Then
+\begin{equation}
+  U_t=\sum_{c\in\mathcal C_t}u_{c,t}.
+\end{equation}
+The package can include nutrition, preventive healthcare, schooling, safe transport,
+digital access, and housing-related support. It should be measured as the incremental
+cost attributable to the SSCF or explicitly identify existing expenditure reclassified
+under it; otherwise the fiscal cost would be overstated or double-counted.
+
+Let $\underline g_t>0$ be the indexed statutory base grant for each eligible newborn.
+The aggregate base obligation is
+\begin{equation}
+  G_t^{\min}=B_t\underline g_t.
+\end{equation}
+The mandatory claim is
+\begin{equation}
+  M_t=U_t+G_t^{\min}.
+\end{equation}
+
+A right cannot honestly be called guaranteed if it disappears whenever residual funds
+are exhausted. The framework therefore makes any shortfall visible:
+\begin{equation}
+  Z_t=\pos{M_t-C_t^0}.
+\end{equation}
+Here $Z_t$ is a transfer from ordinary public revenue authorized by the statute creating
+the SSCF. It may be financed through a standing appropriation or an automatic surcharge.
+It may not be financed by breaching the fund draw cap. Total authorized capacity is
+therefore
+\begin{equation}
+  C_t=C_t^0+Z_t,
+\end{equation}
+and $M_t\le C_t$ by construction.
+
+\begin{remark}
+The backstop is not free money. It states who bears the risk when dedicated revenues
+fall short. Without it, either the minimum is not a right or the model contains an
+unreported deficit. A legislature may set a modest $\underline g_t$ to make activation
+rare, but it cannot claim an unconditional positive grant while assigning all revenue
+risk to the child.
+\end{remark}
+
+\section{Supplementary household allocation}
+
+Households face fixed costs and economies of scale. Let the desired supplemental amount
+for household $f$ be
+\begin{equation}
+  \widehat H_{f,t}=h_t+s_t\omega(K_{f,t}),
+  \qquad h_t,s_t\ge0,
+\end{equation}
+where
+\begin{equation}
+  \omega(K)=\sum_{j=1}^{K}w_j,
+  \qquad
+  w_j=
+  \begin{cases}
+    1, & j\le K^*,\\
+    \lambda^{j-K^*}, & j>K^*,
+  \end{cases}
+\end{equation}
+with $K^*\in\{1,2,\ldots\}$ and $0<\lambda<1$. The taper applies only to this
+supplementary household layer. It never changes $\underline g_t$.
+
+Let
+\begin{equation}
+  \widehat H_t=\sum_{f\in\mathcal F_t}\widehat H_{f,t}
+\end{equation}
+be desired aggregate household support. A share $\beta_H\in[0,1]$ of capacity remaining
+after mandatory claims is reserved for this layer:
+\begin{equation}
+  \overline H_t=\beta_H(C_t-M_t).
+\end{equation}
+Define
+\begin{equation}
+  \xi_t=
+  \begin{cases}
+    \min\{1,\overline H_t/\widehat H_t\}, & \widehat H_t>0,\\
+    0, & \widehat H_t=0,
+  \end{cases}
+\end{equation}
+and set
+\begin{equation}
+  H_{f,t}=\xi_t\widehat H_{f,t},
+  \qquad H_t=\sum_{f\in\mathcal F_t}H_{f,t}.
+\end{equation}
+Thus household support is both individually tapered and aggregately budgeted.
+
+\begin{proposition}[Household bounds]
+For every household $f$,
+\begin{equation}
+  0\le H_{f,t}\le h_t+s_t\left(K^*+\frac{\lambda}{1-\lambda}\right),
+\end{equation}
+and aggregate expenditure satisfies $0\le H_t\le\overline H_t$.
+\end{proposition}
+
+\begin{proof}
+For $K\le K^*$, $\omega(K)=K\le K^*$. For $K>K^*$,
+\[
+\omega(K)=K^*+\sum_{m=1}^{K-K^*}\lambda^m
+\le K^*+\frac{\lambda}{1-\lambda}.
+\]
+Since $0\le\xi_t\le1$, the individual bound follows. The definition of $\xi_t$ gives
+$H_t=\min\{\widehat H_t,\overline H_t\}$ when $\widehat H_t>0$, proving the aggregate
+bound.
+\end{proof}
+
+Because the base term $h_t$ could create incentives to split one economic household
+into multiple administrative units, eligibility must rely on a legally defined care and
+residence unit, with due-process protections for genuine family separation.
+
+\section{Residual pools and exact allocation}
+
+After mandatory claims and actual household support, the remaining capacity is
+\begin{equation}
+  Q_t=C_t-M_t-H_t\ge0.
+\end{equation}
+Choose policy shares $\theta_G,\theta_T,\theta_V\ge0$ satisfying
+\begin{equation}
+  \theta_G+\theta_T+\theta_V\le1.
+\end{equation}
+The authorized pools are
+\begin{equation}
+  \overline G_t^{+}=\theta_GQ_t,
+  \qquad
+  \overline T_t=\theta_TQ_t,
+  \qquad
+  \overline V_t=\theta_VQ_t.
+\end{equation}
+
+\subsection{Equal newborn bonus}
+
+The cohort bonus is
+\begin{equation}
+  b_t^{+}=
+  \begin{cases}
+    \overline G_t^{+}/B_t, & B_t>0,\\
+    0, & B_t=0.
+  \end{cases}
+\end{equation}
+Every newborn $c\in\mathcal B_t$ receives
+\begin{equation}
+  g_{c,t}^{(0)}=\underline g_t+b_t^{+}.
+\end{equation}
+Consequently,
+\begin{equation}
+  \sum_{c\in\mathcal B_t}g_{c,t}^{(0)}
+  =G_t^{\min}+\overline G_t^{+}
+\end{equation}
+when $B_t>0$. The realized cohort, rather than smoothed or forecast births, is the final
+denominator. Forecasts may be used for budgeting, but never to calculate an entitlement
+that can overspend its pool.
+
+\subsection{Progressive account top-ups}
+
+Let $y_{c,t}\ge0$ be an administratively defined measure of the resources available to
+child $c$, preferably averaged across several years and adjusted for household size.
+Let $y_t^*>0$ be a reference threshold. Define the bounded shortfall score
+\begin{equation}
+  z_{c,t}=\clamp{\frac{y_t^*-y_{c,t}}{y_t^*}}.
+\end{equation}
+Additional bounded indicators may represent disability, care burden, displacement, or
+regional cost. For clarity, combine them into $d_{c,t}\in[0,1]$ and define
+\begin{equation}
+  a_{c,t}=1+\kappa_yz_{c,t}+\kappa_dd_{c,t},
+  \qquad \kappa_y,\kappa_d\ge0.
+\end{equation}
+If $\mathcal C_t$ is nonempty, allocate
+\begin{equation}
+  \tau_{c,t}=\overline T_t
+  \frac{a_{c,t}}{\sum_{j\in\mathcal C_t}a_{j,t}}.
+\end{equation}
+If $\mathcal C_t$ is empty, set every $\tau_{c,t}=0$ and $T_t=0$. Otherwise set
+$T_t=\sum_c\tau_{c,t}$.
+
+\begin{proposition}[Exact pool exhaustion]
+If $\mathcal C_t\ne\varnothing$, then $\tau_{c,t}>0$ for every eligible child and
+\begin{equation}
+  \sum_{c\in\mathcal C_t}\tau_{c,t}=\overline T_t.
+\end{equation}
+No income report or demographic realization can cause top-ups to exceed their pool.
+\end{proposition}
+
+\begin{proof}
+Since $a_{c,t}\ge1$, every denominator and every individual weight is positive. Summing
+the normalized shares gives one.
+\end{proof}
+
+The optional adult distribution satisfies $0\le V_t\le\overline V_t$. Unallocated
+capacity is not automatically spent.
+
+\section{Annual budget closure and fund accounting}
+
+Actual program distribution is
+\begin{equation}
+  D_t=U_t+G_t^{\min}+H_t+G_t^{+}+T_t+V_t,
+\end{equation}
+where $G_t^{+}=\overline G_t^{+}$ when $B_t>0$ and $0$ otherwise.
+
+Current distributable resources, including a backstop if activated, are
+\begin{equation}
+  C_t^Y=(1-\phi_t)Y_t+Z_t.
+\end{equation}
+Actual source amounts are defined after actual spending:
+\begin{align}
+  D_t^Y&=\min\{D_t,C_t^Y\},\\
+  D_t^W&=D_t-D_t^Y,\\
+  E_t&=C_t^Y-D_t^Y.
+\end{align}
+Here $E_t\ge0$ is unused current revenue, which is transferred to the fund rather than
+silently disappearing from the accounts. The fund evolves as
+\begin{equation}\label{eq:fundlaw}
+  W_{t+1}=W_t(1+r_t)+\phi_tY_t+E_t-D_t^W.
+\end{equation}
+
+\begin{proposition}[Budget closure]
+Under the allocation rules above,
+\begin{equation}
+  0\le D_t\le C_t,
+  \qquad
+  0\le D_t^W\le\overline d_t.
+\end{equation}
+Moreover, the accounting identity
+\begin{equation}
+  W_{t+1}=W_t(1+r_t)+Y_t+Z_t-D_t
+\end{equation}
+holds.
+\end{proposition}
+
+\begin{proof}
+Mandatory spending satisfies $M_t\le C_t$. Household spending satisfies
+$H_t\le\beta_H(C_t-M_t)$. The three residual pools sum to at most $Q_t$, so total
+spending cannot exceed $C_t$. Since $C_t=C_t^Y+\overline d_t$, the residual definition
+$D_t^W=\pos{D_t-C_t^Y}$ implies $D_t^W\le\overline d_t$. Finally,
+$E_t=C_t^Y-D_t^Y$ and $D_t=D_t^Y+D_t^W$. Substitution into
+Equation~\eqref{eq:fundlaw} gives
+\[
+W_{t+1}=W_t(1+r_t)+\phi_tY_t+C_t^Y-D_t
+=W_t(1+r_t)+Y_t+Z_t-D_t.
+\]
+\end{proof}
+
+\begin{corollary}[Positive and family-independent base]
+For every $c\in\mathcal B_t$,
+\begin{equation}
+  g_{c,t}^{(0)}\ge\underline g_t>0,
+\end{equation}
+and this lower bound is independent of $K_{f,t}$, parental income, and education-module
+completion.
+\end{corollary}
+
+\section{Child-account dynamics}
+
+An SSCF account is the legal property of the child, administered in trust until staged
+access. It is not an asset of the parent, household, or general treasury. If accounts
+are invested inside the social fund, the public balance sheet must record an equal
+liability; otherwise the same assets would be counted both as public fund wealth and as
+private child wealth.
+
+Let $A_{c,s}$ be the account balance at the start of date $s$, $q_{c,s}>-1$ the net
+credited return, $\tau_{c,s}\ge0$ the top-up, and $x_{c,s}\ge0$ the total amount paid out
+at the end of the period. The law of motion is
+\begin{equation}\label{eq:accountlaw}
+  A_{c,s+1}=A_{c,s}(1+q_{c,s})+\tau_{c,s}-x_{c,s},
+\end{equation}
+subject to
+\begin{equation}
+  0\le x_{c,s}\le A_{c,s}(1+q_{c,s})+\tau_{c,s}.
+\end{equation}
+This equation records withdrawals explicitly. Without $x_{c,s}$, a staged-release rule
+would repeatedly distribute claims against capital that remained unchanged on paper.
+
+The public fund return $r_t$ and child-account return $q_{c,s}$ are distinct accounting
+objects. If accounts are externally custodied, $q_{c,s}$ is simply their net portfolio
+return. If internally custodied, the fund must segregate corresponding assets and
+liabilities.
+
+\section{Staged access without forfeiture}
+
+Let release ages satisfy $a_1<a_2<a_3$, for example 18, 21, and 25. Choose target
+shares $\eta_1,\eta_2,\eta_3\ge0$ with $\eta_1+\eta_2+\eta_3=1$. To avoid applying
+fractions repeatedly to an already reduced balance, define conditional release rates
+\begin{equation}
+  k_j=
+  \begin{cases}
+  \displaystyle\frac{\eta_j}{1-\sum_{m<j}\eta_m}, & j=1,2,\\[8pt]
+  1, & j=3.
+  \end{cases}
+\end{equation}
+
+Let $P_{c,j}^{-}$ be the protected balance immediately before release $j$. The amount
+that vests out of protection is
+\begin{equation}
+  R_{c,j}=k_jP_{c,j}^{-},
+  \qquad
+  P_{c,j}^{+}=P_{c,j}^{-}-R_{c,j}.
+\end{equation}
+Thus $k_1=eta_1$, $k_2=eta_2/(1-\eta_1)$, and the final release transfers all
+remaining protected assets. Returns earned between milestones remain attached
+proportionally to the protected assets that produced them.
+
+Financial education affects the form of early access, not ownership. Let
+\begin{equation}
+  e_{c,j}=\sum_{m=1}^{J}\beta_mz_{c,m,j},
+  \qquad z_{c,m,j}\in\{0,1\},
+  \quad \beta_m\ge0,
+  \quad \sum_m\beta_m=1.
+\end{equation}
+With guaranteed discretionary fraction $\delta\in(0,1]$, the immediately unrestricted
+part of release $j<3$ is
+\begin{equation}
+  R_{c,j}^{\mathrm{free}}
+  =R_{c,j}\bigl[\delta+(1-\delta)e_{c,j}\bigr].
+\end{equation}
+The remainder is placed in a restricted wallet usable for a broad statutory list that
+may include education, housing, mobility, tools, healthcare, debt avoidance, and
+enterprise. It is not forfeited. At $a_3$, all remaining restrictions expire regardless
+of module completion.
+
+The education program must be free, accessible, multilingual, disability-accommodating,
+and subject to appeal. The modules should be short and practical. They cannot become a
+test of cultural conformity or an administrative device for permanent exclusion.
+
+\begin{proposition}[No duplicate release]
+Ignoring payouts from already released wallets, the staged rule transfers the entire
+protected balance exactly once by age $a_3$.
+\end{proposition}
+
+\begin{proof}
+The first release leaves fraction $1-\eta_1$. The second conditional rate transfers
+$\eta_2/(1-\eta_1)$ of that protected balance, corresponding to the second target share
+after accounting for the first release. The third release rate equals one and therefore
+transfers the entire remaining protected balance. Each transfer is subtracted from
+$P_{c,j}^{-}$ before the next period.
+\end{proof}
+
+\section{Real per-capita sustainability}
+
+Nominal fund non-decline is not an adequate definition of intergenerational
+sustainability. A fund can grow in currency units while shrinking after inflation or
+relative to the population it serves.
+
+Define inflation and population growth by
+\begin{equation}
+  1+\pi_t=\frac{P_{t+1}}{P_t},
+  \qquad
+  1+n_t=\frac{N_{t+1}}{N_t},
+\end{equation}
+where $\pi_t>-1$ and $n_t>-1$. Real per-capita fund wealth is
+\begin{equation}
+  w_t=\frac{W_t}{P_tN_t}.
+\end{equation}
+
+\begin{proposition}[Exact real per-capita condition]
+For $W_t>0$, real per-capita fund wealth is non-decreasing, $w_{t+1}\ge w_t$, if and only
+if
+\begin{equation}\label{eq:sustainability}
+  1+r_t+\frac{\phi_tY_t+E_t-D_t^W}{W_t}
+  \ge(1+\pi_t)(1+n_t).
+\end{equation}
+Equivalently,
+\begin{equation}
+  r_t+\frac{\phi_tY_t+E_t-D_t^W}{W_t}
+  \ge \pi_t+n_t+\pi_tn_t.
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+By the fund law,
+\[
+\frac{W_{t+1}}{W_t}
+=1+r_t+\frac{\phi_tY_t+E_t-D_t^W}{W_t}.
+\]
+Also,
+\[
+\frac{P_{t+1}N_{t+1}}{P_tN_t}=(1+\pi_t)(1+n_t).
+\]
+The condition $W_{t+1}/(P_{t+1}N_{t+1})\ge W_t/(P_tN_t)$ is therefore equivalent to
+Equation~\eqref{eq:sustainability}.
+\end{proof}
+
+This is an ex-post accounting condition, not a promise that risky returns will realize.
+Ex-ante policy should use conservative expected real returns, rolling asset values,
+stress tests, and a stabilization reserve. A draw cap $\gamma_t$ is a prudential tool;
+it is not, by itself, proof of sustainability.
+
+Where the relevant liability is more closely related to child cohorts than to total
+population, the same proposition may be stated using a transparent demographic index
+$L_t$ in place of $N_t$. The denominator should match the right being stabilized. Birth
+counts determine cohort bonuses directly; total population growth should not be used as
+an indirect substitute.
+
+\part{Calibration, Governance, and Evaluation}
+
+\section{Illustrative calibration}
+
+The following values are arbitrary currency units (CU), not estimates for a particular
+country. They demonstrate accounting behavior.
+
+Assume
+\begin{equation*}
+  Y_t=100\text{ billion},\quad
+  W_t=500\text{ billion},\quad
+  \phi_t=0.40,\quad
+  \gamma_t=0.03,\quad
+  \widetilde W_t=W_t,
+\end{equation*}
+and $r_t=0.05$. Then
+\begin{equation*}
+  \overline d_t=15\text{ billion},
+  \qquad
+  C_t^0=60+15=75\text{ billion}.
+\end{equation*}
+
+Suppose
+\begin{equation*}
+  U_t=25\text{ billion},\qquad
+  B_t=500{,}000,qquad
+  \underline g_t=10{,}000.
+\end{equation*}
+The aggregate statutory base is $5$ billion and mandatory expenditure is
+\begin{equation*}
+  M_t=25+5=30\text{ billion}.
+\end{equation*}
+No backstop is required, so $Z_t=0$ and $C_t=75$ billion. Capacity after mandatory
+claims is $45$ billion.
+
+Let $\beta_H=0.50$. The household-layer budget is $22.5$ billion. If desired aggregate
+household support equals $20$ billion, it is paid in full: $H_t=20$ billion. Remaining
+capacity is
+\begin{equation*}
+  Q_t=75-30-20=25\text{ billion}.
+\end{equation*}
+Choose
+\begin{equation*}
+  \theta_G=0.60,\qquad
+  \theta_T=0.20,\qquad
+  \theta_V=0.
+\end{equation*}
+The newborn bonus pool is $15$ billion, so every newborn receives a bonus of
+\begin{equation*}
+  b_t^+=\frac{15{,}000{,}000{,}000}{500{,}000}=30{,}000.
+\end{equation*}
+The initial account is therefore $40{,}000$ per newborn: a $10{,}000$ protected base
+plus a $30{,}000$ equal cohort bonus. The progressive top-up pool for all eligible child
+accounts is $5$ billion. Total distribution is
+\begin{equation*}
+  D_t=25+5+20+15+5=70\text{ billion}.
+\end{equation*}
+Current distributable revenue is $60$ billion, so
+\begin{equation*}
+  D_t^Y=60\text{ billion},qquad
+  D_t^W=10\text{ billion}.
+\end{equation*}
+The maximum draw is not taken merely because it is available. The closing fund is
+\begin{equation*}
+  W_{t+1}=500(1.05)+40-10=555\text{ billion}.
+\end{equation*}
+
+\subsection{Household-level illustration}
+
+Let $h_t=5{,}000$, $s_t=4{,}000$, $K^*=2$, and $\lambda=0.60$. Before any aggregate
+scaling,
+\begin{align*}
+  \omega(1)&=1,\\
+  \omega(3)&=2.6,\\
+  \omega(6)&=3.3056.
+\end{align*}
+Desired household supplements are therefore
+\begin{align*}
+  \widehat H(1)&=9{,}000,\\
+  \widehat H(3)&=15{,}400,\\
+  \widehat H(6)&=18{,}222.40.
+\end{align*}
+The taper bounds household support, while all newborns still receive the same cohort
+capital.
+
+\subsection{Account growth}
+
+With no later top-ups or withdrawals and a constant net return of 4 percent, a $40{,}000$
+initial account becomes
+\begin{equation*}
+  40{,}000(1.04)^{18}\approx81{,}032.66
+\end{equation*}
+at age 18. This is a nominal illustration; actual policy must report inflation-adjusted
+values, fees, risk, and the distribution of realized returns.
+
+\section{Demographic and revenue stress tests}
+
+\subsection{Birth shock}
+
+Suppose realized births rise from $500{,}000$ to $650{,}000$, while the child floor,
+capacity, statutory base, and desired aggregate household support remain as above. The
+base obligation rises to $6.5$ billion, so
+\begin{equation*}
+  M_t=31.5\text{ billion}.
+\end{equation*}
+Capacity after mandatory claims is $43.5$ billion. The household budget is $21.75$
+billion, still enough to pay the $20$ billion desired amount. The new residual is $23.5$
+billion. Hence
+\begin{equation*}
+  \overline G_t^+=0.60(23.5)=14.1\text{ billion},
+\end{equation*}
+and the per-newborn bonus becomes
+\begin{equation*}
+  b_t^+=\frac{14.1\text{ billion}}{650{,}000}
+  \approx21{,}692.31.
+\end{equation*}
+Every child keeps the $10{,}000$ base, and total newborn expenditure remains exactly
+within its authorized pool. The shock changes the bonus, not the legal minimum and not
+the budget identity.
+
+\subsection{Dedicated-revenue collapse}
+
+Suppose instead that $C_t^0<M_t$. The backstop activates for exactly the shortfall
+$Z_t=M_t-C_t^0$. Household support and all residual pools fall to zero if no capacity
+remains. The system therefore protects essential childhood provision and the statutory
+capital base before optional layers. This ordering makes the political tradeoff visible:
+the state must either fund the promised right, amend it prospectively under valid legal
+rules, or admit default. It cannot conceal insolvency by assigning a zero residual to a
+nominally universal account.
+
+\section{Comparative statics and design choices}
+
+\subsection{The statutory base $\underline g_t$}
+
+A higher base strengthens the independent child claim but raises mandatory expenditure
+linearly:
+\begin{equation*}
+  \frac{\partial G_t^{\min}}{\partial\underline g_t}=B_t.
+\end{equation*}
+It also increases the probability that the fiscal backstop is needed. The base should
+therefore be indexed and meaningful but calibrated to durable revenue, while variable
+prosperity is shared through the cohort bonus.
+
+\subsection{The household share $\beta_H$}
+
+A larger $\beta_H$ protects more residual capacity for household support. When desired
+support is below its cap, increasing $\beta_H$ has no effect. When the cap binds, it
+raises $H_t$ and correspondingly reduces the residual available for bonuses and top-ups.
+
+\subsection{The taper parameters $K^*$ and $\lambda$}
+
+Increasing $K^*$ gives full marginal household weight to more children. Increasing
+$\lambda$ slows the post-threshold taper. Neither parameter changes the child's
+statutory or cohort capital grant.
+
+\subsection{Saving and draw parameters}
+
+A larger $\phi_t$ reduces current-flow capacity and raises fund saving. A larger
+$\gamma_t$ increases maximum current capacity but does not require a larger draw.
+Actual $D_t^W$ is determined by actual expenditure after current resources are used.
+Both parameters should be evaluated against the real per-capita condition rather than a
+nominal balance target.
+
+\subsection{Progressive weights}
+
+Increasing $\kappa_y$ or $\kappa_d$ reallocates a fixed top-up pool; it does not increase
+aggregate spending. This is an advantage of normalization. Distributional choices are
+not allowed to masquerade as financing assumptions.
+
+\section{Governance and legal form}
+
+The mathematics defines claims and constraints. It cannot supply trustworthy
+institutions by itself.
+
+\subsection{Fund governance}
+
+The social wealth fund should have:
+
+\begin{itemize}
+  \item statutory independence and a fiduciary mandate;
+  \item professional management separated from benefit adjudication;
+  \item public reporting of fees, risk, benchmarks, and voting policy;
+  \item independent audit and legislative oversight;
+  \item conflict-of-interest, procurement, and anti-corruption rules;
+  \item a published asset-liability statement distinguishing public assets from child-
+  account liabilities; and
+  \item an emergency rule specifying when, by whom, and for how long ordinary draw
+  limits may be altered.
+\end{itemize}
+
+Ring-fencing must be legal rather than rhetorical. Political raids can occur through
+direct withdrawal, mandated below-market investments, optimistic return assumptions,
+or the transfer of unrelated liabilities onto the fund. Governance rules must address
+all four.
+
+\subsection{Protection of child ownership}
+
+Accounts should be non-seizable by ordinary household creditors and unavailable as
+collateral before release. Guardians should not be able to redirect the balance. The
+law must specify beneficiary status in adoption, foster care, guardianship changes,
+death before release, and family dissolution. Administrative appeals should be simple,
+free, and independent.
+
+\subsection{Eligibility and migration}
+
+Eligibility choices are unavoidable. Citizenship-only rules can exclude long-term
+resident children; immediate eligibility can create political objections concerning
+short-term residence. The framework does not dictate a single rule, but it requires the
+rule to be prospective, administrable, and consistent with equal treatment. Possible
+designs include vesting by years of childhood residence, partial portability, and
+reciprocal arrangements across jurisdictions.
+
+\subsection{Privacy and data minimization}
+
+The universal base requires little means testing. Progressive top-ups require more data
+and therefore create privacy, stigma, and error costs. The state should use the smallest
+resource measure necessary, publish the formula, limit retention, prohibit unrelated
+use, and allow correction. Complexity should be justified by the additional equity it
+produces.
+
+\section{Macroeconomic and political-economy considerations}
+
+A national program of meaningful scale can affect asset prices, labor supply, savings,
+fertility, educational choices, migration, and credit markets. A grant usable for
+housing may partly capitalize into land prices if housing supply is constrained. A
+grant usable for tuition may be captured by providers if price regulation and supply do
+not respond. Capital access can increase entrepreneurship, but failure risk and market
+power shape who retains the gains.
+
+The funding instruments also have different incidence and volatility. Resource rents
+are geographically concentrated and cyclical. Carbon charges should decline if climate
+policy succeeds. Land-value taxation is comparatively difficult to avoid but requires
+competent valuation. Inheritance taxation raises questions of valuation, avoidance,
+liquidity, family businesses, and cross-border mobility. The OECD concludes that well-
+designed inheritance taxation can raise revenue and advance equality of opportunity,
+while also emphasizing design tradeoffs and behavioral responses \cite{oecd2021}.
+
+These differences argue against treating $Y_t$ as a single permanently stable stream.
+Empirical implementation should model each component separately, estimate covariance
+with fund returns and benefit needs, and stress-test severe joint shocks. A stabilization
+reserve and conservative statutory base are preferable to optimistic promises.
+
+Political economy matters as much as portfolio theory. Universal components can build
+broad support, while progressive components direct more resources toward constrained
+children. Universality without progressivity may leave inherited hierarchy largely
+intact; progressivity without a common claim may become stigmatized and politically
+fragile. The SSCF deliberately combines the two while accounting for them separately.
+
+\section{Objections and replies}
+
+\subsection{The framework penalizes saving or family provision}
+
+The equal base is not withdrawn from children whose parents save. Progressive top-ups
+may decline with household resources, but they are allocated from a distinct pool using
+a gradual bounded score. This preserves a universal ownership relation while directing
+additional help where capital constraints are greater.
+
+\subsection{Parents, not the state, should provide for children}
+
+Family duties and public duties are not mutually exclusive. Families already act inside
+legal, monetary, educational, and infrastructural systems. The proposal does not
+eliminate parental provision; it establishes a minimum social inheritance that cannot
+be erased by parental poverty, neglect, death, or family size.
+
+\subsection{Young adults will waste the grant}
+
+Some recipients will make poor decisions, as do some private heirs. That fact does not
+justify denying ownership only to people whose inheritance is publicly constituted.
+Staged access, accessible education, anti-fraud enforcement, and broad restricted uses
+can reduce predictable harms. Permanent paternalism would contradict the agency the
+capital is meant to support.
+
+\subsection{Public services are better than cash or capital}
+
+Often they are better for particular purposes. That is why the development floor has
+first priority. But services do not fully provide mobility, bargaining power, or the
+ability to initiate a project. The correct comparison is not services \emph{or} capital;
+it is a carefully ordered bundle.
+
+\subsection{The common-inheritance category is politically manipulable}
+
+It is. The response is a statutory taxonomy, non-overlap rules, transparent incidence
+analysis, and democratic revision---not the fiction that existing property categories
+are pre-political. The framework intentionally limits its dedicated base rather than
+declaring all wealth socially claimable.
+
+\subsection{A universal program cannot repair historical injustice}
+
+Correct. It is not designed to settle all rectificatory claims. Universal common
+inheritance, progressive capability policy, and specific rectification should be
+debated on their own grounds and may operate simultaneously.
+
+\section{Empirical evaluation agenda}
+
+Implementation should begin with pilots or phased cohorts accompanied by pre-registered
+evaluation. Relevant outcomes include:
+
+\begin{itemize}
+  \item childhood health, educational continuity, and housing stability;
+  \item account accumulation, fees, returns, and loss dispersion;
+  \item post-release education, mobility, home formation, enterprise, and debt;
+  \item labor supply and job-search duration;
+  \item fertility and household-formation responses;
+  \item price capitalization in housing, tuition, and other eligible uses;
+  \item take-up, administrative error, appeal outcomes, and distribution by protected
+  characteristics;
+  \item fund performance and real per-capita sustainability; and
+  \item political durability and public understanding.
+\end{itemize}
+
+Evaluation should compare the full bundle with plausible alternatives: equivalent
+spending on services, unrestricted transfers, debt reduction, or tax credits. The
+question is not whether capital has benefits in isolation, but whether this architecture
+outperforms realistic uses of the same fiscal resources.
+
+\section{Limitations}
+
+This paper supplies a normative architecture and an internally balanced accounting
+model. It does not estimate behavioral elasticities, an optimal grant, or an optimal
+portfolio. It does not resolve the appropriate jurisdiction, the incidence of every
+funding instrument, or the interaction with existing welfare systems. It does not show
+that the SSCF is superior in every country, particularly where basic state capacity or
+essential services are absent.
+
+The model also abstracts from uncertainty at the individual level. Returns differ,
+households move, administrative data contain errors, and some children require costly
+support not captured by a scalar adjustment. Aggregate budget closure is necessary but
+not sufficient for justice.
+
+Finally, capital is not power-neutral. Asset managers, approved-use providers, lenders,
+and platform firms may attempt to capture the new balances. Consumer protection,
+competition policy, housing supply, and public provision are complements to the SSCF,
+not external details.
+
+\section{Conclusion}
+
+No generation creates its world from nothing. It inherits natural assets, accumulated
+knowledge, public infrastructure, legal institutions, ecological liabilities, and a
+distribution of property shaped by earlier decisions. Private effort and voluntary
+exchange remain morally and economically important, but they do not exhaust the sources
+of social wealth.
+
+The Social Starting Capital Framework gives institutional form to that observation. It
+does not promise equal outcomes. It guarantees a child-development floor and a positive
+capital base; recognizes households without allowing family size to diminish the
+child's independent claim; distributes bonuses and top-ups through exact pools; records
+withdrawals and liabilities honestly; and judges fund sustainability in real per-capita
+terms.
+
+The proposal's moral test is simple: whether a child is treated as a future agent rather
+than merely as a dependent member of a fortunate or unfortunate household. Its fiscal
+test is equally simple: whether every promised unit is funded, every risk bearer is
+named, and future cohorts are included in the accounting. A society that claims human
+worth is not determined by birth should be willing to build institutions in which that
+claim has material content.
+
+\appendix
+
+\section{Implementation sequence}
+
+A cautious implementation can proceed in the following order:
+
+\begin{enumerate}[label=\arabic*.]
+  \item Define the universal development package and measure its incremental cost.
+  \item Legislate the statutory base grant, index, eligibility rule, and fiscal backstop.
+  \item Establish the fund's asset-liability boundary and independent governance.
+  \item Dedicate non-overlapping revenue streams and publish incidence estimates.
+  \item Build account custody, registration, guardianship, and appeal systems.
+  \item Introduce household supplements under an aggregate cap.
+  \item Add normalized progressive top-ups only when data quality and privacy safeguards
+  are adequate.
+  \item Pilot staged access and education rules, with all restrictions expiring at the
+  final release age.
+  \item Publish annual budget closure, stress tests, and the real per-capita metric.
+  \item Evaluate outcomes against alternative uses of equal fiscal cost before scaling.
+\end{enumerate}
+
+\section{Compact algorithm}
+
+For each fiscal year $t$:
+
+\begin{enumerate}[label=\arabic*.]
+  \item Observe $W_t$, $\widetilde W_t$, realized $Y_t$, registered $\mathcal C_t$, and
+  finalized $\mathcal B_t$.
+  \item Compute $\overline d_t$, $C_t^0$, $U_t$, $G_t^{\min}$, $M_t$, $Z_t$, and $C_t$.
+  \item Compute desired household support, its aggregate cap, $\xi_t$, and actual $H_t$.
+  \item Compute $Q_t$ and the three residual pools.
+  \item Divide the newborn bonus by actual $B_t$; normalize top-up weights over actual
+  eligible children.
+  \item Calculate actual $D_t$, then $D_t^Y$, $D_t^W$, and $E_t$.
+  \item Update the fund using Equation~\eqref{eq:fundlaw} and publish both sides of the
+  accounting identity.
+  \item Credit individual accounts, record later withdrawals using
+  Equation~\eqref{eq:accountlaw}, and report segregated assets and liabilities.
+  \item Evaluate Equation~\eqref{eq:sustainability} ex post and publish forward stress
+  tests before setting the next year's parameters.
+\end{enumerate}
+
+\begin{thebibliography}{99}
+\raggedright
+
+\bibitem{ackerman1999}
+Bruce Ackerman and Anne Alstott.
+\newblock \emph{The Stakeholder Society}.
+\newblock Yale University Press, New Haven, 1999.
+
+\bibitem{atkinson2015}
+Anthony B. Atkinson.
+\newblock \emph{Inequality: What Can Be Done?}
+\newblock Harvard University Press, Cambridge, MA, 2015.
+
+\bibitem{bauluz2020}
+Luis Bauluz, Yajna Govind, and Filip Novokmet.
+\newblock Global land inequality.
+\newblock World Inequality Lab Working Paper 2020/10, 2020.
+\newblock \url{https://wid.world/document/global-land-inequality-world-inequality-lab-wp-2020-10/}.
+
+\bibitem{george1879}
+Henry George.
+\newblock \emph{Progress and Poverty}.
+\newblock D. Appleton and Company, New York, 1879.
+
+\bibitem{hamilton2010}
+Darrick Hamilton and William A. Darity Jr.
+\newblock Can ``baby bonds'' eliminate the racial wealth gap in putative
+post-racial America?
+\newblock \emph{The Review of Black Political Economy}, 37(3--4):207--216, 2010.
+\newblock \href{https://doi.org/10.1007/s12114-010-9063-1}{doi:10.1007/s12114-010-9063-1}.
+
+\bibitem{locke1689}
+John Locke.
+\newblock \emph{Two Treatises of Government}.
+\newblock Awnsham Churchill, London, 1689.
+
+\bibitem{marx1867}
+Karl Marx.
+\newblock \emph{Capital: A Critique of Political Economy, Volume I}.
+\newblock Otto Meissner, Hamburg, 1867.
+
+\bibitem{norwayfund}
+Norwegian Ministry of Finance.
+\newblock The Government Pension Fund.
+\newblock Government of Norway, accessed October 2026.
+\newblock \url{https://www.regjeringen.no/en/topics/the-economy/the-government-pension-fund/id1441/}.
+
+\bibitem{nozick1974}
+Robert Nozick.
+\newblock \emph{Anarchy, State, and Utopia}.
+\newblock Basic Books, New York, 1974.
+
+\bibitem{oecd2021}
+Organisation for Economic Co-operation and Development.
+\newblock \emph{Inheritance Taxation in OECD Countries}.
+\newblock OECD Tax Policy Studies 28, OECD Publishing, Paris, 2021.
+\newblock \href{https://doi.org/10.1787/e2879a7d-en}{doi:10.1787/e2879a7d-en}.
+
+\bibitem{ostrom1990}
+Elinor Ostrom.
+\newblock \emph{Governing the Commons: The Evolution of Institutions for Collective
+Action}.
+\newblock Cambridge University Press, Cambridge, 1990.
+
+\bibitem{paine1797}
+Thomas Paine.
+\newblock \emph{Agrarian Justice}.
+\newblock Paris, 1797.
+
+\bibitem{piketty2014}
+Thomas Piketty.
+\newblock \emph{Capital in the Twenty-First Century}.
+\newblock Harvard University Press, Cambridge, MA, 2014.
+
+\bibitem{polanyi1944}
+Karl Polanyi.
+\newblock \emph{The Great Transformation}.
+\newblock Farrar \& Rinehart, New York, 1944.
+
+\bibitem{rawls1971}
+John Rawls.
+\newblock \emph{A Theory of Justice}.
+\newblock Harvard University Press, Cambridge, MA, 1971.
+
+\bibitem{rousseau1755}
+Jean-Jacques Rousseau.
+\newblock \emph{Discourse on the Origin and Foundations of Inequality Among Men}.
+\newblock Marc-Michel Rey, Amsterdam, 1755.
+
+\bibitem{sen1999}
+Amartya Sen.
+\newblock \emph{Development as Freedom}.
+\newblock Alfred A. Knopf, New York, 1999.
+
+\bibitem{sherraden1991}
+Michael Sherraden.
+\newblock \emph{Assets and the Poor: A New American Welfare Policy}.
+\newblock M. E. Sharpe, Armonk, NY, 1991.
+
+\bibitem{vanderweide2024}
+Roy van der Weide, Christoph Lakner, Daniel Gerszon Mahler, Ambar Narayan, and
+Rakesh Gupta.
+\newblock Intergenerational mobility around the world: A new database.
+\newblock \emph{Journal of Development Economics}, 166:103167, 2024.
+\newblock \href{https://doi.org/10.1016/j.jdeveco.2023.103167}{doi:10.1016/j.jdeveco.2023.103167}.
+
+\bibitem{vanparijs1995}
+Philippe Van Parijs.
+\newblock \emph{Real Freedom for All: What (If Anything) Can Justify Capitalism?}
+\newblock Oxford University Press, Oxford, 1995.
+
+\bibitem{wir2022}
+Lucas Chancel, Thomas Piketty, Emmanuel Saez, Gabriel Zucman, et al.
+\newblock \emph{World Inequality Report 2022}.
+\newblock World Inequality Lab, 2022.
+\newblock \url{https://wir2022.wid.world/}.
+
+\end{thebibliography}
+
+\end{document}
