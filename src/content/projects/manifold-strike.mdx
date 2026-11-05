@@ -1,0 +1,20 @@
+---
+title: "Manifold Strike"
+description: "A shooter that ships the recipe for its world, not the world. A 260 KB executable that generates every level, texture and song at load time."
+pubDate: 2026-08-30
+thumbnail: "/media/projects/manifold-strike.webp"
+status: "shipped"
+tags: ["gamedev", "c++", "procedural", "demoscene"]
+---
+
+In 2004 the demoscene group Farbrausch shipped kkrieger, a whole shooter in 96 KB, by storing the instructions that build the content instead of the content. Their engine, werkkzeug3, was open-sourced in 2012. I wanted to know whether that approach still holds up for a new game.
+
+Manifold Strike is that game: a 260 KB executable and a small data file, where every level, texture, mesh, material and piece of music is generated on the player's machine from short programs. The part I added that I like most is a level grammar. Short plan strings expand into rooms, doorways, colonnades, storeys and stairs, plus the walkable volume. In one test, 287 bytes of plan produced about 2.7 MB of mesh, roughly 9,400 to 1.
+
+Getting there meant reviving a 2012 engine under a 32-bit Visual Studio 2022 toolchain, then adding game logic, weapons, a UI and host-authoritative deathmatch netcode. I also put a TCP API inside the editor with an MCP server over it, so an agent can read and build the operator graph.
+
+**Stack:** C++, x86 assembly (yasm), Direct3D, werkkzeug3, Python, MCP.
+
+Credits: werkkzeug3 engine and editor by Farbrausch and .theprodukkt, under their original licences.
+
+[Full write-up](https://www.housamkak.com/work/manifold-strike)

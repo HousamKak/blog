@@ -1,0 +1,18 @@
+---
+title: "Electrical Lab"
+description: "Design a circuit once and run it on whichever simulator answers the question: headless Arduino, ngspice, KiCad or a live web workbench."
+pubDate: 2026-09-26
+thumbnail: "/media/projects/electrical-lab.webp"
+status: "wip"
+tags: ["electronics", "simulation", "mcp", "arduino"]
+---
+
+Every circuit tool wants you to redraw the circuit in its own format. Electrical Lab keeps one model (parts, nets, firmware) behind an MCP server and picks the backend by the question. Does the firmware behave? Compile the Arduino sketch and emulate it headlessly. What is the voltage at this node over time? Hand it to ngspice. Need a board? Export to KiCad.
+
+Lab Studio gives the same circuit a web editor with schematic, breadboard, 3D and PCB views and a live simulator, so an agent and I can work on one circuit at the same time. Underneath there is a C++ sparse solver built to WebAssembly and checked against ngspice in tests.
+
+**Stack:** TypeScript, Node.js, MCP, avr8js, ngspice, KiCad CLI, Arduino CLI, C++, WebAssembly.
+
+Credits: microcontroller emulation by avr8js and rp2040js, parts from the Fritzing library (CC-BY-SA).
+
+[Full write-up](https://www.housamkak.com/work/electrical-lab)

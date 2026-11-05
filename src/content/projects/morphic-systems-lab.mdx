@@ -1,0 +1,18 @@
+---
+title: "Morphic Systems Lab"
+description: "A systems-modelling kernel that refuses to show you a claim the model has not earned."
+pubDate: 2026-08-01
+thumbnail: "/media/projects/morphic-systems-lab.webp"
+status: "wip"
+tags: ["system-dynamics", "modelling", "typescript"]
+---
+
+System-dynamics tools are happy to draw you a beautiful stock-and-flow diagram for a model whose units do not add up. I wanted a tool that would not.
+
+Morphic Systems Lab is a headless semantic kernel for system-dynamics models, with a studio UI that is only a projection of it. Diagrams, equations and results appear only when the model can back them. The kernel checks dimensions, scale operations and index conformance, so adding people to dollars per year is an error, not a chart. And the equation you declare is the equation that runs, with no hidden translation between what you see and what is simulated.
+
+The predator-prey and reservoir examples in the studio are the kind of thing it is for: small models where you want to trust every line.
+
+**Stack:** TypeScript, Vite.
+
+[Full write-up](https://www.housamkak.com/work/morphic-systems-lab)

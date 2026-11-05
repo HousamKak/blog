@@ -1,0 +1,18 @@
+---
+title: "Studio"
+description: "Write a film as a script, get narration, animation, sound and a DaVinci Resolve timeline that stays in sync as the script changes."
+pubDate: 2026-10-13
+thumbnail: "/media/projects/video-studio.webp"
+status: "active"
+tags: ["video", "manim", "python", "pipeline"]
+---
+
+Studio is my script-to-film pipeline. A film is written in a small script language, and Studio compiles it into narration, Manim animation, pictures, music and sound, and a DaVinci Resolve timeline.
+
+The rule that makes it work: the voice is the clock. Every visual is placed by a word or a beat in the narration, never by guessed seconds, so when I rewrite a line and the voice gets longer, everything after it moves with it. The Resolve bridge goes both ways. Studio builds the timeline, updates it in place, and pulls my manual edits back so the next build does not wipe them.
+
+The script also produces a production board, so specialist agents working on the same film share ids, dependencies and approvals instead of stepping on each other. Voxel scenes come straight from BlockForge.
+
+**Stack:** Python, Manim, FFmpeg, DaVinci Resolve scripting, ElevenLabs, BlockForge.
+
+[Full write-up](https://www.housamkak.com/work/video-studio)

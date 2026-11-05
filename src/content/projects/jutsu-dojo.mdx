@@ -1,0 +1,18 @@
+---
+title: "Jutsu Dojo"
+description: "Weave hand seals at your webcam and cast effects into a 3D shrine."
+pubDate: 2026-08-13
+thumbnail: "/media/projects/jutsu-dojo.webp"
+status: "wip"
+tags: ["computer-vision", "mediapipe", "three.js", "game"]
+---
+
+This one started as a small applet on my H canvas and got out of hand. You make a sequence of hand seals in front of your webcam, and the right sequence casts an effect (water, fire, a fireball across an arena) into a Three.js scene.
+
+The hard part is recognition. Generic hand-pose models are bad at telling similar seals apart, and everyone's hands are different. So recognition is personalised: you record a few samples of each seal, and a k-NN classifier learns your hands. A patch classifier plus sequence priors handle chains of seals, so a half-formed seal in the middle of a sequence does not derail the cast.
+
+The simulation underneath is deterministic, with replay hash checks, so the same input always gives the same spell.
+
+**Stack:** TypeScript, MediaPipe, Three.js, Express.
+
+[Full write-up](https://www.housamkak.com/work/jutsu-dojo)

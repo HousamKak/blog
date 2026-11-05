@@ -1,0 +1,17 @@
+---
+title: "Rung"
+description: "The box is disposable, the data is not. Infrastructure-as-code whose test suite is a timed drill that destroys the server and rebuilds it."
+pubDate: 2026-09-17
+status: "shipped"
+tags: ["infrastructure", "opentofu", "docker", "self-hosted"]
+---
+
+Self-hosted servers rot. You tweak something over SSH, forget it, and six months later nobody can rebuild the box. Rung is my answer: the whole server is described in OpenTofu and cloud-init, so any Dockerized app can be deployed, destroyed and rebuilt without losing data.
+
+The test suite is a drill. `make drill` destroys the box, recreates it, restores the data and times the whole thing. If the drill passes, I trust the setup. If it does not, I found out on my own schedule instead of during an outage.
+
+The rule that makes this work is that an app cannot deploy until it declares how its state survives, using Turso, Litestream or wal-g depending on the data. There is no daemon or control panel on the box, nothing to babysit.
+
+**Stack:** OpenTofu, cloud-init, Docker, Litestream, wal-g, Turso.
+
+[Full write-up](https://www.housamkak.com/work/rung) (private repository)

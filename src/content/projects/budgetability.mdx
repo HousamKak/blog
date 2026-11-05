@@ -1,0 +1,19 @@
+---
+title: "Budgetability"
+description: "Personal finance for people who live in more than one currency. One wallet holds dollars, lira and dirhams, and changing a rate never rewrites history."
+pubDate: 2026-11-01
+thumbnail: "/media/projects/budgetability.webp"
+url: "https://www.budgetability.app"
+status: "shipped"
+tags: ["finance", "react", "supabase", "pwa"]
+---
+
+Most budgeting apps assume one currency. Households in Lebanon and the Gulf often hold dollars, lira and dirhams at the same time, and the usual workaround (convert everything at today's rate) quietly rewrites the past every time the rate moves.
+
+In Budgetability an account is a wallet with a separate balance per currency. Planning happens in one base currency, but every cross-currency movement snapshots its amounts when it is entered, so a new rate changes forecasts, not history. A forecast page models best and worst cases from real records, which matters more than a monthly budget when income is uneven.
+
+It runs as a web app, an installable PWA and a native mobile client on one Supabase backend, with an MCP server so an agent can read and manage a budget.
+
+**Stack:** React, Vite, Supabase, PostgreSQL, React Native/Expo, MCP.
+
+[budgetability.app](https://www.budgetability.app) · [Repo](https://github.com/HousamKak/budgetability) · [Full write-up](https://www.housamkak.com/work/budgetability)

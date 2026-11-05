@@ -1,0 +1,18 @@
+---
+title: "3modly"
+description: "A 3D model editor built from composable parts, which an agent can drive and see through."
+pubDate: 2026-07-25
+thumbnail: "/media/projects/3modly.webp"
+status: "wip"
+tags: ["3d", "react-three-fiber", "mcp", "agents"]
+---
+
+I wanted an agent to build 3D models I could actually use, a truck, a laptop, a piece of furniture, without me hand-modelling everything. The catch is the same as always: an agent that cannot see its work cannot fix it.
+
+3modly is a browser editor where models are assembled from parametric parts that snap together through sockets, with collision checks and GLB export. An MCP server lets an agent author, snap, measure and export. The part that made it work is the contact sheet: the agent asks for six views of the model at once, looks at them, and corrects itself.
+
+Agent edits and my edits go through the same validated path, so neither of us can put the model in a broken state the other has to clean up.
+
+**Stack:** TypeScript, React, react-three-fiber, Zustand, Vite, MCP.
+
+[Full write-up](https://www.housamkak.com/work/3modly)

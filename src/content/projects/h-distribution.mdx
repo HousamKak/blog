@@ -1,0 +1,18 @@
+---
+title: "H Distribution"
+description: "Self-hosted publishing across social platforms. Write once, get per-platform variants, schedule them, and drive it all from a UI, a CLI or an agent."
+pubDate: 2026-04-16
+thumbnail: "/media/projects/h-distribution.webp"
+status: "wip"
+tags: ["social", "nextjs", "mcp", "self-hosted"]
+---
+
+Posting the same thing to several platforms means rewriting it for each one, then checking comments in five places. H Distribution turns one post into per-platform variants, schedules and publishes them, pulls analytics back, and collects comments into one inbox.
+
+The design choice I care about is one service layer behind everything. The web UI, the CLI, the HTTP API and the MCP server all call the same operations, and scheduled and immediate publishing share one code path with structured outcomes, so "it worked from the UI but not from the agent" cannot happen. Platforms without full publishing APIs get honest assisted and manual states instead of pretending.
+
+It also renders post images from templates, including Arabic right-to-left variants.
+
+**Stack:** TypeScript, Next.js, React, SQLite, Drizzle ORM, OAuth, MCP.
+
+[Full write-up](https://www.housamkak.com/work/h-distribution)

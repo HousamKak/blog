@@ -24,6 +24,19 @@ const recentRenders = (await getCollection('renders')).filter(r => !r.data.draft
 const interactiveRenders = recentRenders.filter(r => r.data.mediaType === 'interactive');
 const recentNotes = (await getCollection('notes')).filter(n => !n.data.draft).sort(byDateDesc);
 
+// Flagship projects shown in the Docket block, in this order.
+const flagshipIds = ['blockforge', 'h-system', 'kiddycody', 'chatability', 'pos-store-management'];
+const allProjects = (await getCollection('projects')).filter(p => !p.data.draft);
+const flagships = flagshipIds
+  .map(id => allProjects.find(p => p.id === id))
+  .filter((p): p is NonNullable<typeof p> => Boolean(p));
+const projectStatusColor: Record<string, string> = {
+  active: 'var(--ink-red)',
+  shipped: 'var(--ink-blue)',
+  archived: 'var(--ink-muted)',
+  wip: 'var(--ink-red)',
+};
+
 const lede = recentPosts[0];
 const secondary = recentPosts[1];
 const tertiary = recentPosts[2];
@@ -178,6 +191,30 @@ const classifieds = [
       <footer style="font-family: var(--font-smallcaps); font-size: 0.65rem; letter-spacing: 0.18em; color: var(--ink-muted); margin-top: 0.4rem; text-align: right;">&mdash; ANON, C. 1911</footer>
     </blockquote>
   </div>
+
+  {flagships.length > 0 && (
+    <section class="chaos-card chaos-full" style="padding: 1.1rem 1.5rem 1.25rem;">
+      <span class="tape tl" aria-hidden="true"></span>
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem;">
+        <div class="chaos-kicker" style="border: none; padding: 0; margin: 0;">The Docket &bull; From the workshop</div>
+        <a href="/projects/" style="font-family: var(--font-smallcaps); font-size: 0.7rem; letter-spacing: 0.18em; color: var(--ink-red); text-decoration: none; border-bottom: 1px dotted var(--ink-red);">ALL PROJECTS &rarr;</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.25rem;">
+        {flagships.map(p => (
+          <a href={`/projects/${p.id}/`} style="text-decoration: none; color: inherit; display: flex; flex-direction: column;">
+            {p.data.thumbnail && (
+              <img src={p.data.thumbnail} alt="" loading="lazy" style="width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; border: 1px solid var(--color-hairline); margin-bottom: 0.55rem; filter: sepia(0.08);" />
+            )}
+            <div style="margin-bottom: 0.3rem;">
+              <span class="ribbon" style={`background: ${projectStatusColor[p.data.status] || 'var(--ink-sumi)'};`}>{p.data.status}</span>
+            </div>
+            <h3 class="chaos-head-md" style="margin: 0 0 0.3rem;">{p.data.title}</h3>
+            <p style="font-family: var(--font-body); font-size: 0.88rem; line-height: 1.45; margin: 0;">{p.data.description}</p>
+          </a>
+        ))}
+      </div>
+    </section>
+  )}
 
   {tertiary && (
     <article class="chaos-card chaos-third tilted-l" style="padding: 1rem 1.15rem;">

@@ -1,0 +1,18 @@
+---
+title: "RealityForge"
+description: "An engine for building and testing mathematical worlds: declare the structure and principles, derive the laws, then run them. BlockForge is its host."
+pubDate: 2026-11-02
+thumbnail: "/media/projects/realityforge.webp"
+status: "wip"
+tags: ["research", "physics", "c++", "blockforge"]
+---
+
+Game physics usually starts from Newton and bolts on tweaks. I wanted to go the other way: declare what a world is made of and which principles must hold, and derive the family of physical laws that are allowed. Then run them as executable theories and see what happens.
+
+RealityForge is a research engine that does that. A construction compiler works over finite groups and graphs, and an independent verifier checks what it produces, so a world cannot claim a symmetry it does not have. Before a world runs, the engine classifies its energy and stability exactly, so you know whether it will blow up before you watch it blow up.
+
+The output is a physics package that BlockForge imports and gives geometry and pictures, like a fireball whose path bends in a crosswind because the laws say so.
+
+**Stack:** TypeScript, C++, CMake.
+
+[Full write-up](https://www.housamkak.com/work/realityforge)

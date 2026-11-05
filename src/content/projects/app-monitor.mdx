@@ -1,0 +1,18 @@
+---
+title: "App Monitor"
+description: "My own telemetry and crash reporting for every app I ship. Usage, versions, errors and symbolicated crashes on one dashboard, on Cloudflare."
+pubDate: 2026-10-11
+thumbnail: "/media/projects/app-monitor.webp"
+status: "active"
+tags: ["observability", "cloudflare", "android", "ios"]
+---
+
+I ship enough small apps that I needed one place to see how they are doing, without paying for a seat per app. App Monitor is that place: register an app, drop in a small SDK, and see usage, versions, errors and crashes together.
+
+It runs on two Cloudflare Workers (ingest and dashboard) with D1, R2 and Queues. The SDKs cover the web, Android, iOS and Python, and native crashes are the interesting part: an NDK signal handler on Android and a C crash writer on iOS, with source maps and native symbols uploaded from CI so stack traces come back readable.
+
+Alert rules fire on new issues, regressions, error spikes and crash-free drops, by email, Telegram or webhook. There is also an MCP server over the admin API, so when something breaks I can ask an agent what happened instead of clicking around.
+
+**Stack:** TypeScript, Cloudflare Workers, D1, R2, Queues, Java/NDK, Swift, C, Python, MCP.
+
+[Full write-up](https://www.housamkak.com/work/app-monitor)

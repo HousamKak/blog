@@ -1,0 +1,22 @@
+---
+title: "BlockForge"
+description: "A voxel world engine where a script becomes a world, and a world becomes a film. Built so an agent can build, look at what it built, and fix it."
+pubDate: 2026-11-05
+thumbnail: "/media/projects/blockforge.webp"
+url: "https://blockforge.housamkak.com"
+status: "active"
+tags: ["voxel", "graphics", "agents", "c++", "three.js"]
+---
+
+BlockForge started as a logo for my brother's coding academy and turned into the biggest thing I have built. It is a world compiler: you write a world as source (build plans, a structure language, generators, Luau mods), and the engine compiles it into a voxel world, then animates and films it.
+
+The problem I cared about is that 3D scenes are usually opaque files you cannot diff, merge or rebuild from a recipe. And agents are bad at working blind. So BlockForge gives them eyes: a `snapshot` call renders any view off-screen, and `query` tells them exactly what is in the world.
+
+Two things I am proud of:
+
+- **Seekable rendering.** Every frame is a pure function of story time, so a still, a scrub and a full render of the same moment give the same pixels, in the browser and in the native C++ client.
+- **Git for worlds.** Every change becomes a version with its recipe attached, and branches diff block by block and merge three ways.
+
+**Stack:** JavaScript, Three.js (WebGPU/WebGL), C++17, SDL2, Luau, WASM, MCP, Cloudflare Workers.
+
+[Live site](https://blockforge.housamkak.com) · [Full write-up](https://www.housamkak.com/work/blockforge)

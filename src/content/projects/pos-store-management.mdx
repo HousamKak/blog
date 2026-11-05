@@ -1,0 +1,18 @@
+---
+title: "Store POS"
+description: "A point of sale that keeps a Lebanese store selling when the internet does not, in dollars and lira, often in the same sale."
+pubDate: 2026-10-28
+thumbnail: "/media/projects/pos-store-management.webp"
+status: "active"
+tags: ["offline-first", "sqlite", "node", "retail"]
+---
+
+A small shop in Lebanon has three problems most POS products ignore at once. The internet drops, so checkout cannot depend on it. Prices move between US dollars and Lebanese lira, often inside one sale. And the owners want to see the business from somewhere other than the counter.
+
+The first version was a Google Sheets and Apps Script system. A spreadsheet that needs the network on every scan is the wrong shape for a cashier, so I rebuilt it local-first: a Node and Express backend on a local SQLite file that is the source of truth. A sale commits locally before anything else happens. SQLite triggers write each change into an outbox in the same transaction, and a background worker drains it to Turso whenever the connection is back. If the internet is down for a day, the outbox just grows.
+
+Checkout pricing runs through one module for both the quote and the commit, and a hash binds every quoted line, rate and rule to the sale that was actually saved. Stock uses FIFO lots with expiry, and the books report in both currencies.
+
+**Stack:** Node.js, Express, SQLite, Turso/libSQL, Cloudflare R2, vanilla JS, PostgreSQL/PostGIS.
+
+[Full write-up](https://www.housamkak.com/work/pos-store-management) (private codebase)

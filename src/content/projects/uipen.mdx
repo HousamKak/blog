@@ -1,0 +1,19 @@
+---
+title: "UIpen"
+description: "Point at your running app, and Claude fixes the right line of code. Pins on the page arrive with the file, line and component attached."
+pubDate: 2026-08-23
+thumbnail: "/media/projects/uipen.webp"
+url: "https://uipen.dev"
+status: "shipped"
+tags: ["dev-tools", "claude-code", "mcp", "typescript"]
+---
+
+Describing a UI bug to an agent in words is slow. "The button under the header, no, the other one." UIpen is a dev-mode overlay that skips that: you drop pins, regions and arrows on the running page, and each annotation reaches a Claude Code session with the DOM selector, source file, line and component name already attached. Claude edits the right file, the dev server hot-reloads, and the pin turns green.
+
+Getting the source location right is the hard part. UIpen walks the dev builds of React, Vue, Svelte, Angular, Astro, Qwik and SolidJS, with a data attribute fallback for anything else. For design tweaks, the agent can offer knobs (sliders, colour pickers, design-token chips) so you preview CSS live before it writes anything.
+
+It ships with installers, licensing and an activation service, and a security pass made sure a page cannot point Claude at files outside the project.
+
+**Stack:** TypeScript, Bun, React, Next.js, MCP, Claude Code Channels, WebSocket, SQLite.
+
+[uipen.dev](https://uipen.dev) · [Website repo](https://github.com/HousamKak/uipen-website) · [Full write-up](https://www.housamkak.com/work/uipen)

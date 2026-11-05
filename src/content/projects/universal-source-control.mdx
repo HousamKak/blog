@@ -1,0 +1,17 @@
+---
+title: "Universal Source Control"
+description: "Git versions representations. This versions evolution: a versioning core that records operations, so things like game assets can diff and merge."
+pubDate: 2026-09-24
+status: "wip"
+tags: ["version-control", "research", "gamedev"]
+---
+
+Git is brilliant for text and useless for most of what games are made of. Two people editing the same level or the same model produce a conflict Git can only describe as "these bytes differ". That is a big part of why games are rarely open source in the way libraries are.
+
+Universal Source Control is a research series, a spec and an early implementation of a domain-agnostic versioning core. Instead of storing snapshots of a file, it records operations on state, so a diff can say "this tower moved two blocks east" and a merge can reason about it. Semantic diff and a spatial canonical form are the two core ideas, and BlockForge's world history is where I am testing them first.
+
+The essay series goes from why games are not open source to the architecture and the experiments.
+
+**Stack:** TypeScript, Markdown.
+
+[Full write-up](https://www.housamkak.com/work/universal-source-control)

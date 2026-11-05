@@ -1,0 +1,19 @@
+---
+title: "Chatability"
+description: "Ask the page you are reading. Capture any part of a PDF or slide and get answers about exactly that part, not the whole document."
+pubDate: 2026-09-08
+thumbnail: "/media/projects/chatability.webp"
+url: "https://web.chatability.app"
+status: "active"
+tags: ["ai", "claude", "react", "chrome-extension", "mobile"]
+---
+
+When I read a long deck or a paper, my question is almost never about the whole document. It is about one figure, one equation, one slide. General chatbots make you paste in the file or describe what you are looking at, and the answer drifts.
+
+Chatability started as SlideChat, a web app for chatting with the current slide. It grew into a single gesture: hold, select a region of the page, and that capture becomes the context for the question. You can stage several captures and ask about them together. The same gesture works in the web reader, a Chrome side-panel extension and the iOS and Android clients.
+
+Answers can include small interactive demos of the idea being explained. Those needed the most care: each one runs in a sandboxed frame with no network access and no extension APIs. Slides and PDFs are only ever served through short-lived signed URLs, so a share link grants exactly what the owner meant and nothing guessable.
+
+**Stack:** React, Vite, Express, SQLite, Claude Agent SDK, Chrome MV3, Swift, Android.
+
+[Try it](https://web.chatability.app) · [Full write-up](https://www.housamkak.com/work/chatability)

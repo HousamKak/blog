@@ -1,0 +1,19 @@
+---
+title: "AnyThyng"
+description: "Say a sentence, get a working app on your phone. A blank screen with a chat bar that becomes whatever you describe."
+pubDate: 2026-08-24
+thumbnail: "/media/projects/anythyng.webp"
+url: "https://anythyng.app"
+status: "wip"
+tags: ["ai", "android", "claude", "aws"]
+---
+
+AnyThyng is a blank phone screen with a chat bar. You describe something (a tip calculator, a habit tracker, a little tank game) and the screen becomes it.
+
+A Node server built around the Claude Agent SDK generates each app as one self-contained HTML document, versions it, and serves it to a thin Kotlin/Compose Android shell. The interesting problems were all about trust. Edits send only the changed region, anchored on markers in the page, and if an anchor is missing or duplicated the whole patch is rejected instead of half-applied. Code the agent writes for the server runs in a worker thread with resource limits and a 3 second timeout enforced from outside. The WebView is sealed: no network, no token in the page.
+
+Apps can also be shared live through rooms: a short code, a socket and a server-sequenced event log.
+
+**Stack:** TypeScript, Node.js, Claude Agent SDK, libSQL/Turso, Kotlin, Jetpack Compose, OpenTofu, AWS Fargate.
+
+[Landing page](https://anythyng.app) · [Full write-up](https://www.housamkak.com/work/anythyng)

@@ -1,0 +1,18 @@
+---
+title: "H"
+description: "A canvas where AI agents, terminals and live applets are wired together like a circuit. My daily workbench for running many coding agents at once."
+pubDate: 2026-09-26
+thumbnail: "/media/projects/h-system.webp"
+status: "active"
+tags: ["agents", "mcp", "typescript", "tooling"]
+---
+
+H is the environment I work in every day. By spring 2026 I was running several Claude Code sessions at once, and the work was fine but the coordination was not: terminals piled up, I lost track of which agent was done and which was waiting on me, and every small tool I wanted was another browser tab.
+
+So I built a canvas. Tiles are terminals, chats, generated applets, processes and datastores, and they connect with typed wires, like components on a circuit board. The part I like most is the agent link: drag a wire from a terminal running Claude Code into an applet, and that session can discover the applet and read or drive it directly. My to-do list is one of those applets, and the agents tick items off it.
+
+Under the canvas is an event-sourced TypeScript backend, so the canvas, the Telegram bot and the desktop app are all views of the same stream. A turn tracker reads structured transcripts, so "finished" and "needs input" are separate signals and silence never counts as done.
+
+**Stack:** TypeScript, Node.js, React, SQLite, event sourcing, Tauri, MCP, Claude Agent SDK.
+
+[Full write-up](https://www.housamkak.com/work/h-system) (private codebase)

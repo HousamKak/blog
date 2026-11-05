@@ -1,29 +1,18 @@
 ---
 title: "The Housam & Review"
-description: "A personal blog engine dressed as a broadsheet newspaper. Astro 5, MDX, per-post theming, a working analog clock, an analog typography stack, and an increasingly chaotic front page."
+description: "A personal blog engine dressed as a broadsheet newspaper. Astro, MDX, per-post theming, a working analog clock and an increasingly chaotic front page."
 pubDate: 2026-04-18
 status: "active"
 url: "https://blog.housamkak.com"
 tags: ["astro", "design", "typography", "blog"]
 ---
 
-This site. Built from scratch in Astro 5 + Tailwind v4 + MDX. Content is file-based across six collections: posts, papers, notes, renders (including interactive applets), frontpages, and projects. Every page renders as static HTML at build time; interactivity is opt-in via React islands.
+This site. I wanted a blog that reads like a newspaper someone actually typeset, not another white page with a sans-serif headline, so I built it from scratch in Astro, Tailwind and MDX.
 
-## Stack
+Everything is a file: posts, papers, notes, renders (including interactive applets), front pages and the projects on this docket each live in their own collection. Every page renders to static HTML at build time, and interactivity is opt-in through React islands, so a post with a GPU fractal viewer loads the fractal code and a plain essay loads nothing.
 
-- **Astro 5**: static site generator, content layer, view transitions
-- **Tailwind CSS v4**: utility styling, token-driven theme
-- **MDX**: content with inline components
-- **KaTeX** (build-time) for math, **Shiki** for code
-- **Wilson** (GPU) for fractal applets
-- **Three.js + react-three-fiber** for 3D renders
-- Hosted on **GitHub Pages** with a custom domain
+Each post can pick its own theme. The default is a quiet broadsheet; the Chaos Edition front page is a collage of tape, pushpins, horoscopes, classifieds and obituaries for dead browsers.
 
-## Design directions shipped
+**Stack:** Astro, Tailwind CSS, MDX, KaTeX (at build time), Shiki, Three.js and react-three-fiber for 3D renders, hosted on GitHub Pages.
 
-- Default: elegant Medium-style broadsheet
-- Chaos Edition: this one, a collage with ticker, horoscope, classifieds, obituaries, weather
-
-## Repo
-
-Source: `github.com/HousamKak/blog`
+[Source](https://github.com/HousamKak/blog)

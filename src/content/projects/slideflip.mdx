@@ -1,0 +1,18 @@
+---
+title: "SlideFlip"
+description: "Turn an English PowerPoint deck into a correctly mirrored Arabic deck, with no Office install and no chance of silently changing the content."
+pubDate: 2026-09-15
+thumbnail: "/media/projects/slideflip.webp"
+status: "wip"
+tags: ["arabic", "rtl", "dotnet", "localisation"]
+---
+
+Translating a deck into Arabic is the easy half. The hard half is that everything has to mirror: layout, groups, connectors, arrows and chevrons, tables and charts, all flipped to right-to-left reading order. Doing it by hand takes hours per deck, and PowerPoint's own tools get much of it wrong.
+
+SlideFlip works directly on the OOXML package, so the engine needs no Office install and no network. Order matters more than I expected: it translates first, then mirrors, so bidi flags and embedded Latin like FY26 or +3.3% still render the right way round. Formatting runs survive translation through inline markers the translator has to return intact.
+
+Every run is checked. It hashes the text, counts shapes and validates the schema before and after, and writes atomically, so a layout change can never quietly alter what a slide says.
+
+**Stack:** .NET 8, C#, DocumentFormat.OpenXml, Claude API.
+
+[Full write-up](https://www.housamkak.com/work/slideflip)

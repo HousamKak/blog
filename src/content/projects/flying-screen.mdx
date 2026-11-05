@@ -1,0 +1,19 @@
+---
+title: "Flying Screen"
+description: "Can a display hover beside you while you work? A physics co-design engine that answers whether any such aircraft can exist at all."
+pubDate: 2026-09-10
+thumbnail: "/media/projects/flying-screen.webp"
+url: "https://github.com/HousamKak/flying-screen"
+status: "shipped"
+tags: ["physics", "research", "python", "drones"]
+---
+
+I wanted a screen that floats next to me. Before building anything, I wanted to know whether physics even allows it. Given a screen, a mission and today's batteries and motors, does any feasible hovering aircraft exist, and if so, what is the best one?
+
+Flying Screen is a co-design engine, a browser design tool and a paper that answer that. The model goes in layers, from momentum theory and mass closure up to Newton-Euler dynamics, control and optimisation, and every number traces back to an equation.
+
+The finding I find most interesting is the feasibility wall. As the screen grows, the mass that has to lift the batteries that lift the mass stops converging. Past a fold point there is no equilibrium mass at all, so no amount of clever engineering helps. The tests check the engine's sensitivities against the closed-form theory, and MuJoCo simulations show the designs that do work flying their routes.
+
+**Stack:** Python, NumPy, MuJoCo, LaTeX, HTML/JS.
+
+[Repo](https://github.com/HousamKak/flying-screen) · [Full write-up](https://www.housamkak.com/work/flying-screen)

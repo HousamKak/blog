@@ -1,0 +1,18 @@
+---
+title: "Super Camera"
+description: "A native Windows screen and camera recorder with hardware H.264, a camera bubble, and no Electron."
+pubDate: 2026-10-12
+thumbnail: "/media/projects/super-camera.webp"
+status: "shipped"
+tags: ["windows", "csharp", "wpf", "video"]
+---
+
+I record a lot of short demos, and every recorder I tried was either a heavy Electron app or a full streaming suite for a two-minute clip. So I wrote the one I wanted.
+
+Super Camera is a native WPF app that records the camera, the screen, or the screen with a movable camera bubble, with microphone and system audio. It encodes to MP4 in hardware through the Windows capture and media APIs, so there is no ffmpeg and nothing bundled beyond .NET.
+
+The small detail I care about: the floating control overlay is excluded from the capture, so I can stop the recording without the stop button showing up in the video. There is light editing built in for trimming the ends.
+
+**Stack:** C#, .NET 9, WPF, Windows.Graphics.Capture, Windows.Media.Capture.
+
+[Full write-up](https://www.housamkak.com/work/super-camera)

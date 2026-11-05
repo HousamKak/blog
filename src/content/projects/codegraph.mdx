@@ -1,0 +1,18 @@
+---
+title: "CodeGraph"
+description: "Gives an LLM eyes on how code connects, through a Neo4j graph and four conservation laws that say what an edit just broke."
+pubDate: 2025-11-19
+url: "https://github.com/HousamKak/codegraph"
+status: "wip"
+tags: ["python", "neo4j", "mcp", "agents"]
+---
+
+When an agent edits code, it sees the file in front of it, not the callers three modules away. CodeGraph indexes Python code into a Neo4j graph of functions, classes, calls and imports, so those relationships become something you can query.
+
+The idea I wanted to test was conservation laws for code. Take a snapshot of the graph, let the model edit, take another, and check four laws across the two, starting with signature conservation: a function whose signature changed while its callers did not shows up as a violation, not a runtime surprise. CodeGraph is read-only on purpose. The model makes the edit, CodeGraph reports what broke.
+
+It comes with a FastAPI backend, a small frontend, a CLI and a read-only MCP server, and I built it with Claude as a coding assistant.
+
+**Stack:** Python, Neo4j, FastAPI, MCP.
+
+[Repo](https://github.com/HousamKak/codegraph) · [Full write-up](https://www.housamkak.com/work/codegraph)

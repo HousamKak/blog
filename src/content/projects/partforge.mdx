@@ -1,0 +1,18 @@
+---
+title: "Partforge"
+description: "One toolchain that lets an agent design, check, slice and print a real mechanical part, with the engineering checks a render cannot show."
+pubDate: 2026-09-15
+thumbnail: "/media/projects/partforge.webp"
+status: "wip"
+tags: ["cad", "3d-printing", "openscad", "mcp"]
+---
+
+An agent can write OpenSCAD, but a nice render tells you nothing about whether the part will print, fit or hold. Partforge closes that gap. It is one core with two front ends, a terminal command (`pf`) and an MCP server, spanning OpenSCAD, headless Bambu Studio slicing, Bambu printers and SolidWorks.
+
+`pf build` renders, measures, judges printability and slices in one pass, and comes back with grams and print time. The checks are real metrology: watertightness, wall-thickness distribution, overhang area, tipping risk. Fits come from the ISO 286 tables, and the `.scad` library has real ISO metric threads and print-aware holes.
+
+On the SolidWorks side it drives the app over COM, and an add-in task pane sends whatever I have selected straight to a Claude session.
+
+**Stack:** Node.js, OpenSCAD, Bambu Studio CLI, SolidWorks COM API, C#, Python, MCP.
+
+[Full write-up](https://www.housamkak.com/work/partforge) (local tool, not packaged)

@@ -1,0 +1,16 @@
+---
+title: "Highlightability"
+description: "Code highlights and notes in VS Code that survive restarts and stay attached to the right lines as files change under Git."
+pubDate: 2025-10-29
+url: "https://github.com/HousamKak/highlightability"
+status: "shipped"
+tags: ["vscode", "extension", "typescript", "dev-tools"]
+---
+
+When I read an unfamiliar codebase I want to mark it up the way I would mark up a paper: highlight a block, write a note next to it, come back tomorrow and find it still there. VS Code does not do that, and the extensions I tried lost their marks the moment the file changed.
+
+Highlightability is a VS Code extension for highlighting code and attaching comments that persist across sessions. The interesting part is anchoring. Highlights are Git-aware, so when lines move because someone edited the file above them, the highlight follows the code instead of staying stuck on the old line numbers.
+
+**Stack:** TypeScript, VS Code API.
+
+[Repo](https://github.com/HousamKak/highlightability) · [Full write-up](https://www.housamkak.com/work/highlightability)
