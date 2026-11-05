@@ -1,6 +1,6 @@
 ---
 title: "Make everything drivable by an agent"
-description: "Almost everything I build now ships a CLI and an MCP server next to its UI. H, BlockForge, UIpen, Partforge, Electrical Lab and H Distribution all follow the same rule. Here is what the rule buys, what it costs, and where I draw the line."
+description: "Almost everything I build now ships a CLI and an MCP server next to its UI, so an agent can drive it. What that rule buys, what it costs, and where I draw the line."
 pubDate: 2026-12-24
 tags: ["agents", "mcp", "tooling", "essay", "h", "blockforge"]
 draft: true
@@ -8,7 +8,7 @@ draft: true
 
 {/*
   Facts for Housam to confirm before publishing:
-  - Tool counts, counted from source on 2026-11-05 and worth re-checking: Partforge 54 MCP tools (README), Electrical Lab 33 MCP tools (README), H Distribution 102 tool() registrations in src/mcp/tools.ts + tools-growth.ts, BlockForge about 260 distinct blockforge_* tool names across cli/mcp*.js, H about 100 distinct h_* names referenced in packages/mcp/src. Round or drop any you would rather not state.
+  - Per-project tool counts were cut from the prose as inventory (only "hundreds of tools" remains, where the size is the point). For reference, counted from source on 2026-11-05: Partforge 54 MCP tools (README), Electrical Lab 33 MCP tools (README), H Distribution 102 tool() registrations in src/mcp/tools.ts + tools-growth.ts, BlockForge about 260 distinct blockforge_* tool names across cli/mcp*.js, H about 100 distinct h_* names referenced in packages/mcp/src. Round or drop any you would rather not state.
   - H Distribution "32 platforms" is from src/cli/README.md.
   - Which of these projects are public. The post links only https://www.housamkak.com/work. Add per-project links (for example blockforge.housamkak.com) once project pages exist.
   - UIpen: check LICENSING.md and MONETIZATION.md before describing it publicly as a product.
@@ -21,14 +21,14 @@ Somewhere in the last year I stopped thinking of a user interface as the front d
 
 Look across what I have built recently and the same shape keeps appearing:
 
-- **H**, my canvas of terminals and live applets, ships an MCP server (`h-orchestrator`) with about a hundred tools.
-- **BlockForge**, the world compiler, has a CLI (`kc.js`) and an MCP server with a couple of hundred tools: build plans, cameras, films, materials, critics, exports.
-- **Partforge**, my mechanical part toolset, drives OpenSCAD, Bambu Studio and SolidWorks from one core, through a CLI (`pf`) or 54 MCP tools.
-- **Electrical Lab** builds a circuit once and runs it on five backends, through 33 MCP tools.
-- **H Distribution**, my self-hosted publishing system, has a CLI where every command returns JSON and an MCP server with about a hundred tools.
+- **H**, my canvas of terminals and live applets, ships an MCP server (`h-orchestrator`).
+- **BlockForge**, the world compiler, has a CLI (`kc.js`) and an MCP server that covers build plans, cameras, films, materials, critics and exports.
+- **Partforge**, my mechanical part toolset, drives OpenSCAD, Bambu Studio and SolidWorks from one core, through a CLI (`pf`) or an MCP server.
+- **Electrical Lab** builds a circuit once and runs it on five backends, all through MCP.
+- **H Distribution**, my self-hosted publishing system, has a CLI where every command returns JSON, and an MCP server over the same calls.
 - **UIpen** sends what I point at in a browser straight into a Claude Code session.
 
-App Monitor, Budgetability and Comms Hub do it too. It was not a plan. It is a rule I keep arriving at, so I want to write down why, and where it breaks. The projects themselves are on [my work page](https://www.housamkak.com/work).
+App Monitor, Budgetability and Comms Hub do it too. I never planned it. It is a rule I keep arriving at, so I want to write down why, and where it breaks. The projects themselves are on [my work page](https://www.housamkak.com/work).
 
 ## The rule
 
@@ -54,7 +54,7 @@ Acting is half of it. An agent that builds a world and cannot look at it is buil
 
 The Escher Waterfall work leaned on this constantly: render a still, compare it to the reference, measure, change one thing, render again. The loop only works because "look" is a tool call.
 
-### 3. One circuit, many truths
+### 3. One circuit, five backends
 
 Electrical Lab is the clearest case of the rule paying off. The agent describes a circuit once, in a backend-neutral model of parts, nets and firmware, and then asks the right backend the right question:
 
@@ -76,11 +76,11 @@ Partforge's loop is `pf scad set`, then `pf build`, which renders, measures wall
 
 H Distribution has a `schema --json` command that returns every command, subcommand, flag and return shape in one machine-readable catalogue. An agent calls it once and knows the whole surface. Every response has the same shape, `{ ok, message?, error?, data? }`, so there is never any parsing of human prose.
 
-### 6. Software that is wired, not just called
+### 6. Wiring an agent to an applet
 
 H takes the idea one step further. On the canvas, I drag a wire from a terminal's "Agent link" output to an applet's input, and the agent in that terminal can now drive that applet. It calls `h_my_links` to find what it is wired to, reads the applet's state, and patches it; the tile re-renders live on my screen and the wire pulses. For code rather than data, it reads the applet's HTML, edits it and writes it back with a change note, and the tile hot-reloads with the old version restorable.
 
-My own to-do list is one of those applets. When a session I am running hits something only I can do, it adds an item. That is a strange and pleasant feeling the first time.
+My own to-do list is one of those applets. When a session hits something only I can do, it adds an item to my list. The first time that happened it felt strange, and then very pleasant.
 
 ## What it costs, and where it fails
 
@@ -106,7 +106,7 @@ Every MCP server is a process. Each Claude Code session spawns its own full flee
 
 ### Too many tools is its own interface problem
 
-A couple of hundred tools is a lot to choose from. More tools do not make a better agent; better-named tools with schemas and examples do. BlockForge leans on `tool_info` for field descriptions, H on a live `h_capabilities` summary built from the actual registries, H Distribution on `schema`. The surface needs a table of contents, or the agent guesses.
+Hundreds of tools is a lot to choose from. More tools do not make a better agent; better-named tools with schemas and examples do. BlockForge leans on `tool_info` for field descriptions, H on a live `h_capabilities` summary built from the actual registries, H Distribution on `schema`. The surface needs a table of contents, or the agent guesses.
 
 ### Silence is not completion
 
@@ -122,7 +122,7 @@ So the rule, as I now state it:
 
 1. One core. The UI, the CLI and the MCP server are adapters over it, never reimplementations.
 2. Structured in, structured out. JSON results, schemas, a self-describing catalogue.
-3. Let the agent see, not just act.
+3. Let the agent see what it did, as well as act.
 4. Physical, financial and secret actions need a person, and look different.
 5. Count the processes.
 

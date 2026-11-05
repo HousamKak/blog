@@ -1,6 +1,6 @@
 ---
 title: "The flying screen: can a display hover beside you?"
-description: "I wanted a screen that follows me around so I could work without sitting. The physics says yes, for half an hour. Then noise, blade clearance and the size of a letter on the screen say something more interesting."
+description: "I wanted a screen that follows me around so I could work without sitting. The physics says yes, for half an hour. What actually stops it is noise, blade clearance and the size of a letter on the screen."
 pubDate: 2026-12-03
 tags: ["engineering", "aerodynamics", "control", "flying-screen", "story"]
 draft: true
@@ -9,6 +9,7 @@ draft: true
 {/*
   Facts for Housam to confirm before publishing:
   - The origin: the first message in "Initial Conversation.txt" ("a flying screen that follows me so I work without sitting and I can workout"). Confirm that is the story you want told, and which assistant the conversation was with if you want to name it.
+  - Inventory counts (paper word count, number of diagrams, number of tests) were cut from the prose on purpose.
   - All numbers are from paper/results/macros.tex and README.md as of 2026-09-10 (DESK-1/W: 1.724 kg, 492 mm rotors, 1036 rpm, 106 W, 30 min to 12% reserve, 53.8 dBA at 1 m, 56.6 dBA at the ear, 1.20 m standoff, 0.59 m blade gap, 278% UI scaling, 692 x 389 logical desktop). Re-check if make_results.py has been rerun since.
   - "Roughly 68 m/s tip speed for a commercial camera drone" is the paper's own comparison figure.
   - The review: described without the reviewer's name. Confirm whether you want to name them (backlog D2 is a separate post on the review).
@@ -19,11 +20,11 @@ draft: true
 
 It started with one lazy sentence I typed into a chat window: *I am thinking of a flying screen that follows me so I work without sitting and I can work out.*
 
-I stand a lot when I think. I pace. I also sit for ten hours a day in front of a monitor, which is not great for a body. So the picture was simple. A display hovering beside me, at eye height, that drifts along when I walk to the window and turns when I turn. Work while standing, work while moving, maybe even work while doing something that looks a bit like exercise.
+I pace when I think. I also sit in front of a monitor for ten hours a day, which is not great for a body. So the picture was simple. A display hovering beside me, at eye height, that drifts along when I walk to the window and turns when I turn. Work while standing, work while moving, maybe even work while doing something that looks a bit like exercise.
 
 My worry was obvious too. A drone that carries a screen needs motors. Motors are mass. More mass needs more thrust, which needs bigger motors and a bigger battery, which is more mass. Does that loop ever stop, or does it run away?
 
-That question turned into a co-design engine, a 32,000 word [paper](/papers/flying-screen/) with 71 diagrams, an independent review that found real bugs, and a design called DESK-1/W. This post is the readable version.
+That question turned into a co-design engine, a long [paper](/papers/flying-screen/), an independent review that found real bugs, and a design called DESK-1/W. Short version: the loop closes, for half an hour, and energy turns out to be the easy part.
 
 ## The loop that might not close
 
@@ -47,7 +48,7 @@ $$
 M_0^{\max} = \frac{8\,\alpha^3 \rho A\, e_b^2\, \mathrm{FM}^2 \eta^2}{27\, g^3\, t_f^2}
 $$
 
-Four times the flight time costs you sixteen times the payload, and the test suite asserts that exponent comes out at exactly $-2$.
+Four times the flight time costs you sixteen times the payload. (The test suite asserts that exponent comes out at exactly $-2$.)
 
 When you open the tool on its defaults (a 13 inch panel, four 40 cm rotors, 250 Wh/kg cells, a 10 percent reserve and a one hour session) it says **no solution**. The wall is 0.60 kg of effective fixed load and the design is asking for 0.77 kg. At eight hours the wall falls to about 9 grams. My original fear was correct, for long sessions.
 
@@ -57,7 +58,7 @@ Cut the session to half an hour and the algebra relaxes completely. At 20 minute
 
 Four human requirements stop it instead:
 
-- **Noise.** A quiet office is about 45 dBA, normal speech about 60. You need to sit (stand) next to this thing for thirty minutes and think.
+- **Noise.** A quiet office is about 45 dBA, normal speech about 60. You need to stand next to this thing for thirty minutes and think.
 - **Downwash.** Loose paper starts moving at roughly 5 m/s of wake.
 - **Size.** It has to live beside a desk.
 - **Clearance.** It is spinning blades near your face.
@@ -68,7 +69,7 @@ Broadband rotor noise goes with the sixth power of tip speed. Halving the tip sp
 
 ## The 14 dB mistake
 
-Here is my favourite failure in the project, because it was so quiet.
+My favourite failure in the project, because it was so quiet (sorry):
 
 The first version of the acoustic model used an anchor constant I had more or less guessed. Then I tried to calibrate it against real aircraft. EU regulation 2019/945 makes drone manufacturers declare a sound *power* level. I had been treating that number as a sound *pressure* at one metre. Those are different quantities. The conversion over a reflecting floor is about 8 dB, and once I ran four commercial aircraft back through the model properly, the anchor moved to 82.9 dB from the 68 I had assumed. The four aircraft, which span 3.6 times in mass, agree with each other to within 1.5 dB, which is what makes me trust the corrected value.
 
@@ -88,7 +89,7 @@ The safety analysis pushed the standoff to 1.2 m, which keeps the blade tips abo
 
 At 1.2 m, a 15.6 inch 1920 by 1080 panel is *sharper* than a desktop monitor: 117 pixels per degree. Sharpness is fine. The problem is letters. A 16 px line of body text subtends 5.8 arcminutes at that distance, and the ergonomics standard (ANSI/HFES 100) asks for at least 16. To meet it you scale the interface by about 278 percent, which leaves a logical desktop of 692 by 389 pixels.
 
-The resolution is there. The usable workspace is a tablet's. Move closer and the text gets readable but the blades get to within 15 cm of your eyes. You can have a safe flying screen or a full desktop on a flying screen, not both, at this panel size. A bigger panel would fix it, and the acoustics will not allow a bigger panel.
+The resolution is there. The usable workspace is a tablet's. Move closer and the text gets readable but the blades get to within 15 cm of your eyes. You can have a safe flying screen or a full desktop on a flying screen, not both, at this panel size. A bigger panel would fix it, and the acoustics will not allow a bigger panel. Readability is an angle, not a pixel count.
 
 And pixel density does not pick the panel either. Areal density does: a desktop monitor panel is two to three times heavier per square metre than a laptop panel, which is the difference between a 1.7 kg aircraft and one over 4 kg that breaks every limit.
 
@@ -115,9 +116,9 @@ Running all of that together, with the battery loop closed around the flight sim
 
 And the version I would actually want: on a 37 g, 48 V tether it is lighter (1.62 kg), quieter, and never stops. 48 V stays under the safety extra-low voltage line. The tether is not a fallback, it is the primary mode, with the battery there for when you walk away from the desk.
 
-## The review that found what 52 tests did not
+## The review that found what the tests did not
 
-When the engine and the paper were done, all 52 tests passed. Then an independent review went through the derivations and the code with a reproduction script, and found real problems. Two examples:
+When the engine and the paper were done, every test passed. Then an independent review went through the derivations and the code with a reproduction script, and found real problems. Two examples:
 
 - The component solver searched for a feasible mass on a grid that stepped by 1.35 times. Near the fold, the window of feasible masses can be narrower than one grid step. The review found a case at a 4280 second mission with two valid roots, 4.568 kg and 4.617 kg, that the engine reported as "no mass closes". The paper had also called that failure "infeasibility".
 - The control authority divided the balanced rotor differential by the number of rotors, a factor of four on every axis, and that error had flowed into the gain rule and every layout comparison.
@@ -130,10 +131,6 @@ No hardware was built. Every number here is the output of a model, and the paper
 
 So the most valuable next step is not a better model. It is one 492 mm paddle rotor on a thrust stand, measuring thrust, power, rpm and the noise spectrum. That single measurement would settle most of the uncertainty in the design.
 
-## What I took from it
+If I started again, I would calibrate against real hardware on day one. A unit mistake was worth more than every design decision combined, and I only found it because I went looking for real aircraft to compare against.
 
-- I was afraid of the wrong constraint. Energy looked like the whole problem and turned out to be the easy part.
-- A unit mistake (power versus pressure) was worth more than every design decision combined. Calibrate against real hardware early.
-- Readability is an angle, not a pixel count.
-
-The full derivation, the 71 diagrams and the design study are in the paper: [The Flying Screen](/papers/flying-screen/).
+The full derivation and the design study are in the paper: [The Flying Screen](/papers/flying-screen/).

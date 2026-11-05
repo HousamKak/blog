@@ -1,6 +1,6 @@
 ---
 title: "A point of sale for a two-currency economy"
-description: "In Lebanon a shelf holds items priced in dollars and items priced in lira, and a cashier types 500 when they mean 500,000. Building an offline-first point of sale for a currency that will not sit still, and auditing my own money code when the tests all passed."
+description: "In Lebanon one shelf holds items priced in dollars and items priced in lira, and a cashier types 500 when they mean 500,000. I built an offline-first point of sale for a currency that will not sit still, then audited my own money code while every test passed."
 pubDate: 2026-11-26
 tags: ["web-dev", "lebanon", "money", "databases", "story"]
 draft: true
@@ -9,68 +9,65 @@ draft: true
 {/*
   Facts for Housam to confirm before publishing:
   - Confidentiality: the store, its owner, its location and all real figures are left out on purpose. Every amount in the post is synthetic test data from audit/AUDIT-2026-10-26.md (the 89,000 and 100,000 rates, the $1 plus 89,000 LBP cart, the $20 return, the 100,000 LBP count). Get the owner's OK before publishing anyway (backlog decision 2).
-  - Credit: the post calls Mahdi Kak "my brother" and does not link his GitHub (commits are as mahdi-alkak1-1). Mahdi Kak authored the May 2026 fixes on branches fix/pos-logic-audit, feat/returns-approvals-ui and fix/pos-lbp-k-input (double submit guard, idempotent atomic checkout, receipt ids, mixed-currency totals, total_sale_lbp, k LBP input). Confirm he is happy to be named and how (brother? co-developer?).
-  - The October audit (26 Oct) and remediation (27 Oct onward) are described as yours. Confirm.
+  - The May fixes (double submit guard, idempotent atomic checkout, receipt ids, mixed-currency totals, total_sale_lbp, k LBP input), the October audit (26 Oct) and the remediation (27 Oct onward) are all described as your own work.
   - Status: REMEDIATION.md marks many findings "Implemented locally" and several "In progress"; not everything is deployed to the store. The post says the fixes are local and tested against disposable databases. Update before publishing if they have been deployed.
   - Lebanon context: the 1,507.5 peg and a market rate around 89,500 LBP per dollar are general public figures, not store data. Check the current rate on the day.
   - Stack described: Express, sqlite3, a vanilla JS single-page frontend, local SQLite as source of truth, a sync outbox drained every 5 seconds to a cloud libSQL mirror, a read-only viewer machine. The cloud provider and database names are deliberately not named.
-  - "43 existing tests passed", "27 isolated database scenarios", "30 findings" are from the audit.
+  - "43 existing tests passed" and "30 findings" are from the audit.
   - pubDate is a placeholder (week 4 of the launch rhythm).
 */}
 
-For more than twenty years, a US dollar was worth 1,507.5 Lebanese lira. Then the banking system collapsed, and the number stopped meaning anything. Today a dollar is worth something like 89,500 lira, and every shop in the country lives in two currencies at once.
+The receipt said **$89,001.00**. The customer had bought two dollars' worth of goods.
 
-A store I built software for is a good example. Some products are priced in dollars and some in lira, sometimes on the same shelf. Customers pay in either. Nobody types full lira amounts: a cashier who is owed 500,000 lira thinks "500".
+That bug lived in a point of sale I wrote for a store in Lebanon, and it survived months of real use and a green test suite. It only makes sense once you know what money looks like there.
 
-I wrote a point of sale for that store with my brother, Mahdi Kak. This post is about what money looks like in code when the currency itself is unstable, and about the audit that showed me how much of my money code was wrong while every test passed.
+For more than twenty years, a US dollar was worth 1,507.5 Lebanese lira. Then the banking system collapsed and the number stopped meaning anything. Today a dollar is worth something like 89,500 lira, and every shop in the country lives in two currencies at once. Some products are priced in dollars and some in lira, sometimes on the same shelf. Customers pay in either. And nobody types full lira amounts: a cashier who is owed 500,000 lira thinks "500".
 
 ## Offline first, because the network is not a given
 
 The architecture is deliberately boring. An Express backend with `sqlite3`, and a vanilla JavaScript single-page frontend with no build step, served by the same process on the store's machine.
 
-The local SQLite database is the source of truth. Scans and lookups are sub-millisecond. A sale commits locally in under 20 milliseconds, and the cashier never waits on the internet. SQLite triggers write every change into a `sync_outbox` table, and a worker drains it every 5 seconds to a cloud mirror. A second machine, the viewer, runs the same code in read-only mode against that mirror, so reports can be read on another machine without touching the till.
+The local SQLite database is the source of truth. A sale commits locally in under 20 milliseconds, and the cashier never waits on the internet. SQLite triggers write every change into a `sync_outbox` table, and a worker drains it every 5 seconds to a cloud mirror. A second machine, the viewer, runs the same code in read-only mode against that mirror, so reports can be read without touching the till.
 
-If the connection drops for an afternoon, the store keeps selling. The mirror catches up when it comes back. In a country where power and internet both come and go, that was not an optimization, it was the requirement.
+If the connection drops for an afternoon, the store keeps selling and the mirror catches up later. In a country where power and internet both come and go, that was the requirement, not an optimization.
 
-## The first round: what Mahdi fixed in May
+## The bugs a cashier finds first
 
-The first serious pass over the checkout logic was Mahdi's, in May. It is a good list, because every item on it is a bug that every point of sale has at some point.
+My first serious pass over the checkout logic was in May. Every item on the list is a bug that every point of sale has at some point.
 
-**The double click that sold twice.** Pressing Complete Sale twice quickly, or hitting `F12` twice, submitted the sale twice. Stock went down twice. The fix had two halves: the button is disabled while a sale is in flight, and the backend accepts an `Idempotency-Key`, so a retry returns the original result instead of creating a second sale.
+**The double click that sold twice.** Pressing Complete Sale twice quickly, or hitting `F12` twice, submitted the sale twice and took the stock down twice. The fix has two halves: the button is disabled while a sale is in flight, and the backend accepts an `Idempotency-Key`, so a retry returns the original result instead of creating a second sale.
 
-**Half a cart.** The old checkout looped over the cart and called `POST /api/sales` once per line. If line three failed (network, stock, validation), lines one and two were already committed. The fix was a single endpoint, `POST /api/pos/complete-sale`, that processes the whole cart in one database transaction. All lines or none.
+**Half a cart.** The old checkout looped over the cart and called `POST /api/sales` once per line. If line three failed, lines one and two were already committed. Now a single endpoint, `POST /api/pos/complete-sale`, processes the whole cart in one database transaction. All lines or none.
 
 **Receipts that were not receipts.** A multi-item checkout created several sales rows with nothing tying them together, and printed with a fake id. Now every line carries one `receipt_id`.
 
-**Mixed carts.** Cart totals summed `price * qty` across items without converting currencies. Now the POS computes the total in both dollars and lira at the current rate, and shows one as primary and the other alongside it.
+**Mixed carts.** Cart totals summed `price * qty` across items without converting currencies. Now the POS computes the total in both dollars and lira at the current rate, shows one as primary and the other alongside it.
 
-**The thousand zeros.** The "Amount Received (LBP)" field wanted full lira, so a cashier typed `500000` for 500k. That is slow, and an extra or missing zero is a factor of ten. Now the field is in thousands: type `500`, and the POS calculates with 500,000 LBP. Change and the insufficient cash check follow the same convention.
+**The thousand zeros.** The "Amount Received (LBP)" field wanted full lira, so a cashier typed `500000` for 500k. That is slow, and one extra or missing zero is a factor of ten. Now the field is in thousands: type `500`, and the POS calculates with 500,000 LBP. Change and the insufficient cash check follow the same convention.
 
-That last one sounds cosmetic. It is not. It is the difference between software that matches how people already think about money and software that makes them translate, all day, under pressure, with a queue.
+That last one sounds cosmetic. It is the difference between software that matches how people already count money and software that makes them translate, all day, under pressure, with a queue.
 
-## Five months later, an audit
+## Five months later, trying to break it
 
-By October the store had been running on this for months. I decided to audit it properly: not to read the code and feel good, but to try to break it.
+By October the store had been running on this for months, and I decided to audit it properly: not read the code and feel good, but try to break it.
 
-The method mattered. I built 27 isolated database scenarios using the real models and real migrations, each on a disposable SQLite file with synthetic data, plus probes of the frontend and of startup. No real sale, customer or setting was touched. The existing test suite, 43 tests, passed the whole time. That was the first finding, really: the tests covered what the code did, not what the business needed.
+I built isolated database scenarios on the real models and real migrations, each on a disposable SQLite file with synthetic data, plus probes of the frontend and of startup. No real sale, customer or setting was touched. The existing suite of 43 tests passed the whole time. That was the first finding, really: the tests covered what the code did, not what the business needed.
 
-The audit came back with 30 findings. Here are the ones that are about two currencies.
+The audit came back with 30 findings. These are the ones about two currencies.
 
-**A dollar and 89,000 lira make 89,001.** The checkout fix from May converted currencies across items. But inventory is tracked in lots, and each lot has its own price and its own currency. One cart line could draw from two lots: one unit priced at $1 and one priced at 89,000 LBP. The frontend added the two raw prices into one line total and labelled it in dollars: `89001`. The receipt printer had the same flaw at the receipt level, and printed **$89,001.00** for what was $2.00 at the test rate. The server, meanwhile, converted correctly, so what the screen showed, what the cashier collected and what the database stored could all disagree.
+**A dollar and 89,000 lira make 89,001.** My May fix converted currencies across items. But inventory is tracked in lots, and each lot has its own price and its own currency. One cart line could draw from two lots: one unit priced at $1 and one priced at 89,000 LBP. The frontend added the two raw prices into one line total and labelled it in dollars: `89001`. The receipt printer had the same flaw at the receipt level, which is how $2.00 at the test rate came out as $89,001.00. The server, meanwhile, converted correctly, so the screen, the cash in the drawer and the database could all disagree.
 
-**Two exchange rates in one program.** Settings, expenses and payments used the rate from the settings page. Many report and capital calculations used the rate loaded from config at startup. With the setting at 100,000 and the startup value at 89,000, a $1 expense appeared as 100,000 LBP in the profit and loss report and as 89,000 LBP in daily cash. Worse, payments did not store a rate at all. A payment made in one currency against a sale in the other was converted when it was recorded, and later revalued at whatever the rate was that day.
+**Two exchange rates in one program.** Settings, expenses and payments used the rate from the settings page. Many report and capital calculations used the rate loaded from config at startup. With the setting at 100,000 and the startup value at 89,000, a $1 expense showed as 100,000 LBP in the profit and loss report and as 89,000 LBP in daily cash. Worse, payments did not store a rate at all. A payment in one currency against a sale in the other was converted when recorded, then revalued later at whatever the rate was that day.
 
-**Returns that refunded only one currency.** Approving a return reduced the dollar total of the sale but never touched its lira total, and reports prefer the lira figure. Selling two units for $20 and returning them one at a time left a sale with a dollar total of 0, a lira total of 1,780,000, and a cost total of 2. The same fully returned sale showed a $2 loss and a 1,602,000 LBP profit.
+**Returns that refunded only one currency.** Approving a return reduced the dollar total of the sale but never touched its lira total, and the reports prefer the lira figure. Sell two units for $20, return them one at a time, and you get a sale with a dollar total of 0, a lira total of 1,780,000 and a cost total of 2. The same fully returned sale showed a $2 loss and a 1,602,000 LBP profit.
 
-**Zero is not missing.** End of day reconciliation looked for the latest positive cash count. A count of 100,000 LBP on day one, a count of zero on day two, and an explicit zero opening on day three carried day one's 100,000 into day three. An empty drawer is a fact, and the code treated it as an absence of facts.
+**Zero is not missing.** End of day reconciliation looked for the latest *positive* cash count. Count 100,000 LBP on day one, count zero on day two, open explicitly at zero on day three, and day one's 100,000 carried into day three. An empty drawer is a fact, and the code treated it as an absence of facts.
 
-None of these threw an error. That is what makes money bugs dangerous. Every one of them produced a plausible number.
+None of these threw an error. Every one of them produced a plausible number, which is exactly what makes money bugs dangerous.
 
 ## What changed
 
-The fixes follow a few principles that I would now apply to any software that touches money in more than one currency.
-
-**One source for the current rate.** Every new operation asks the same provider. And checkout refuses to complete if the rate changed between the quote and the click:
+**One source for the current rate.** Every new operation asks the same provider, and checkout refuses to complete if the rate changed between the quote and the click:
 
 ```js
 const er = await getCurrentExchangeRate();
@@ -81,26 +78,24 @@ if (exchangeRate != null && exchangeRate !== '' && Number(exchangeRate) !== er) 
 }
 ```
 
-**Capture the rate on every financial event.** A payment, a refund, a stock loss, an expense: each one stores the exact rate used. A historical report must never substitute today's rate for a missing one. Where the history simply does not have a rate, the report marks the total as incomplete and says that it includes only known amounts. That discloses uncertainty. It does not invent a number.
+**Capture the rate on every financial event.** A payment, a refund, a stock loss, an expense: each one stores the exact rate it used. A historical report never substitutes today's rate for a missing one. Where the history simply has no rate, the report marks the total as incomplete and says it includes only known amounts. It discloses the gap instead of inventing a number.
 
 **Convert per lot, and print what the server committed.** Cart lines convert each lot to the line's currency before adding. Receipts show separate currency totals. And the printed receipt comes from the server's finalized response, not from the cart cached in the browser, so what the customer holds is what the database recorded.
 
-**Bind the quote to the checkout.** The live quote shows the actual gross, discount, lot split and total. A hash covers every quoted line, the rate and every applied rule, including cases where individual prices change but the grand total happens to stay the same. Checkout recomputes everything and compares. A mismatch rolls back the stock, the rows and the idempotency key, and the cashier sees the new price before trying again. The idempotency key itself is bound to the user and the request hash, so a genuine retry returns the receipt it already committed, and a different request with a reused key is refused.
+**Bind the quote to the checkout.** The live quote shows the actual gross, discount, lot split and total. A hash covers every quoted line, the rate and every applied rule, which catches cases where individual prices change but the grand total happens to stay the same. Checkout recomputes everything and compares. A mismatch rolls back the stock, the rows and the idempotency key, and the cashier sees the new price before trying again. The idempotency key is bound to the user and the request hash, so a genuine retry returns the receipt it already committed, and a reused key on a different request is refused.
 
 **Never edit history; reverse it.** A return now records an explicit adjustment, in both currencies, with the original lot costs, instead of rewriting the original sale. Correcting an expense reverses it today and creates a linked replacement today, in one transaction, and the original stays on its original day. A reversal cannot be applied twice. Every critical mutation writes an audit record inside the same transaction, and if the audit record fails, the sale fails with it.
 
-**Zero is a value.** Reconciliation stores explicit flags for "counted" and "opening", so zero is distinguishable from absent.
+**Zero is a value.** Reconciliation stores explicit "counted" and "opening" flags, so zero is distinguishable from absent.
 
-All of this is tested against disposable databases, including injected failures halfway through a transaction to prove nothing partial survives. The remediation is local and being validated before it reaches the store's machine. Existing records are a separate problem: correcting history needs a consistent snapshot and a reviewed correction journal, not a script that runs itself.
+All of it is tested against disposable databases, including failures injected halfway through a transaction to prove nothing partial survives. The remediation is local and still being validated before it reaches the store's machine. Existing records are a separate problem: correcting history needs a consistent snapshot and a reviewed correction journal, not a script that runs itself.
 
-## What I took away
+## What I would do from day one next time
 
-**Store native amounts and the rate, always.** Every number that ever crossed a currency boundary should carry the amount in its own currency, the converted amount and the rate that connected them. Anything less and history becomes unrecoverable the day the rate moves, which in Lebanon is any day.
+**Store native amounts and the rate, always.** Every number that crosses a currency boundary should carry its amount in its own currency, the converted amount and the rate that connected them. Anything less and history becomes unrecoverable the day the rate moves, which in Lebanon is any day.
 
 **Match the cashier's mental model.** Thousands of lira is how people count. Software that insists on full units is not more correct, it is more error prone.
 
-**Passing tests describe the code, not the business.** Forty-three green tests and thirty findings. The scenarios that found the bugs were written from the ledger's point of view: sell, return, pay, recount, reverse, then check that every report agrees with every other report.
-
-**Two people are better than one on money code.** Mahdi's pass in May caught the bugs a cashier would hit first. The October audit caught the ones an accountant would hit at the end of the month. Both were needed, and neither of us would have found the other's list alone.
+**Write tests from the ledger's side.** Forty-three green tests and thirty findings. The scenarios that found the bugs were written from the ledger's point of view: sell, return, pay, recount, reverse, then check that every report agrees with every other report. My May fixes caught what a cashier hits first. Only that second pass caught what an accountant hits at the end of the month.
 
 The lira will keep moving. The software no longer has to pretend it does not.

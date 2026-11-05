@@ -20,7 +20,7 @@ draft: true
 
 In July, H kept falling over.
 
-H is the agent orchestration platform I run my work through: an infinite canvas of terminals, each one a Claude Code session, wired to applets and to a backend that tracks what every agent is doing. It has a supervisor that owns the backend's lifecycle, a health monitor that probes every service, and a dashboard that shows which ones are up.
+H is the agent platform I run my work through: an infinite canvas of terminals, each one a Claude Code session, wired to applets and to a backend that tracks what every agent is doing. A supervisor owns the backend's lifecycle, a health monitor probes every service, and a dashboard shows which ones are up.
 
 The dashboard kept showing services going down. Then up. Then down. The backend restarted itself. The desktop app froze, and copy and paste stopped working. Logs showed crash storms. It looked like a pile of bugs.
 
@@ -39,8 +39,6 @@ On top of that sat H itself (backend, supervisor, the Vite dev server, the docs 
 Nothing was crashing on its own. Everything was starving.
 
 ## How starvation became crashes
-
-This is the part worth writing down, because the mechanism is general.
 
 H's health monitor probed each service's `/health` endpoint with a 1.5 second timeout and declared a service down after 2 consecutive failures. On an idle machine that is generous. On a machine at 100% CPU, a perfectly healthy Node process can take longer than 1.5 seconds just to get scheduled and answer. So the monitor reported services as "down" or "vanished" that were alive and doing their job, slowly.
 
@@ -82,7 +80,7 @@ So H now runs a **shared MCP hub**: one upstream process per server, multiplexed
 - **Registry-driven, hot-reloading.** The hub reads H's own MCP registry every 5 seconds. Register a new stdio server and it is hosted and shared with no restart and no config edit; remove one and its upstream is closed. In testing, a newly registered server was reachable in under 7 seconds.
 - **Exceptions where they belong.** Remote HTTP and SSE servers pass through untouched. The `h-orchestrator` server stays per terminal, because it is scoped to the session it runs in. And any server can be forced back to a private spawn with an environment variable.
 
-The test that mattered: three concurrent clients calling the Electrical Lab server shared exactly **one** upstream process. Five real servers, including one returning real Gmail data, proxied correctly through the hub.
+The test that mattered: three concurrent clients calling the Electrical Lab server shared exactly **one** upstream process. Real servers, including one returning live Gmail data, proxied correctly through the hub.
 
 ## Shipping it found three more bugs
 
@@ -102,9 +100,7 @@ None of these three caused the July crashes. All three were found because I went
 
 **Health checks are load tests you did not mean to run.** A timeout tuned on an idle machine becomes a false alarm generator on a busy one. If a health check can trigger a restart, it can make an overload worse.
 
-**Restarts need to be idempotent with respect to resources.** Respawning a server without freeing its port, its lock files or its children is not a restart, it is a second failure.
-
-**Every agent session is a process tree.** Each Claude Code session brings its MCP servers with it. Multiply by the number of sessions and look at the total before you blame anything else.
+**Every agent session is a process tree.** Multiply its MCP servers by the number of sessions and look at the total before you blame anything else.
 
 **Know the ceiling.** Even with the hub, 8 cores and 16 GB is under spec for four full sessions plus the platform, a desktop app and image generation all at once. The honest options are fewer simultaneous sessions, more hardware, or moving heavy jobs to another machine. Software can stop the machine from hurting itself. It cannot create cores.
 

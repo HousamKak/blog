@@ -5,17 +5,15 @@ pubDate: 2026-04-16
 tags: ["astro", "web-dev", "meta"]
 ---
 
-This is the first post on my blog. I built the whole thing from scratch: no templates, no CMS, no starter kits. Just Astro 5, Tailwind CSS v4, MDX, and TypeScript. The source lives in a single repo, content is file-based, and it deploys to GitHub Pages on every push.
-
-This post walks through the architecture and the decisions behind it.
+This is the first post on my blog. I built the whole thing from scratch: no templates, no CMS, no starter kits. Just Astro 5, Tailwind CSS v4, MDX, and TypeScript. The source lives in a single repo, content is file-based, and it deploys to GitHub Pages on every push. Here is how it fits together, and why.
 
 ## Why Astro?
 
 Astro ships **zero JavaScript** by default. Every page is rendered as static HTML at build time. When I need interactivity (a GPU fractal viewer, a 3D model), I drop in a React component as an "island" that hydrates only where it appears. The rest of the page stays inert.
 
-This is a meaningful distinction. Most React-based frameworks ship the entire runtime to every page. Astro doesn't. A blog post about math renders as pure HTML with KaTeX markup. A post with an interactive shader gets one React island. Nothing more.
+Most React-based frameworks ship the entire runtime to every page. Astro doesn't. A blog post about math renders as pure HTML with KaTeX markup. A post with an interactive shader gets one React island. Nothing more.
 
-The result: fast pages, clean architecture, full control over what runs in the browser.
+So the pages are fast, and I decide exactly what runs in the browser.
 
 ## Project Structure
 
@@ -39,7 +37,7 @@ src/
     └── global.css    # Design tokens + prose typography
 ```
 
-Astro's file-based routing maps cleanly onto the content model. Each collection gets a listing page, a dynamic `[...id].astro` route, and a card component. Tags aggregate across all four collections.
+Astro's file-based routing maps cleanly onto the content model. Each collection gets a listing page, a dynamic `[...id].astro` route, and a card component. Tags aggregate across every collection.
 
 ## Content Collections
 
@@ -274,4 +272,4 @@ Astro also generates a sitemap and an RSS feed automatically via integrations.
 
 ## What's Next
 
-More posts about rendering, math, and research. The content system is ready for papers with PDF embeds, notes for short-form writing, and renders for visual work. The per-post theming opens the door for posts that feel different from each other: not just different content, but different aesthetics.
+More posts about rendering, math, and research. The content system is ready for papers with PDF embeds, notes for short-form writing, and renders for visual work. And with per-post theming, a post can look as different from the others as it reads.

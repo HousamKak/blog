@@ -1,6 +1,6 @@
 ---
 title: "Building Escher's Waterfall in BlockForge"
-description: "Escher's Waterfall is water running downhill all the way back to the top. Every corner is believable and the whole cannot exist. Here is how I built it as a real voxel structure, kept it closed in one view, and filmed it so it reads."
+description: "Escher's Waterfall is water running downhill all the way back to the top. Every corner is believable and the whole cannot exist. I built it as a real voxel structure that closes from exactly one camera, then filmed it so it reads."
 pubDate: 2026-12-10
 heroImage: "/media/posts/escher-waterfall-blockforge/waterfall-illusion.webp"
 tags: ["blockforge", "voxel", "impossible-geometry", "rendering", "gamedev"]
@@ -12,7 +12,7 @@ draft: true
   - Rights. Escher's prints are in copyright in many countries (until 2042 per the BlockForge notes). The two stills here are from the FIRST film (examples/films/escher-waterfall, 2026-10-16), which is a new composition on the idea of the print, not the faithful reconstruction in Projects/Escher Waterfall/ (kept private). No image of the original print is included; the post links to nothing of Escher's. Confirm you are comfortable publishing these stills.
   - The walkable version (world escher-waterfall, made public on the viewer with noindex on 2026-10-30 on your decision). It is mentioned but not linked. Add a link to blockforge.housamkak.com if it is live and you want traffic there.
   - The blind test was run with Codex CLI, one fresh run per still. Confirm you are fine naming the tool.
-  - Numbers from docs/IMPOSSIBLE_GEOMETRY.md: pixel check 0 of 348,408 pixels at 1080p for the Penrose triangle, Waterfall gap k = -36 per scale, 1296 water parcels, period 412 frames (17.167 s), reveal turn 40 degrees, blind test 5 of 5 (first film) and 6 of 6 (revisit).
+  - Numbers from docs/IMPOSSIBLE_GEOMETRY.md: pixel check 0 of 348,408 pixels at 1080p for the Penrose triangle, Waterfall gap k = -36 per scale, water parcels (count cut from the prose), period 412 frames (17.167 s), reveal turn 40 degrees, blind test 5 of 5 (first film) and 6 of 6 (revisit).
   - Music credit: Bach, Prelude No. 1 in C major, BWV 846, Kimiko Ishizaka, CC0.
   - pubDate is a placeholder (week 6 of the launch rhythm).
 */}
@@ -21,7 +21,7 @@ Escher made *Waterfall* in 1961. Water runs gently downhill along a zigzag chann
 
 The trick inside it is three Penrose triangles. Every corner of the channel is a corner you could build. Every pair of neighbouring pieces makes sense. Only the whole loop is impossible.
 
-BlockForge is my world compiler: worlds are source code, a build plan compiles into blocks, and two clients (native C++ and web) render the same plan. So the question I asked was a slightly stubborn one. Not "can I fake this with an image". Can I *build* it, as a real structure of blocks that exists in 3D, and have it close exactly from one camera?
+BlockForge is my world compiler: worlds are source code, a build plan compiles into blocks, and two clients (native C++ and web) render the same plan. So I asked a slightly stubborn question. Faking it with an image is easy. Can I *build* it, as a real structure of blocks that exists in 3D, and have it close exactly from one camera?
 
 The answer is yes, and the reason is one line of geometry.
 
@@ -82,7 +82,7 @@ All of this runs in both clients, in the native vertex programs (the G-buffer to
 
 ## Part 3: water that flows forever
 
-The water is 1296 parcels, one per cell of path and lane, each moving at constant speed around the loop. Because every grid axis projects to the same screen length in this view, constant speed in 3D is constant speed on screen, so the water reads as gently downhill all the way round. A parcel that reaches the end of the channel wraps to the top of the fall: the same pixel in the illusion view, a visible jump anywhere else. The mill wheel turns on the same clock.
+The water is made of parcels, one per cell of path and lane, each moving at constant speed around the loop. Because every grid axis projects to the same screen length in this view, constant speed in 3D is constant speed on screen, so the water reads as gently downhill all the way round. A parcel that reaches the end of the channel wraps to the top of the fall: the same pixel in the illusion view, a visible jump anywhere else. The mill wheel turns on the same clock.
 
 The clock is music. The score is Bach's Prelude No. 1 in C major, BWV 846, in Kimiko Ishizaka's CC0 recording, and the loop is four bars long. Later I found that the period (17,150 ms) did not divide into whole 24 fps frames, so every wrap missed by a fifth of a cell and the wheel by 1.4 degrees, and from the second loop on, a few parcels hung in the air between the lip and the fall. The period is now 412 whole frames. That kind of bug only shows up when you watch the film loop ten times.
 
@@ -136,9 +136,4 @@ The aqueduct is a helix. The print is that helix seen along its own step. So the
 
 From anywhere other than the print view, the structure shows its trick, and I decided not to hide that. The reveal has been part of the piece since the first film.
 
-## What I keep from it
-
-- An impossible figure is a possible structure seen from the one direction that hides its gap. Once you see it that way, it is an engineering problem.
-- Draw order is the real difficulty, not geometry. Every wrong shear I tried produced a visible artefact I could name.
-- Pixel-exact checks against a CPU reference are what let me change the joins with confidence.
-- A blind test tells you whether it reads. It does not tell you whether it is good. For that, put it next to the original and measure.
+If I did it again, I would put the film next to the print and measure on the first day, not after the blind test. A blind test tells you whether it reads. It does not tell you whether it is good, and it certainly did not tell me the water was missing the wheel.
