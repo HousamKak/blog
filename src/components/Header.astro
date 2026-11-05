@@ -25,26 +25,7 @@ function isActive(href: string, current: string): boolean {
 const now = new Date();
 const dateLong = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
 const iso = now.toISOString().slice(0, 10);
-
-const ticker = [
-  'Stop the presses: a new dispatch has entered the ledger',
-  'Weather: fog over Beirut, scattered cursor movements',
-  'Volatility desk reports anomalous calm',
-  'A reader has complained about the drop cap. The drop cap is winning',
-  'Classifieds open: submit your regrets by fax',
-  'Julia set spotted misbehaving in section C',
-  '404s down 12% month on month. Apparently',
-  'The ampersand refuses to be italicised',
-  'Editor-in-chief seen muttering about kerning',
-  'Incoming: another post that is definitely not a draft',
-];
 ---
-<div class="chaos-ticker" aria-label="Newswire">
-  <div class="chaos-ticker-track">
-    {ticker.map(item => (<span class="chaos-ticker-item">{item}</span>))}
-    {ticker.map(item => (<span class="chaos-ticker-item">{item}</span>))}
-  </div>
-</div>
 
 <header class="chaos-masthead">
   <div class="chaos-masthead-top">
