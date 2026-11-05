@@ -1,6 +1,6 @@
 ---
 title: "Interactive Julia Sets with Wilson"
-description: "Exploring Julia sets with an interactive GPU-accelerated fractal viewer. Drag, pan, zoom — all running in your browser."
+description: "Exploring Julia sets with an interactive GPU-accelerated fractal viewer. Drag, pan, zoom, all running in your browser."
 pubDate: 2026-04-16
 heroImage: "/media/images/julia-sets-preview.png"
 tags: ["math", "interactive", "webgl", "wilson"]
@@ -8,7 +8,7 @@ tags: ["math", "interactive", "webgl", "wilson"]
 
 import WilsonGPUApplet from '../../components/WilsonGPUApplet.tsx';
 
-Julia sets are fractal structures defined by iterating $z \mapsto z^2 + c$ for a fixed complex constant $c$. Different values of $c$ produce wildly different shapes — from spirals to dendrites to filled discs.
+Julia sets are fractal structures defined by iterating $z \mapsto z^2 + c$ for a fixed complex constant $c$. Different values of $c$ produce wildly different shapes, from spirals to dendrites to filled discs.
 
 The applet below renders a Julia set in real time on the GPU. **Drag the point** to change $c$ and watch the fractal morph. **Scroll to zoom**, **drag the background to pan**.
 
@@ -107,4 +107,4 @@ $$
 K_c = \left\{ z_0 \in \mathbb{C} : \sup_n |z_n| < \infty \right\}
 $$
 
-The Mandelbrot set is the set of $c$ values for which $z_0 = 0$ stays bounded — in other words, it's a map of which Julia sets are connected.
+The Mandelbrot set is the set of $c$ values for which $z_0 = 0$ stays bounded. In other words, it's a map of which Julia sets are connected.

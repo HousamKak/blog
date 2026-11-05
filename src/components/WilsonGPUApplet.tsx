@@ -32,9 +32,9 @@ interface WilsonGPUAppletProps {
   panAndZoom?: boolean;
   /** Draggable points: { id: [x, y] } */
   draggables?: Record<string, [number, number]>;
-  /** Called when a draggable moves — receives (wilson, id, x, y) */
+  /** Called when a draggable moves, receives (wilson, id, x, y) */
   onDrag?: string;
-  /** Called after pan/zoom — receives (wilson) */
+  /** Called after pan/zoom, receives (wilson) */
   onPanAndZoom?: string;
   /** Enable fullscreen button */
   fullscreen?: boolean;
@@ -80,7 +80,7 @@ export default function WilsonGPUApplet({
     let destroyed = false;
 
     async function init() {
-      // Dynamic import bypasses Vite's bundler — Wilson stays as a runtime ES module
+      // Dynamic import bypasses Vite's bundler, so Wilson stays as a runtime ES module
       const wilsonUrl = new URL('/lib/wilson/wilson.js', window.location.origin).href;
       const { WilsonGPU } = await import(/* @vite-ignore */ wilsonUrl);
 

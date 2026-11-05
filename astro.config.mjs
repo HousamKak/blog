@@ -141,12 +141,29 @@ const mediaComposerDevApi = {
   },
 };
 
+// /tools/hero-composer is a local authoring tool. The page lives in
+// src/dev-tools/ (outside src/pages) and is only routed during `astro dev`, so
+// production builds and the sitemap never include it.
+const heroComposerDevRoute = {
+  name: 'hero-composer-dev-route',
+  hooks: {
+    'astro:config:setup': ({ command, injectRoute }) => {
+      if (command !== 'dev') return;
+      injectRoute({
+        pattern: '/tools/hero-composer',
+        entrypoint: './src/dev-tools/hero-composer.astro',
+      });
+    },
+  },
+};
+
 export default defineConfig({
   site: 'https://blog.housamkak.com',
   integrations: [
     mdx(),
     react(),
     sitemap(),
+    heroComposerDevRoute,
   ],
   vite: {
     plugins: [tailwindcss(), mediaComposerDevApi],

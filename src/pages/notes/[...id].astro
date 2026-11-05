@@ -3,7 +3,8 @@ import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
 
 export async function getStaticPaths() {
-  const notes = await getCollection('notes');
+  // Drafts are previewable in dev but never built for production.
+  const notes = (await getCollection('notes')).filter((e) => !import.meta.env.PROD || !e.data.draft);
   return notes.map(note => ({
     params: { id: note.id },
     props: { note },

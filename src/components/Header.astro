@@ -27,11 +27,11 @@ const dateLong = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long
 const iso = now.toISOString().slice(0, 10);
 
 const ticker = [
-  'Stop the presses — a new dispatch has entered the ledger',
+  'Stop the presses: a new dispatch has entered the ledger',
   'Weather: fog over Beirut, scattered cursor movements',
   'Volatility desk reports anomalous calm',
   'A reader has complained about the drop cap. The drop cap is winning',
-  'Classifieds open — submit your regrets by fax',
+  'Classifieds open: submit your regrets by fax',
   'Julia set spotted misbehaving in section C',
   '404s down 12% month on month. Apparently',
   'The ampersand refuses to be italicised',
@@ -49,7 +49,7 @@ const ticker = [
 <header class="chaos-masthead">
   <div class="chaos-masthead-top">
     <div class="left">{dateLong} &bull; CHAOS EDITION</div>
-    <div class="center">"Patience Compounds — Chaos Pays Dividends"</div>
+    <div class="center">"Patience Compounds, Chaos Pays Dividends"</div>
     <div class="right">VOL. ∞ &bull; NO. 00 &bull; {iso}</div>
   </div>
 
@@ -62,6 +62,7 @@ const ticker = [
       <div class="flank-label">NEWSWIRE</div>
       <div>FREE WITH ALL DOUBTS</div>
       <div>EST. MMXXVI</div>
+      <a href="https://www.housamkak.com" rel="noopener" style="color: var(--ink-red); text-decoration: none; border-bottom: 1px dotted var(--ink-red);">MAIN SITE ↗</a>
     </div>
   </div>
 
@@ -94,7 +95,7 @@ const ticker = [
     // Monotonically advancing in x (no backwards) and generally rising in y,
     // with small random perturbations so every visit is different.
     function randomPlanePath() {
-      var segments = 8 + Math.floor(Math.random() * 4);    // 8–11 waypoints
+      var segments = 8 + Math.floor(Math.random() * 4);    // 8 to 11 waypoints
       var totalX   = 2000 + Math.random() * 1200;           // overall horizontal travel (px)
       var totalY   = 400 + Math.random() * 500;             // overall upward travel (px)
       var segLen   = totalX / segments;
@@ -117,7 +118,7 @@ const ticker = [
           var cy = (py + nextY) / 2 - 100 + (Math.random() - 0.5) * 80;
           path += ' Q ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ' ' + nextX.toFixed(1) + ' ' + nextY.toFixed(1);
         } else {
-          // Smooth continuation — each T reflects the previous control point
+          // Smooth continuation: each T reflects the previous control point
           path += ' T ' + nextX.toFixed(1) + ' ' + nextY.toFixed(1);
         }
 

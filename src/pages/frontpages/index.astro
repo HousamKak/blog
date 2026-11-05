@@ -8,7 +8,7 @@ const editions = (await getCollection('frontpages'))
   .filter(f => !f.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
-<BaseLayout title="Frontpages" description="The archive of every front page of The Housam & Review — every edition preserved.">
+<BaseLayout title="Frontpages" description="The archive of every front page of The Housam & Review, every edition preserved.">
   <div style="padding: 1rem 0 0;">
     <BackLink href="/" label="Back to the front page" />
   </div>
@@ -29,7 +29,7 @@ const editions = (await getCollection('frontpages'))
             <iframe
               class="frontpage-preview-iframe"
               src={`/frontpages/${ed.id}/`}
-              title={`${ed.data.title} — preview`}
+              title={`${ed.data.title} (preview)`}
               scrolling="no"
               loading="lazy"
               aria-hidden="true"
@@ -89,7 +89,7 @@ const editions = (await getCollection('frontpages'))
     box-shadow: 4px 6px 0 rgba(26, 18, 8, 0.18);
   }
 
-  /* Tighter scale on small cards — improves perceived crispness on narrow widths */
+  /* Tighter scale on small cards: improves perceived crispness on narrow widths */
   @media (max-width: 600px) {
     .frontpage-preview-iframe {
       width: 1200px;

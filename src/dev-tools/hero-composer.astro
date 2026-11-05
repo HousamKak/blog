@@ -5,12 +5,15 @@
 //     or from uploads (drag-drop or file picker). Uploads can optionally be
 //     persisted to public/media/uploads/ so they survive a reload.
 //   - Each layer can be wrapped in a cream paper "panel" (configurable padding,
-//     colors, border, shadow, corner radius) — handy for reading-mat treatments.
+//     colors, border, shadow, corner radius), handy for reading-mat treatments.
 //   - Drag layers directly on the canvas to reposition. Shift-drag = 1% snap.
 //   - Reorder, hide, delete, duplicate layers.
 //   - Save writes the composed PNG to public/media/<dir>/<file>. Download works
 //     anywhere.
 //
+// Dev only: this file lives outside src/pages and is injected as a route only
+// when running `astro dev` (see heroComposerDevRoute in astro.config.mjs), so
+// it never ships in the production build or the sitemap.
 // All server endpoints used here are attached via a Vite dev middleware only
 // (see astro.config.mjs), so nothing here affects the production static build.
 ---

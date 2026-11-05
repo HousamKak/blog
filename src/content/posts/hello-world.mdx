@@ -5,13 +5,13 @@ pubDate: 2026-04-16
 tags: ["astro", "web-dev", "meta"]
 ---
 
-This is the first post on my blog. I built the whole thing from scratch — no templates, no CMS, no starter kits. Just Astro 5, Tailwind CSS v4, MDX, and TypeScript. The source lives in a single repo, content is file-based, and it deploys to GitHub Pages on every push.
+This is the first post on my blog. I built the whole thing from scratch: no templates, no CMS, no starter kits. Just Astro 5, Tailwind CSS v4, MDX, and TypeScript. The source lives in a single repo, content is file-based, and it deploys to GitHub Pages on every push.
 
 This post walks through the architecture and the decisions behind it.
 
 ## Why Astro?
 
-Astro ships **zero JavaScript** by default. Every page is rendered as static HTML at build time. When I need interactivity — a GPU fractal viewer, a 3D model — I drop in a React component as an "island" that hydrates only where it appears. The rest of the page stays inert.
+Astro ships **zero JavaScript** by default. Every page is rendered as static HTML at build time. When I need interactivity (a GPU fractal viewer, a 3D model), I drop in a React component as an "island" that hydrates only where it appears. The rest of the page stays inert.
 
 This is a meaningful distinction. Most React-based frameworks ship the entire runtime to every page. Astro doesn't. A blog post about math renders as pure HTML with KaTeX markup. A post with an interactive shader gets one React island. Nothing more.
 
@@ -60,7 +60,7 @@ const posts = defineCollection({
 });
 ```
 
-The `draft: true` flag hides posts from listings and feeds without deleting them. The `theme` field controls per-post visual theming — more on that below.
+The `draft: true` flag hides posts from listings and feeds without deleting them. The `theme` field controls per-post visual theming, more on that below.
 
 Papers get extra fields like `authors`, `venue`, `doi`, and `pdfUrl`. Renders track `mediaType` (2D vs 3D) and `mediaUrl` for the embedded viewer. All of this is type-safe end to end.
 
@@ -95,7 +95,7 @@ html.dark {
 }
 ```
 
-This means dark mode is free — no conditional classes, no `dark:` variants scattered across templates. Components just reference tokens, and the tokens change.
+This means dark mode is free: no conditional classes, no `dark:` variants scattered across templates. Components just reference tokens, and the tokens change.
 
 ## Per-Post Theming
 
@@ -127,7 +127,7 @@ Adding a new theme means adding a CSS block and a value to the Zod enum. No comp
 
 ## Dark Mode
 
-Dark mode runs without any framework. A small inline script in `<head>` reads `localStorage` and applies the `dark` class before first paint — no flash of wrong theme:
+Dark mode runs without any framework. A small inline script in `<head>` reads `localStorage` and applies the `dark` class before first paint, so there is no flash of wrong theme:
 
 ```javascript
 function applyDarkMode() {
@@ -159,7 +159,7 @@ Some posts need real interactivity. The [Julia sets post](/posts/interactive-jul
 />
 ```
 
-The `client:load` directive tells Astro to hydrate this component on page load. Everything else on the page — the header, the prose, the math — stays as static HTML. The component dynamically imports the Wilson library at runtime, bypassing Vite's bundler:
+The `client:load` directive tells Astro to hydrate this component on page load. Everything else on the page (the header, the prose, the math) stays as static HTML. The component dynamically imports the Wilson library at runtime, bypassing Vite's bundler:
 
 ```typescript
 const wilsonUrl = new URL('/lib/wilson/wilson.js', window.location.origin).href;
@@ -188,7 +188,7 @@ $$
 \mathcal{L} = \int \left( \frac{1}{2} \partial_\mu \phi \, \partial^\mu \phi - V(\phi) \right) d^4x
 $$
 
-Code highlighting uses Shiki with dual themes — `github-light` and `github-dark`. Astro embeds both color sets as CSS variables in the generated HTML. A single CSS rule swaps them:
+Code highlighting uses Shiki with dual themes: `github-light` and `github-dark`. Astro embeds both color sets as CSS variables in the generated HTML. A single CSS rule swaps them:
 
 ```css
 html.dark .astro-code,
@@ -222,7 +222,7 @@ async function init(canvas: HTMLCanvasElement) {
 
 ## Layout and Typography
 
-The page uses a 3-column CSS grid. Content sits in the center column (max `48rem`). On wide screens, the side gutters become visible — the right gutter holds a sticky table of contents on post pages:
+The page uses a 3-column CSS grid. Content sits in the center column (max `48rem`). On wide screens, the side gutters become visible. The right gutter holds a sticky table of contents on post pages:
 
 ```css
 .layout-grid {
@@ -246,7 +246,7 @@ The page uses a 3-column CSS grid. Content sits in the center column (max `48rem
 
 On mobile, the table of contents collapses into an inline box above the content. The TOC auto-generates from h2/h3 headings extracted during the MDX render pass.
 
-Prose typography is hand-tuned in a `.prose` class — no Tailwind typography plugin. Headings use the theme's heading font, paragraphs are `1.0625rem` at `1.8` line height, code blocks get borders and shadows from design tokens. Everything adapts when the theme changes.
+Prose typography is hand-tuned in a `.prose` class, with no Tailwind typography plugin. Headings use the theme's heading font, paragraphs are `1.0625rem` at `1.8` line height, code blocks get borders and shadows from design tokens. Everything adapts when the theme changes.
 
 ## Build and Deploy
 
@@ -274,4 +274,4 @@ Astro also generates a sitemap and an RSS feed automatically via integrations.
 
 ## What's Next
 
-More posts about rendering, math, and research. The content system is ready for papers with PDF embeds, notes for short-form writing, and renders for visual work. The per-post theming opens the door for posts that feel different from each other — not just different content, but different aesthetics.
+More posts about rendering, math, and research. The content system is ready for papers with PDF embeds, notes for short-form writing, and renders for visual work. The per-post theming opens the door for posts that feel different from each other: not just different content, but different aesthetics.

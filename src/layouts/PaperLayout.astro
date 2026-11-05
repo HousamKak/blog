@@ -38,11 +38,11 @@ const { title, description, pubDate, authors, pdfUrl, venue, doi, publications =
       <div class="article-byline">
         <span class="byline-by">BY</span>
         <span class="byline-author">{authors.map(a => a.toUpperCase()).join(' · ')}</span>
-        <span class="byline-sep">—</span>
+        <span class="byline-sep">&middot;</span>
         <FormattedDate date={pubDate} />
         {doi && (
           <>
-            <span class="byline-sep">—</span>
+            <span class="byline-sep">&middot;</span>
             <a href={`https://doi.org/${doi}`} target="_blank" rel="noopener" style="color: var(--ink-red); text-decoration: none; border-bottom: 1px dotted var(--ink-red);">DOI ↗</a>
           </>
         )}
@@ -94,7 +94,7 @@ const { title, description, pubDate, authors, pdfUrl, venue, doi, publications =
 
       <div class="article-footer">
         <div class="footer-rule"></div>
-        <div class="footer-tags">FILED UNDER — {tags.map(t => t.toUpperCase()).join(' • ')}</div>
+        <div class="footer-tags">FILED UNDER: {tags.map(t => t.toUpperCase()).join(' • ')}</div>
       </div>
     </div>
   </article>

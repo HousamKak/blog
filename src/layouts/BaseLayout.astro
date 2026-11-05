@@ -56,7 +56,7 @@ const themeClass = theme !== 'default' ? `theme-${theme}` : '';
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
 
     <!--
-      Dark mode init — runs before first paint.
+      Dark mode init: runs before first paint.
       Also restores after ViewTransitions swap (which replaces <html> attributes).
     -->
     <script is:inline>
@@ -86,7 +86,7 @@ const themeClass = theme !== 'default' ? `theme-${theme}` : '';
 
     <Footer />
 
-    <!-- Ambient pixel starfield — only runs when theme-pixel is on html -->
+    <!-- Ambient pixel starfield, only runs when theme-pixel is on html -->
     <script is:inline>
       function initPixelAmbient() {
         var canvas = document.getElementById('pixel-ambient');

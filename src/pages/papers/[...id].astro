@@ -3,7 +3,8 @@ import { getCollection, render } from 'astro:content';
 import PaperLayout from '../../layouts/PaperLayout.astro';
 
 export async function getStaticPaths() {
-  const papers = await getCollection('papers');
+  // Drafts are previewable in dev but never built for production.
+  const papers = (await getCollection('papers')).filter((e) => !import.meta.env.PROD || !e.data.draft);
   return papers.map(paper => ({
     params: { id: paper.id },
     props: { paper },

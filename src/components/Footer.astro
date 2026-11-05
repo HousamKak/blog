@@ -1,13 +1,64 @@
 ---
 const year = new Date().getFullYear();
+
+// Elsewhere in the press: Housam's other public pages.
+const elsewhere = [
+  { href: 'https://www.housamkak.com', label: 'Housam Kak' },
+  { href: 'https://www.housamkak.com/work', label: 'Work' },
+  { href: 'https://www.housamkak.com/cv', label: 'CV' },
+  { href: 'https://github.com/HousamKak', label: 'GitHub' },
+];
 ---
 <footer class="mt-auto border-t border-[var(--color-border)] py-8">
   <div class="mx-auto flex max-w-4xl flex-col items-center gap-3 px-4 text-sm text-[var(--color-muted)]">
+    <nav class="footer-elsewhere" aria-label="Elsewhere">
+      <span class="footer-elsewhere-label">Elsewhere in the press</span>
+      <span class="footer-elsewhere-links">
+        {elsewhere.map(link => (
+          <a href={link.href} rel="noopener">{link.label}&nbsp;↗</a>
+        ))}
+      </span>
+    </nav>
     <div class="flex gap-4">
       <a href="/rss.xml" class="transition-colors hover:text-[var(--color-text)]">RSS</a>
       <a href="/tags/" class="transition-colors hover:text-[var(--color-text)]">Tags</a>
       <a href="/about/" class="transition-colors hover:text-[var(--color-text)]">About</a>
     </div>
-    <p>&copy; {year} Housam.</p>
+    <p>&copy; {year} Housam Kak.</p>
   </div>
 </footer>
+
+<style>
+  .footer-elsewhere {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px dotted var(--color-border);
+    font-family: var(--font-smallcaps);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .footer-elsewhere-label {
+    color: var(--ink-red);
+    font-weight: 700;
+  }
+  .footer-elsewhere-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1.1rem;
+  }
+  .footer-elsewhere a {
+    color: var(--ink-sumi);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-red);
+    padding: 0.2rem 0;
+  }
+  .footer-elsewhere a:hover {
+    color: var(--ink-red);
+  }
+</style>

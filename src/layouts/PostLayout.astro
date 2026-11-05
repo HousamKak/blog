@@ -39,7 +39,7 @@ const isHelloWorld = Astro.url.pathname.startsWith('/posts/hello-world');
         <div class="article-byline">
           <span class="byline-by">BY</span>
           <span class="byline-author">HOUSAM KAK</span>
-          <span class="byline-sep">—</span>
+          <span class="byline-sep">&middot;</span>
           <span class="byline-date">{dateLabel}</span>
           {updatedDate && (
             <span class="byline-update"> &nbsp;&bull;&nbsp; Revised <FormattedDate date={updatedDate} /></span>
@@ -59,7 +59,7 @@ const isHelloWorld = Astro.url.pathname.startsWith('/posts/hello-world');
 
         <div class="article-footer">
           <div class="footer-rule"></div>
-          <div class="footer-tags">FILED UNDER — {tags.map(t => t.toUpperCase()).join(' • ')}</div>
+          <div class="footer-tags">FILED UNDER: {tags.map(t => t.toUpperCase()).join(' • ')}</div>
         </div>
       </div>
 
@@ -80,7 +80,7 @@ const isHelloWorld = Astro.url.pathname.startsWith('/posts/hello-world');
 </BaseLayout>
 
 <script>
-  // TOC scrollspy — highlight the link for the section currently in view.
+  // TOC scrollspy: highlight the link for the section currently in view.
   (function() {
     function init() {
       const toc = document.querySelector('[data-toc]') as HTMLElement | null;

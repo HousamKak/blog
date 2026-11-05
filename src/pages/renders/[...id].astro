@@ -8,7 +8,8 @@ import ThreeViewer from '../../components/ThreeViewer.tsx';
 import BackLink from '../../components/BackLink.astro';
 
 export async function getStaticPaths() {
-  const renders = await getCollection('renders');
+  // Drafts are previewable in dev but never built for production.
+  const renders = (await getCollection('renders')).filter((e) => !import.meta.env.PROD || !e.data.draft);
   return renders.map(entry => ({
     params: { id: entry.id },
     props: { entry },
@@ -38,7 +39,7 @@ const mediaLabel: Record<string, string> = {
       <div class="article-byline">
         <span class="byline-by">BY</span>
         <span class="byline-author">HOUSAM KAK</span>
-        <span class="byline-sep">—</span>
+        <span class="byline-sep">&middot;</span>
         <FormattedDate date={pubDate} />
       </div>
       <div style="margin-bottom: 1.5rem;">
@@ -67,7 +68,7 @@ const mediaLabel: Record<string, string> = {
 
       <div class="article-footer">
         <div class="footer-rule"></div>
-        <div class="footer-tags">FILED UNDER — {tags.map(t => t.toUpperCase()).join(' • ')}</div>
+        <div class="footer-tags">FILED UNDER: {tags.map(t => t.toUpperCase()).join(' • ')}</div>
       </div>
     </div>
   </article>
