@@ -1,0 +1,126 @@
+---
+title: "Bit for bit with a 2003 compiler: teaching a phone to agree with retail Zero Hour"
+description: "A retail Zero Hour LAN match checks nothing but the simulation, so a phone and a PC agree only if every float is computed exactly as Visual C++ 6 and the x87 FPU computed it in 2003. Four days of reading old machine code, one expression at a time, until nine retail replays reproduced on an Android phone."
+pubDate: 2026-11-19
+tags: ["gamedev", "reverse-engineering", "compilers", "floating-point", "zero-hour"]
+draft: true
+---
+
+{/*
+  LEGAL REVIEW PENDING. Do not publish until the legal review decision on the Generals Android fork is made.
+
+  Facts for Housam to confirm before publishing:
+  - Upstream credit: the Android port is MYSOREZ/GeneralsZH-Android-Port, imported at v1.4.0 (commit 576e226) on 8 October 2026. Everything before that date in the port is upstream work. Check the credit paragraph and the lineage list match README.md "Lineage & credits".
+  - Your own work as described here: the SAGE_RETAIL_RULES 30 Hz engine (commit 911626f, 11 Oct) and the retail-rules commits of 11 to 14 October; plus, in one paragraph, in-app updates, App Monitor crash reporting and Arabic release notes (8 to 11 October).
+  - Who built the port's dual 30 Hz / 60 Hz engine setup? The post says "the port ships two engines" without claiming it. The integer-division bug is described in the diary as coming from "this fork's 60 Hz work"; the post says "the port's 60 Hz work". Confirm.
+  - Status: as of the 14 October diary, all nine retail replays reproduce, but a live LAN game against a retail PC was "not yet done". The post says so. Update if a live match has happened since.
+  - Numbers: about 375,000 frames across nine replays, 4 to 55 minutes each; 5.36M inputs for the acos/asin fit; 2,081 INI numbers; babai 9,600 to 79,400; missile lead moved four replays 3,000 to 16,000 frames; 73 inlined dot/length sites; 14 NaN compares. All from LESSON-retail-lan-compat.md and docs/DEV_BLOG/2026-10-DIARY.md.
+  - The replay set is TheSuperHackers/GeneralsReplays (GeneralsZH/1.04). The VC6 toolchain is itsmattkc/MSVC600, as used by TheSuperHackers' CI. Confirm both credits.
+  - Deliberately absent: the app's product name, its website, and anything about how it is distributed. Keep it that way.
+  - Authorship framing: these commits are co-authored with Claude. The post says "I" throughout; decide with backlog item F7 whether to mention the agent workflow.
+  - "In 2025 EA released its source code under the GPL": check the exact release date you want to cite.
+  - pubDate is a placeholder (week 3 of the launch rhythm).
+*/}
+
+Command & Conquer: Generals Zero Hour came out in 2003. In 2025 EA released its source code under the GPL, and a community of people took that source and did remarkable things with it. One of those things is an Android port by [MYSOREZ](https://github.com/MYSOREZ/GeneralsZH-Android-Port), which runs the real game engine on a phone, with touch controls and cross-play against the community's GeneralsOnline PC client.
+
+I did not write that port. On 8 October 2026 I imported it at v1.4.0 and started maintaining a fork. This post is about one piece of work I did on top of it, between 11 and 14 October: making the phone agree, bit for bit, with the original retail game.
+
+## Credit where it is due
+
+The phone runs Zero Hour because of a chain of people, each building on the last:
+
+- **Westwood and EA Pacific** made the game, and **EA** released the source under GPL v3.
+- **[TheSuperHackers](https://github.com/TheSuperHackers/GeneralsGameCode)** maintain the community mainline: build modernization, the move off the 2003 toolchain, and much of the cross-platform groundwork. They also keep a VC6 build in CI that reproduces retail replays, and a public set of retail replays. Both were essential here.
+- **[Fighter19](https://github.com/Fighter19/CnC_Generals_Zero_Hour)** did the original Unix and 64-bit port.
+- **[GeneralsX](https://github.com/fbraz3/GeneralsX)** extended it to macOS and Linux, and **[ammaarreshi](https://github.com/ammaarreshi/Generals-Mac-iOS-iPad)** to iOS and iPad.
+- **[GeneralsOnline](https://www.playgenerals.online)** replaced the dead online service and built the PC client the port plays against.
+- **MYSOREZ** built the Android port itself.
+
+Everything below sits on that.
+
+## The problem: retail checks only the simulation
+
+The port was built to play against the GeneralsOnline PC client, which runs the community's modernized rules at 60 Hz. I wanted something else: a phone on a LAN against a PC running the original retail Zero Hour 1.04, unpatched.
+
+Generals is a lockstep RTS. Every machine runs the whole simulation and only sends player orders over the network. Every frame, each machine hashes its game state into a checksum, and if two machines disagree, the match is declared out of sync.
+
+I read EA's original source to see what a retail LAN join actually checks. The answer was almost nothing: the INI and executable checksum comparison in `LANAPI::handleRequestJoin` is commented out in retail 1.04, TheSuperHackers keep it off for Zero Hour, and the duplicate serial check passes because the phone sends an empty serial. So the store a PC copy came from does not matter on LAN.
+
+What does matter is the per-frame logic checksum. The phone has to compute the same game, to the bit, as a PC running a binary compiled in 2003.
+
+The port ships two engines: a 60 Hz one for GeneralsOnline cross-play, and a 30 Hz one. I put everything retail-specific behind a single build switch, `SAGE_RETAIL_RULES`, compiled only into the 30 Hz engine. The 60 Hz engine is not touched by anything in this post.
+
+## A modern compiler is not a reference
+
+Retail Zero Hour was compiled with Visual C++ 6, and its floating point runs on the x87 FPU at 24-bit precision. A modern MSVC build of the same source is not retail compatible. Neither is clang on an ARM phone, out of the box.
+
+So the first job was a reference I could trust. TheSuperHackers' CI checks retail replays with VC6 builds only. I built their tree with VC6 exactly the way their CI does: a portable VC6 toolchain from [itsmattkc/MSVC600](https://github.com/itsmattkc/MSVC600) at the pinned commit and hash, their `vc6` preset, run headless against a replay in a retail game folder. One trap: the folder must not contain the GeneralsOnline data patch, because the game's recursive archive scan would quietly mount it.
+
+That reference reproduces the recorded checksums of [TheSuperHackers' retail replay set](https://github.com/TheSuperHackers/GeneralsReplays). Nine replays: nine maps, all three factions, Hard AI, 4 to 55 minutes each, about 375,000 frames in total.
+
+Then I added a probe to the reference that writes exactly what the phone's network trace writes at each checkpoint: the checksum parts, the per-object checksums, the matrix words, and at one chosen frame the entire stream of words that goes into the checksum, with section marks. From then on a mismatch was a diff, not a hunt.
+
+## The loop
+
+Every divergence went through the same six steps.
+
+1. Replay on the phone at 30 Hz. At the first mismatch, the phone dumps its whole checksum word stream.
+2. Dump the reference at the same frame, and diff section by section. Every single case was inside the objects section, in one or a few objects.
+3. Diff the object's words. Which word, and by how much? A difference of `0x80` in a high byte is a sign bit on a zero. A difference of 1 in the last place is rounding.
+4. Read retail's machine code for that function, with `dumpbin /DISASM` on the reference's object file. It says exactly what VC6 computed, in what order, and what it kept in a register.
+5. If the value comes from a library function, measure the function: a VC6 harness linked against the reference's own object file, run over millions of inputs, then an exact emulation fitted and checked against all of them.
+6. Fix under `SAGE_RETAIL_RULES`, rebuild, rerun every replay.
+
+On 12 October, none of the nine replays reproduced to the end. On 14 October, all nine did.
+
+## What VC6 did that clang does not
+
+The fixes fell into classes. A few of them, roughly in the order they bit.
+
+**Signed zeros.** VC6 constant-folded `0*a` to `+0` and `0-a` to `-a` inside inlined cross products. IEEE arithmetic gives `-0` in some of those places. The values are equal; the bits are not; and the checksum hashes bits.
+
+**Transcendentals that are never rounded.** Retail's `Sin` compiles to `fld; fsin; ret`. The result sits in an 80-bit x87 register and the caller multiplies it before it is ever rounded to a float. I wrapped these in a small `X87Real` type that rounds once per operation, the way 24-bit x87 does. Checked on 686 infantry moves: all reproduced.
+
+**acos and asin, measured.** Retail's `acos` is computed as `atan2(sqrtf((1-x)(1+x)), x)`. I did not guess that; I fitted it against the reference over 5.36 million inputs and it matched on every one. Along the way I confirmed that `sin`, `cos`, `tan`, `atan`, `atan2`, `sqrt`, `log` and `fmod` match a plain double computation rounded to float exactly.
+
+**Additions in VC6's order.** Floating point addition is not associative, and VC6 regrouped sums per call site. The common one is a vector length computed as `(z*z + y*y) + x*x`, not in source order. Worse, every inlined copy of a helper like `length` or `normalize` gets its own grouping, while the out-of-line copy sums in source order. There were 73 such sites for lengths and dot products alone. The rule I ended up with: never guess, read the listing for the site, then check the order offline against the reference's values.
+
+**Division by a constant.** VC6 at `/O2` divides by a constant by multiplying with its rounded reciprocal. So an INI value of `"120%"` becomes 1.19999993. Clang does the same with `-freciprocal-math`, but it goes further: it merges three or more divisions by one variable and hoists loop-invariant divisors, which VC6 never did. Those sites keep real divisions. Found by diffing reciprocal divisions per function in the disassembly. That fix alone moved five replays 100 to 2,100 frames further.
+
+**Double promotion.** A double literal in an expression keeps the phone's whole expression in double with one rounding at the end. Retail rounds every step to 24 bits. The missile lead distance was the big one: a missile's thrust direction was right, but its goal was one unit in the last place off, from a lead distance computed in another file. Fixing it moved four replays 3,000 to 16,000 frames further.
+
+**Values kept in a register.** In VC6 a `(Real)` cast does not round. Only a store to memory does. Box corner collision tests store the cosine and keep the sine in a register. Each site had to be read. The box test fix moved one long replay from frame 9,600 to frame 79,400 in a single change.
+
+**NaN comparisons.** A compare with a NaN on x87 sets three condition flags at once. Whether VC6's `test ah, MASK` then takes the branch depends on the operand order and the mask, and often differs from IEEE's "always false". A braking factor of 0/0 in the locomotor force cap hit this. Fourteen more compares were NaN sensitive. The fix is to write the logically equivalent form that gives retail's outcome: `a > b` that branches on NaN becomes `!(b >= a)`.
+
+**The x87 exponent.** An x87 register holds a 24-bit mantissa but a much wider exponent. A product of two tiny matrix entries stays nonzero, and keeps its sign, until it is stored. Rotations now multiply through a register type that models exactly that, and decaying pitch, roll and yaw rates that fall into the denormal range round twice, as x87 does.
+
+**And a few that were not floating point at all.**
+
+- An uninitialized variable in the AI's production code that VC6 happened to leave `true`. With `false`, the AI chose its next building the frame its dozer appeared, one frame before retail. TheSuperHackers already keep it `true` under `#if _MSC_VER < 1300`, so grepping the reference for that condition is a good way to find retail behavior in simulation code.
+- The partition solver sorts with `std::sort` from STLport 4.5.3, which is unstable above 16 elements. The phone now uses that exact algorithm.
+- A frame count divided as integers in retail had become a float division in the port's 60 Hz work. The only such site in the simulation.
+- `BitFlags` hashed `sizeof(this)` bytes of a mask into the checksum: 4 on every PC client, 8 on a 64-bit phone. Invisible until a player activated a battle plan, which put a mask into the checksum.
+
+Two things I suspected and ruled out by measurement: VC6's `sscanf("%f")` is correctly rounded on all 2,081 numbers in the retail INI files, and the per-store executable checksum is never checked on LAN.
+
+## Traps worth knowing
+
+**A trace changes the code it traces.** Adding a log line inside a VC6 function changes how VC6 compiles that function, and the reference stops being retail. Trace from another translation unit, or from the caller.
+
+**When the arithmetic matches, the input does not.** If a function's own operations match the listing and the output still differs, perturb each input by a few ulps offline until the retail output appears, then trace where that input came from.
+
+**One frame early is a decision, not arithmetic.** When a unit stops or the AI acts one frame early or late, log the decision's inputs on both sides, not the math.
+
+**Audit before you chase.** An audit of the simulation against TheSuperHackers' tree, looking for changes that only made sense for the GeneralsOnline rules, found most of them in one pass. Doing that first saves days of chasing divergences one at a time.
+
+## Where it stands
+
+On 14 October the phone's 30 Hz engine reproduced all nine retail Zero Hour 1.04 replays to their last checkpoint, bit for bit. Every change is behind `SAGE_RETAIL_RULES`, so the 60 Hz GeneralsOnline engine is unchanged.
+
+What is not done yet: a live LAN game against a retail PC with this engine, and more retail replays to widen coverage. Nine replays reproducing is strong evidence, not proof. A live match exercises the network code too, and I will write that up when it has happened.
+
+The same week I also added in-app updates, crash reporting through App Monitor (my own telemetry platform, which caught a Galaxy A55 crash inside the GL driver that is a story of its own), and release notes in English and Arabic. Those were the practical side of taking over a project. This was the fun part.
+
+What stays with me is how much of a 2003 compiler's personality lives in a game's behavior. The game's rules are the source code plus every decision VC6 made about it: the order it added things, what it kept in a register, when it rounded. Reproducing the game meant reproducing the compiler, one site at a time.

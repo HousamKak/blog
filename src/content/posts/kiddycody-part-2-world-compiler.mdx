@@ -1,0 +1,136 @@
+---
+title: "KiddyCody, part 2: the voxel toy became a world compiler"
+description: "In April I said I would rewrite the block engine in C++ and post updates. Six months later it is BlockForge: two peer clients, worlds as source code, version control for worlds, and an agent at the controls. What got built, what was harder than expected, and what is still only a plan."
+pubDate: 2026-11-05
+tags: ["voxel", "gamedev", "blockforge", "story", "agents"]
+draft: true
+---
+
+{/*
+  Facts for Housam to confirm before publishing:
+  - Commit counts: 964 commits on the working line as of 2026-11-05, 797 of them in October 2026 (git log in D:/dev/block game). Recount on the day.
+  - "More than 250 MCP tools": 262 distinct blockforge_* tool names in docs/reference/mcp-tools.md. Confirm the number you want to quote.
+  - Native client: C++17, SDL2, OpenGL 3.3 or a CPU renderer. Web: three.js WebGPU with a WebGL fallback (docs/concepts/clients-and-parity.md).
+  - Representation lab numbers (273 / 2,218 / 15,029 cells, 51,712 triangles) are from WORLD_COMPILER_ARCHITECTURE.md section 2.2 and describe a proof of concept, not production.
+  - Blind tests: comic and rubber hose 5 of 5, anime needs a second pass, Escher's Waterfall 5 of 5 (STATUS.md, 2026-10-22).
+  - Authorship framing: the post says agents (Claude Code sessions) write most of the code under your direction, and that several sessions work in the repo at once. This touches backlog decision F7; confirm the wording.
+  - blockforge.housamkak.com is linked as a "coming soon" page. Confirm it should be public from the blog.
+  - The Baalbek film is deliberately not mentioned (audio rights, backlog C4).
+  - Is the Mahdi in the closing line still happy to be named? He is credited by name in part 1 already.
+  - Suggested figures (none embedded yet): a still from each client of the same world, a world-history diff view, a critic report contact sheet.
+  - pubDate is a placeholder (week 1 of the launch rhythm).
+*/}
+
+The [first post](/posts/kiddycody-voxel-engine/) ended with a promise. My brother needed a logo, the logo became SVG blocks, the blocks became a little isometric engine, and the engine hit the ceiling of what a browser would give me at about 36,000 blocks. So I said I would move to C++, do the Minecraft research properly, and post updates.
+
+I did not post updates. I built instead. This is the update, six months late, and the thing it describes is not really a voxel game any more.
+
+## What it is now
+
+The project is called BlockForge, and the one-line description I keep coming back to is this:
+
+> An AI describes a world. The engine builds it, animates it and films it, reproducibly.
+
+That sentence carries most of the design. The world is not a file somebody sculpted by hand. The truth is a recipe: build plans, generators, tool runs with their parameters, styles. The world itself is a build product, the way a binary is a build product of source code. Delete it and you can regenerate it exactly.
+
+So I stopped calling it an engine and started calling it a **world compiler**. Source goes in. Worlds, stills and films come out.
+
+## The C++ rewrite that was not a port
+
+The plan in April was simple: rewrite the browser engine in C++, get the performance, move on. That is not what happened, and I am glad.
+
+The native client is C++17 on SDL2, with an OpenGL 3.3 renderer and a CPU renderer for headless work. The web client is still there, now on three.js with WebGPU and a WebGL fallback. Neither is a port of the other any more. Both read the same build plans, the same save format, the same timeline schema and the same mod API. Features land in both.
+
+Keeping two clients honest turned out to be its own engineering discipline. "It looks the same" is not a test. So there is a harness for almost every seam:
+
+- saves round-trip between the clients;
+- shaped blocks and catalogs produce the same geometry;
+- behaviors produce the same trace, tick by tick, in the native exe and in Node;
+- mods produce the same frame hashes in Node WASM, browser WASM and native;
+- the two batch clients render the same stills with the same timing;
+- the native CPU and GPU renderers agree.
+
+The mod system is the part I like most here. Mods are Luau, run by one C++ library. The native client links it in, and the web client runs the same library compiled to WebAssembly. Same code, same math, same random numbers, bit for bit. When a mod misbehaves in the browser, it misbehaves the same way natively, which makes it debuggable.
+
+## Time is a function, not a simulation
+
+The output is media, mostly films. Films need something games usually do not: any frame has to be computable on its own.
+
+Frame `n` shows story time `t = n / fps`. If I render only frame 300, or frames 280 to 320, or the whole film in eight parallel chunks, I get the same pixels as one full render. That is what makes stills, scrubbing, re-rendering a single beat and frame caches possible.
+
+Everything that moves reads one clock, the story clock: cameras, behaviors, baked animation, lighting keys, actors, even web pages shown on in-world screens (they get the time injected). Every moving thing is then classified as one of three kinds:
+
+- **seekable**: the look at `t` is a pure function of `t`, the world, the parameters and a seed;
+- **simulated**: deterministic, but frame `t` needs the history from zero (timers, springs, physics);
+- **interactive**: depends on input or the wall clock.
+
+Before a batch render, the client lists everything that is not seekable and refuses to start:
+
+```
+Not seekable: motion.parametric at [4, 2, 1] (spring channels; bake it or set "direct": true), ...
+```
+
+This was harder than it sounds. A lot of things I thought were "just animation" were secretly simulations. A pulsing rune driven by a timer is not seekable. A spring on a motion channel is not seekable. Each one has to be baked, rewritten as a function of `t`, or explicitly marked as allowed to be nondeterministic, with a warning on the render. The refusal is annoying, and it is the single most useful thing in the render pipeline.
+
+## Version control for worlds
+
+If worlds are source, they should have history. They do.
+
+A world store is a folder next to the save, like a `.git` folder. The world is cut into 32 by 32 by 32 chunks, and each chunk is stored as an object named by the SHA-256 of its content. The objects of one commit go into a single pack file, so committing a world of a thousand chunks writes a handful of files, not a thousand.
+
+On top of that sit the things you would expect from Git: versions with the recipe that produced them, branches, block-by-block diffs between any two versions, three-way merges, and world pull requests with review pages. You can walk through a world's history and watch it build. History is off until you ask for it, so a world without it behaves exactly as before.
+
+## The operator is an agent
+
+This is the part that changed how I work.
+
+Everything in BlockForge is data an agent can write, and every capability is reachable over MCP. There are more than 250 MCP tools now, and a coverage test fails the build if a capability exists without a tool. The CLI (`kc.js`) and the MCP server sit on the same bridge, so an agent can build a world, render a still, look at it, and decide what to change.
+
+Looking is the important bit. An agent that cannot see what it made is writing blind. So there are snapshots, contact sheets, raycasts and queries, and there is a critic loop. The critic renders a small preview of a shot and runs nine deterministic checks before anything expensive happens: the camera turning faster than 45 degrees a second or rolling more than 8 degrees, clipped highlights or crushed blacks, black or frozen frames while the camera moves, text with contrast under 4.5:1, a subject drifting out of the safe area, flicker, and a frame that differs when rendered alone (the determinism promise, checked again).
+
+I ended up writing down what "AI native" means for this project, because I needed a rule for new features. Anything new has to be:
+
+1. **schema driven**: a typed, versioned source an agent reads and writes;
+2. **compiled**: results derived from source, reproducible in both clients;
+3. **reachable**: a CLI command and an MCP tool;
+4. **observable**: an agent can see the result;
+5. **verifiable**: it can be judged without a human;
+6. **reversible**: it can be diffed, merged and undone.
+
+If a feature cannot meet one of the six, its spec has to say why.
+
+I should be honest about the other side of this: most of BlockForge's code is written by Claude Code sessions that I direct, often several at once in the same repository. I own the decisions, the looks, the vision documents and the bugs I find by watching the output. The agents do a large share of the typing. That arrangement needed its own rules, like committing only your own paths and never `git add -A` over a shared tree, but that is another post.
+
+## Style is a property you can test
+
+One question I did not expect to care about: can an engine change its look on command, and can you prove it?
+
+A style here is full art direction, not a filter. It starts with a research dossier, gets a scene built for it, sits side by side with references, and then faces a blind test: show the frames to a reader who does not know which style they are looking at, and see if they name it. Comic and rubber hose passed 5 of 5. Anime did not read well enough and needs a second pass. A reconstruction of Escher's *Waterfall*, water flowing downhill forever along an impossible loop, also passed 5 of 5. That one deserves its own post, and it is getting one.
+
+## What was harder than expected
+
+Every list of features hides a list of things that broke. Some of the ones that taught me something:
+
+- **Caching a world is cache invalidation, with all its jokes.** A generator ran as a child process and read a data file that was not in its declared imports. Change the data, and the build happily reused the cached world. Declaring code imports is not enough; the build has to know about every input.
+- **Replaying operations is not the same as reaching a state.** Remove a style operation from a generated plan, and the incremental update can be empty, leaving the old style in place. The world needs desired-state reconciliation, not a log of edits.
+- **Tests can test the wrong binary.** Local tests picked up a stale executable from a feature build folder, and passed. Verification now records which toolchain and binary it actually ran.
+- **A failed test can leave the world running.** A test that died during setup left a bridge process alive, which then confused the next test. Resource ownership and cleanup are part of the test contract.
+- **October happened.** The repository has 964 commits, and 797 of them landed in October. Most of what I describe here was built in a few weeks once the architecture settled. Speed like that only works with the parity harnesses and the determinism checks catching what I cannot.
+
+## What is built, and what is a plan
+
+I keep a vision document and a status document, and the rule is that they never get confused. What is landed: the two clients, the shared plan and save format, the mod host in both, story-time rendering with the seek check, world history up to pull requests, the critic loop, the style system with the blind tests, the MCP surface, export to 16:9 and 9:16.
+
+What exists as a first slice: the typed world compiler itself. A small source format compiles to voxels and triangle surfaces independently from the same shapes. In the proof of concept, one scene gives 273 voxel cells at 1 m resolution, 2,218 at 0.5 m and 15,029 at 0.25 m, and a thin ring that vanishes completely at the two coarser resolutions (0, 0, then 64 cells). The same shapes give 51,712 triangles as a surface. Repeated builds give identical artifact hashes. That vanishing ring is the whole argument for keeping more than one representation: a thin thing is real in the source even when a grid is too coarse to see it.
+
+What is still a plan: worlds made of many representations at once (fields, curves, meshes, systems) compiled to whatever a target needs; drivable cars and race films; characters sculpted at high detail and shrunk to world size; a game subsystem. Those are written down with specs and phases, and none of them should be read as shipped.
+
+## Where the logo fits
+
+It is funny to look back. The whole thing started because image generators would not let me edit one shape of a logo without regenerating the rest. The fix was to make the logo source code: blocks I could read, recolor and recombine.
+
+BlockForge is the same idea taken as far as I can take it. A world you cannot regenerate, diff or merge is a raster image. A world that is source code is an SVG. Everything else, the two clients, the clock, the history, the agent at the controls, follows from refusing to treat the output as the truth.
+
+The landing page is at [blockforge.housamkak.com](https://blockforge.housamkak.com). It says "coming soon", and it means it.
+
+Mahdi still has his logo. The academy is still teaching kids to code. I am still writing a voxel engine. It just compiles now.

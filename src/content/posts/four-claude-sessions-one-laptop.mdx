@@ -1,0 +1,111 @@
+---
+title: "Four Claude sessions overloading one laptop"
+description: "My agent platform's services kept dying. None of them were broken. The machine was at 100% CPU because four Claude Code sessions had each spawned their own fleet of MCP servers, and my own watchdog was turning slowness into crashes."
+pubDate: 2026-11-12
+tags: ["agents", "h", "mcp", "debugging", "story"]
+draft: true
+---
+
+{/*
+  Facts for Housam to confirm before publishing:
+  - The machine: 8 logical cores, 15.7 GB RAM, measured at 100% CPU and 86% RAM (13.5 GB used). Confirm it is a laptop (the source note says "the box"), and whether to name the model.
+  - Process counts are from docs/stabilization-2026-07-20.md: about 20 MCP child processes, about 33 Node processes in total, WebView2 at 1.5 GB.
+  - The MCP servers named (blockforge, budgetability, electronics, saken) are your own projects. Confirm you are fine naming them; Saken and Budgetability have no public pages yet.
+  - Woopy is described as "a screen-aware desktop companion" (docs/spec-woopy-*). Confirm the description, or drop the name.
+  - Dates: the note is dated 20 July 2026, the fixes are commits b980730 (21 July) and 1c28b58 and 2f2ce09 (22 July).
+  - The prod/dev port collision details (voice 3105 to 4105, supervisor 3110 to 4110) and the four-day-old stale bundle are from commit 1c28b58.
+  - "codex image-gen" is described as an image generation MCP server (3modly). Confirm the name you want public.
+  - pubDate is a placeholder (week 2 of the launch rhythm).
+*/}
+
+In July, H kept falling over.
+
+H is the agent orchestration platform I run my work through: an infinite canvas of terminals, each one a Claude Code session, wired to applets and to a backend that tracks what every agent is doing. It has a supervisor that owns the backend's lifecycle, a health monitor that probes every service, and a dashboard that shows which ones are up.
+
+The dashboard kept showing services going down. Then up. Then down. The backend restarted itself. The desktop app froze, and copy and paste stopped working. Logs showed crash storms. It looked like a pile of bugs.
+
+It was not. When I finally stopped guessing and measured, the answer was one number: **CPU 100%**.
+
+## What was actually eating the machine
+
+The machine has 8 logical cores and 15.7 GB of RAM. At the time, 13.5 GB of it was in use, and every core was pinned.
+
+The culprit was a feature, not a bug. I had four Claude Code sessions open in H, working on different projects in parallel. Each session spawns the MCP servers it is configured with, over stdio, as its own child processes. And H was writing every server in its registry into every terminal's config.
+
+So every session got a **private copy** of every MCP server. Four sessions, four copies each: four BlockForge servers, four Budgetability servers, four Electrical Lab servers, four Saken servers, and so on. About 20 MCP child processes, most of them idle, all of them Node.
+
+On top of that sat H itself (backend, supervisor, the Vite dev server, the docs server, the Tauri shell), the WebView2 renderer for the desktop app at 1.5 GB, Woopy (a screen-aware desktop companion I was building), and an image generation server that spikes CPU every time it runs. Roughly **33 Node processes fighting over 8 cores**.
+
+Nothing was crashing on its own. Everything was starving.
+
+## How starvation became crashes
+
+This is the part worth writing down, because the mechanism is general.
+
+H's health monitor probed each service's `/health` endpoint with a 1.5 second timeout and declared a service down after 2 consecutive failures. On an idle machine that is generous. On a machine at 100% CPU, a perfectly healthy Node process can take longer than 1.5 seconds just to get scheduled and answer. So the monitor reported services as "down" or "vanished" that were alive and doing their job, slowly.
+
+That alone would only have been a misleading dashboard. The real damage came from the supervisor's watchdog. When the backend looked dead, the watchdog respawned it. But the old backend often was not dead yet, or had a straggler child still holding the socket. The new backend tried to bind port 3100, got `EADDRINUSE`, and crashed. The watchdog saw a crash and respawned again. And again.
+
+So the system took an overloaded machine and converted it into a crash loop, which used more CPU, which made the next health probe slower, which made the next false alarm more likely. A feedback loop built out of reasonable components.
+
+One correction to my own first reading: the supervisor itself was **stable the whole time**. It only flapped in the health display, because its own health probe was starving like everything else. The real restarts were the backend respawn loop.
+
+## The fixes, in order of how much they mattered
+
+**1. Free the port before respawning.** The watchdog now kills any process still owning the backend's port, waits until the port is actually free, and only then spawns. That alone removes the self-inflicted `EADDRINUSE` storm. It also checks one more thing first: if a healthy backend came up during the backoff (I started one by hand, or a script did), it adopts that one and watches it instead of killing it.
+
+**2. A crash-loop breaker.** If the backend exits within 5 seconds of starting, 4 times inside a 60 second window, the supervisor stops hammering and backs off for 30 seconds. Respawning into the same failure every 200 ms helps nobody, least of all a machine that is already out of CPU.
+
+```ts
+const CRASH_LOOP_WINDOW_MS = 60_000;
+const CRASH_LOOP_THRESHOLD = 4;
+const BACKOFF_LOOP_MS = 30_000;
+```
+
+**3. A stronger debounce.** The watchdog used to call the backend dead after 2 missed polls. Now it waits for 4 polls, about 12 seconds, so a backend that is merely slow to answer during a graceful restart is not mistaken for a crash.
+
+**4. Health probes that tolerate load.** The probe timeout went from 1.5 to 4 seconds, and a service is only marked down after 3 consecutive failures, about 15 seconds. A transient spike no longer flaps services red on the dashboard.
+
+**5. Serialize the heaviest job.** The image generation server now runs one job at a time by default. It was the single biggest CPU spike, and running two at once never made anything faster.
+
+**6. Reap orphans.** When a session dies uncleanly, its MCP children can be orphaned and keep running forever. A small PowerShell script finds Node processes that look like MCP servers and whose parent process no longer exists, and kills them. It runs as a dry run by default and only kills with `-Apply`. Live servers, whose parent session is still alive, are never touched.
+
+Those six stopped the crashes. They did not fix the cause.
+
+## The actual fix: share the MCP servers
+
+The duplication was the cause. Four copies of a server that answers a handful of tool calls an hour is pure waste.
+
+So H now runs a **shared MCP hub**: one upstream process per server, multiplexed to every terminal over Streamable HTTP. When a terminal starts, H writes each registered stdio server into its config as an HTTP URL pointing at the hub, instead of a private spawn. Three things made it pleasant to live with:
+
+- **Lazy spawning.** An upstream server starts on its first call. A server nobody uses costs nothing.
+- **Registry-driven, hot-reloading.** The hub reads H's own MCP registry every 5 seconds. Register a new stdio server and it is hosted and shared with no restart and no config edit; remove one and its upstream is closed. In testing, a newly registered server was reachable in under 7 seconds.
+- **Exceptions where they belong.** Remote HTTP and SSE servers pass through untouched. The `h-orchestrator` server stays per terminal, because it is scoped to the session it runs in. And any server can be forced back to a private spawn with an environment variable.
+
+The test that mattered: three concurrent clients calling the Electrical Lab server shared exactly **one** upstream process. Five real servers, including one returning real Gmail data, proxied correctly through the hub.
+
+## Shipping it found three more bugs
+
+The first version of the hub was a standalone script. Making it work in the packaged desktop app the next day exposed three things that had been quietly broken for a while.
+
+**The hub could never have shipped.** The installed app runs one bundled backend with no `node_modules`. A standalone script could not even resolve the MCP SDK there. So the hub moved into H's MCP package and starts from inside the backend process, which means development and the desktop app now run the same code path. If it fails to bind, that is not fatal: terminals fall back to private spawns and it logs a warning.
+
+**Production was not isolated from development.** The desktop app only moved its main API port. The voice sidecar still bound the development port, and the supervisor stayed on the development port too. Which meant that the production app's "restart system" button sent its restart request to the **development** supervisor and restarted the wrong backend. They now live on separate ports, and the hub follows the same split.
+
+**The desktop app shipped a stale backend.** The build command was just the Tauri build, and the step that bundles the backend only ran when I ran it by hand. The bundle in the tree was four days old, so every recent production build had silently shipped old server code. The build now runs the bundler first.
+
+None of these three caused the July crashes. All three were found because I went looking at the system as it actually runs instead of as I thought it ran.
+
+## What I would tell someone running many agents
+
+**Measure before you debug.** The logs described symptoms. One look at CPU, RAM and a process list described the cause. H now has a machine load meter on its health dashboard, with a per-process breakdown, so the first thing I see when something "dies" is whether the machine is simply full.
+
+**Health checks are load tests you did not mean to run.** A timeout tuned on an idle machine becomes a false alarm generator on a busy one. If a health check can trigger a restart, it can make an overload worse.
+
+**Restarts need to be idempotent with respect to resources.** Respawning a server without freeing its port, its lock files or its children is not a restart, it is a second failure.
+
+**Every agent session is a process tree.** Each Claude Code session brings its MCP servers with it. Multiply by the number of sessions and look at the total before you blame anything else.
+
+**Know the ceiling.** Even with the hub, 8 cores and 16 GB is under spec for four full sessions plus the platform, a desktop app and image generation all at once. The honest options are fewer simultaneous sessions, more hardware, or moving heavy jobs to another machine. Software can stop the machine from hurting itself. It cannot create cores.
+
+Still on the list: reaping MCP servers that are idle rather than orphaned, which needs per-server last-call tracking, and a global semaphore for heavy jobs beyond image generation. For now, four agents can work at once, and when one of them makes the machine sweat, nothing dies of it.
