@@ -1,0 +1,59 @@
+---
+title: "The Flying Screen: Coupled Sizing, Flight Dynamics and Control of a Human-Adjacent Hovering Display"
+description: "Can a display hover beside a standing person for half an hour? A co-design study that closes mass, energy, flight and control together, and finds that noise, blade clearance and text size bind long before energy does."
+pubDate: 2026-09-10
+authors: ["Housam Kak"]
+pdfUrl: "/media/pdfs/flying-screen.pdf"
+tags: ["engineering", "aerodynamics", "control", "mathematical-framework", "flying-screen"]
+draft: true
+---
+
+{/*
+  Facts for Housam to confirm before publishing:
+  - Author line. The PDF itself says "Derivation, computational treatment and design study" with no name. Add your name to main.tex and rebuild, or confirm "Housam Kak" here is enough.
+  - The PDF copied here is paper/The Flying Screen.pdf as built on 2026-09-10 19:41. The last commit (19:51, "Start every major section of the paper on a new page") may postdate that build; rebuild with python paper/build.py if so. TeX is not on this machine's PATH, so it was not rebuilt here.
+  - Whether to name the independent reviewer (reviews/2026-09-10/review.md). It is described here only as "an independent review".
+  - pubDate is set to the paper's own date (2026-09-10); change it to the publish date if you prefer.
+  - PDF lives at /media/pdfs/ to match the Social Starting Capital paper, not /papers/.
+*/}
+
+## Overview
+
+A display that hovers beside a standing person, and follows them when they move, is not an aircraft sizing problem with a payload attached. It is a coupled problem. The mass of the machine sets the thrust it needs, thrust sets the power, power over the mission sets the battery, and the battery is part of the mass. A second loop runs through the dynamics: the power actually drawn depends on what the controller does, which depends on the inertia, which depends on where the battery sits.
+
+This paper derives the whole system, solves it, and reports the design that results. It combines analytical models (momentum and blade-element theory, thin-wall beams, rigid-body dynamics on SE(3)), empirical fits where theory runs out (motor mass, the acoustic anchor), numerical optimisation and simulation, and says which is which. No hardware was built.
+
+## Part I: does a design exist?
+
+Momentum theory over an actuator disk gives the induced velocity and ideal hover power. A blade-element profile term turns the figure of merit from an assumption into a consequence of blade geometry. Substituting into a mass budget collapses the whole sizing question into one scalar equation,
+
+$$
+\alpha m - \beta m^{q} = M_0, \qquad q = \frac{3-p}{2},
+$$
+
+where $p$ is the exponent of a disk-area scaling law $A \sim m^p$. For $q > 1$ the equation has exactly two, one or zero positive solutions according to the sign of $M_0^{\max} - M_0$. The transition is a saddle-node bifurcation, not a heavy aeroplane: past a critical payload there is no equilibrium mass at all. The lighter root is precisely the attracting fixed point of the naive sizing iteration. The logarithmic sensitivities of the critical payload come out in closed form, with endurance entering at exponent $-2$ and specific energy, figure of merit and electrical efficiency each at $+2$. Four times the flight time costs sixteen times the payload.
+
+## Part II: how does it fly?
+
+The flight model is Newton-Euler translation and rotation with the full inertia tensor of one shared geometry, rotor thrust and reaction torque through an allocation map, first-order rotor-speed dynamics, a battery energy state, a gimbal, and an orientation-dependent flat-plate model of the screen. The screen is what separates this vehicle from a camera drone: a large plate hung off the centre of mass couples attitude to translational drag, and that drag feeds back as a pitching moment.
+
+The controller is a cascade from position to rotor speed, with a geometric attitude law on SO(3), angular-rate feedforward from differential flatness, gains bounded by the machine's own control authority (computed by linear programming over the rotor speed limits), and a reference governor whose keep-out sphere moves with the user's head.
+
+## Part III: coupling, computation, results
+
+The co-design problem is stated as a differential-algebraic system with a fixed-point constraint, with conditions for the inner mass map to be well posed and for the simulation-in-the-loop battery iteration to contract. The engine closes the battery loop with the flight simulator inside it and finishes with a verification flight. It is verified against the closed forms, calibrated against measured hardware (four commercial aircraft for acoustics, three motors for torque density), and was corrected after an independent review found five defects that the test suite had passed.
+
+The resulting design, **DESK-1/W**, carries a 15.6 inch, 1920 by 1080 laptop panel and a thin-client computer on a 1.724 kg quadrotor with four 492 mm two-blade paddle rotors turning at 1036 rpm. It draws 106 W, hovers for 30 minutes to a 12 percent reserve, and is predicted at 53.8 dBA free field at one metre and 56.6 dBA at the ear once the room is modelled. On a 48 V tether it is lighter, quieter and never lands.
+
+## Four findings
+
+1. **The binding constraint is acoustic, not energetic.** At a 20 minute session the energetic wall sits far above the fixed load. Noise scales with the sixth power of tip speed, so the design is driven to large, slow, wide-chord rotors.
+2. **A declared sound power level is not a pressure at one metre.** The 8 dB difference between the two, compounded by an uncalibrated anchor, was worth 14 dB of error before calibration. That is wider than the entire design space.
+3. **The standoff is measured to the display, but the blades reach back toward the user.** A safety criterion evaluated at the vehicle's centre is wrong by the full reach of the machine, which is what pushed the standoff to 1.2 m.
+4. **The standoff that keeps the blades safe makes text too small.** At 1.2 m, 16 px body text subtends 5.8 arcminutes against a 16 arcminute minimum. Meeting it takes about 278 percent interface scaling, which leaves a logical desktop of about 692 by 389 pixels. The resolution is there; the usable workspace is a tablet's.
+
+## Limits, stated up front
+
+Rotor aerodynamics are momentum theory with one profile term and three near-field corrections; there is no blade-element momentum theory and no model of the recirculating flow a machine like this sets up in a closed room, which passes the room's whole volume through its disks about every 21 seconds. The acoustic model is a broadband scaling law fitted to four aircraft and ranks designs rather than certifying them. Mission energies are near-hover figures. Every result is a single point estimate with no uncertainty propagation, and the controller has no rotor-failure mode. The most valuable next step is not a better model but one measured rotor on a thrust stand.
+
+A readable companion to this paper is the post [Can a screen fly next to my desk?](/posts/can-a-screen-fly/).

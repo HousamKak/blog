@@ -1,0 +1,144 @@
+---
+title: "Building Escher's Waterfall in BlockForge"
+description: "Escher's Waterfall is water running downhill all the way back to the top. Every corner is believable and the whole cannot exist. Here is how I built it as a real voxel structure, kept it closed in one view, and filmed it so it reads."
+pubDate: 2026-12-10
+heroImage: "/media/posts/escher-waterfall-blockforge/waterfall-illusion.webp"
+tags: ["blockforge", "voxel", "impossible-geometry", "rendering", "gamedev"]
+draft: true
+---
+
+{/*
+  Facts for Housam to confirm before publishing:
+  - Rights. Escher's prints are in copyright in many countries (until 2042 per the BlockForge notes). The two stills here are from the FIRST film (examples/films/escher-waterfall, 2026-10-16), which is a new composition on the idea of the print, not the faithful reconstruction in Projects/Escher Waterfall/ (kept private). No image of the original print is included; the post links to nothing of Escher's. Confirm you are comfortable publishing these stills.
+  - The walkable version (world escher-waterfall, made public on the viewer with noindex on 2026-10-30 on your decision). It is mentioned but not linked. Add a link to blockforge.housamkak.com if it is live and you want traffic there.
+  - The blind test was run with Codex CLI, one fresh run per still. Confirm you are fine naming the tool.
+  - Numbers from docs/IMPOSSIBLE_GEOMETRY.md: pixel check 0 of 348,408 pixels at 1080p for the Penrose triangle, Waterfall gap k = -36 per scale, 1296 water parcels, period 412 frames (17.167 s), reveal turn 40 degrees, blind test 5 of 5 (first film) and 6 of 6 (revisit).
+  - Music credit: Bach, Prelude No. 1 in C major, BWV 846, Kimiko Ishizaka, CC0.
+  - pubDate is a placeholder (week 6 of the launch rhythm).
+*/}
+
+Escher made *Waterfall* in 1961. Water runs gently downhill along a zigzag channel, arrives back at the top, falls, turns a mill wheel, and carries on downhill forever. Perpetual motion, drawn so calmly you almost believe it.
+
+The trick inside it is three Penrose triangles. Every corner of the channel is a corner you could build. Every pair of neighbouring pieces makes sense. Only the whole loop is impossible.
+
+BlockForge is my world compiler: worlds are source code, a build plan compiles into blocks, and two clients (native C++ and web) render the same plan. So the question I asked was a slightly stubborn one. Not "can I fake this with an image". Can I *build* it, as a real structure of blocks that exists in 3D, and have it close exactly from one camera?
+
+The answer is yes, and the reason is one line of geometry.
+
+## The one line
+
+Under an orthographic projection along a direction $d$, the cells $p$ and $p + k\,d$ land on exactly the same pixel. Depth along the view direction is invisible.
+
+So take the impossible loop and walk it in 3D. Each segment is a real bar of blocks. When you come back around to where the loop should close, you are not at the start. You are $k$ steps further along the view direction. In 3D the structure is a helix that does not close, a perfectly ordinary, buildable thing. Seen exactly along $d$, its end sits on top of its start and the eye reads a closed impossible loop.
+
+<figure>
+  <img
+    src="/media/posts/escher-waterfall-blockforge/waterfall-illusion.webp"
+    alt="A voxel rendering in a pen-and-ink look: a zigzag aqueduct that appears to flow downhill in a closed loop, a mill wheel under a waterfall, two towers topped with polyhedra, and giant mosses on the left."
+  />
+  <figcaption>
+    FIG. 1. THE ILLUSION VIEW
+    <em>
+      The first BlockForge Waterfall, a new composition on the idea of the
+      print, in the lithograph look. From this one orthographic camera the
+      channel closes on itself.
+    </em>
+  </figcaption>
+</figure>
+
+This is not a trick I invented. Roger Penrose made it exact in 1992 ("On the cohomology of impossible figures"): every small patch of an impossible picture has a consistent 3D reading, fixed up to a shift along the view direction, and going around the loop those shifts do not add up to zero. In an orthographic picture that mismatch is a single number, the gap. In my solver it is literally the `k` the tool reports.
+
+What made it practical is that voxels sit on an integer grid and the engine already has true orthographic and isometric cameras. No image warping. The structure exists, and the picture is exact.
+
+## Part 1: the solver
+
+The first piece is a creator tool, `impossible`, available from the CLI and through BlockForge's MCP server like every other tool. You give it a figure as a closed path of unit moves (along grid axes, or by screen angle in the view), a profile for the cross section (a bar, a deck for stairs, a channel with floor and walls, or nothing for a falling sheet of water), and the view direction. It walks the path in 3D, refuses any path that does not close on screen, and reports how far off the closure is in views.
+
+```bash
+node cli/kc.js tool run impossible --figure penrose-triangle --check true --size 1920x1080
+```
+
+The library so far: the Penrose triangle (k = 12), the Penrose stairs, an impossible cube found by searching closed walks over the cube's outline, and Waterfall's channel: a fall and a four leg zigzag with weirs, k = -36 per scale.
+
+The stairs taught me something. In the isometric view, a flight that climbs all the way around has to run at least twice its rise per step, which forces the flights to be unequal (6, 6, 2 and 2 steps). Escher's drawing hides that. The grid does not let you.
+
+Then the check. `--check` renders the plan natively and compares it, face per pixel, against a CPU reference rasterizer of the same plan and camera. For the Penrose triangle at 1920 by 1080: **0 of 348,408 pixels differ**. The stairs are off by 11 pixels, all on a riser edge.
+
+## Part 2: the joins, or why the far piece has to draw in front
+
+Here is the catch that makes it more than a camera angle. At the closing corner, the piece that is physically far away has to *appear in front* of the piece that is near. A depth buffer does not care about your art. It draws the near piece on top and the illusion shows a seam.
+
+The fix is a depth shear along the camera's own view axis. Moving a vertex along the view axis never changes an orthographic image, only its depth. So inside small "join" boxes, each vertex gets pushed along the view axis by an amount that ramps along the path, and only when the camera is within a small tolerance of the illusion view. Turn the camera away and the shear fades out and you see the true, open structure.
+
+Getting there took several wrong answers, in the order they were forced:
+
+- **A constant depth jump** near the join puts a step inside a visible surface, and the line pass draws it as a silhouette.
+- **One global linear shear** with the right total collapses the whole view axis to one depth. The shear has to follow the path, segment by segment.
+- **Per segment linear shears** that differ inside a corner make the two bars' surfaces cross, which drew little wedges at every corner. Each segment now holds a constant shear for a margin of cells at both ends and ramps in between.
+- **The greedy mesher** in the native client merges faces across box boundaries, and a merged face took one box's shear across another's: the depth pass was off by up to 5 blocks while the colours looked fine. Every box now gets its own block key in the same colour. After that, the depth error is 0.016 blocks, which is just the 16 bit depth quantisation.
+- **Relief.** A channel's walls over its floor flip draw order once the shear along them is steeper than the path's own depth change. For a loop like Waterfall's, that is exactly how steep it needs to be on average. So the channel keeps its true depth everywhere and the whole shear goes into the falling water above the wheel.
+
+All of this runs in both clients, in the native vertex programs (the G-buffer too, so outlines see continuous depth) and in the web materials, which needed their flat normals taken from the unsheared position so the faces did not shade wrong.
+
+## Part 3: water that flows forever
+
+The water is 1296 parcels, one per cell of path and lane, each moving at constant speed around the loop. Because every grid axis projects to the same screen length in this view, constant speed in 3D is constant speed on screen, so the water reads as gently downhill all the way round. A parcel that reaches the end of the channel wraps to the top of the fall: the same pixel in the illusion view, a visible jump anywhere else. The mill wheel turns on the same clock.
+
+The clock is music. The score is Bach's Prelude No. 1 in C major, BWV 846, in Kimiko Ishizaka's CC0 recording, and the loop is four bars long. Later I found that the period (17,150 ms) did not divide into whole 24 fps frames, so every wrap missed by a fifth of a cell and the wheel by 1.4 degrees, and from the second loop on, a few parcels hung in the air between the lip and the fall. The period is now 412 whole frames. That kind of bug only shows up when you watch the film loop ten times.
+
+## Part 4: the reveal
+
+An impossible figure that only exists from one angle is a postcard. I wanted the film to show the trick. So the reveal camera starts in the illusion view, turns 40 degrees away over one bar (blending half way to perspective as it goes), holds for two, and turns back over one until the figure snaps shut again. The structure separates into its offset pieces within the first two degrees of the turn.
+
+<figure>
+  <img
+    src="/media/posts/escher-waterfall-blockforge/waterfall-reveal.webp"
+    alt="The same voxel structure seen from another angle: the aqueduct is clearly open, the columns hold nothing up, and the tower and channel stand apart."
+  />
+  <figcaption>
+    FIG. 2. THE REVEAL
+    <em>
+      Forty degrees off the illusion view. The loop is an open helix, the
+      columns support nothing, and the waterfall pours from a channel that
+      is somewhere else entirely.
+    </em>
+  </figcaption>
+</figure>
+
+## Part 5: does it read?
+
+I needed a test that was not my own eyes, because by that point my eyes had seen it far too many times to be fair judges. So I ran a blind test: stills from the finished film at 2, 9, 20, 33 and 38 seconds, each shown to a fresh model run with no context, asked what it was looking at.
+
+5 of 5 named M. C. Escher. Four of them named *Waterfall* specifically. One answer: "an isometric, pen-and-ink engraving style, with dense crosshatching and blocky, voxel-like architecture. The impossible aqueduct and geometric towers strongly resemble M. C. Escher's Waterfall."
+
+The honest part of that result: every answer said engraving or pen and ink, not lithograph. The look I built had crisp ruled lines on every surface and read like a banknote. Close, but not the print's crayon on stone.
+
+## Then I looked harder, and it was ugly
+
+The first film passed the blind test, and when I sat with it next to the print it still looked wrong. The water read as grey strips sliding. The polyhedron on the right read as an octahedron. And worst of all, when I finally measured it, the water never touched the wheel. The fall came down two cells behind the rim and the channel ran off in the other direction from a wheel standing in a dead-end trough.
+
+So it went through rounds, each one a sentence from me and a measured change:
+
+- "The water is not right": real flowing water three courses deep in every leg, streaks and crests travelling along it, white water at every weir.
+- "It falls beside the wheel, not on it": the axle moved into the start of the channel, the fall now lands on the blades, and the channel turns toward the camera at its end so the fall pours over a lip you can actually see.
+- "Move the fall to the front of the wheel": landing just past the top was right in the world and wrong in the view, because on screen the sheet ended on the middle of the wheel.
+- "The water on the wheel appears to move in the opposite direction": the wheel and the flow both had the right sense. The bug was the shader's coordinate on a curved surface. It projected the flow direction onto each flat facet of the band, so the pattern climbed a sawtooth on every facet and its net speed came out between -33 and -75 blocks a second against the rim's +16. Flow boxes now take an `around` coordinate that runs along the arc.
+
+The look got rebuilt too: a second lithograph look with crayon tone on a grained stone, values from speck density, strokes that follow each surface. The revisited version scored 6 of 6 on the blind test, all naming *Waterfall*.
+
+That later, much closer version stays private. The closer it gets to the print, the more it is a copy of a work that is still in copyright. The stills in this post are from the first film, a new composition built on the geometric idea, and the Penrose figures underneath it are mathematics.
+
+## Walking it
+
+The last step was making it walkable, which raises a fun question: the loop only closes from one camera, so how does walking it feel impossible instead of broken?
+
+The aqueduct is a helix. The print is that helix seen along its own step. So the walkable world adds a portal: a pure translation between two pieces with identical piers and channel section. Walk the end of the last leg and you carry straight on into the second leg. Three legs, a Penrose triangle walked for real, about 21.7 m around, one metre down every lap, and you arrive at the same height you started. Because it is a translation and not a rotation, the wall tones and the sun stay consistent, and a normal corner does the turning.
+
+From anywhere other than the print view, the structure shows its trick, and I decided not to hide that. The reveal has been part of the piece since the first film.
+
+## What I keep from it
+
+- An impossible figure is a possible structure seen from the one direction that hides its gap. Once you see it that way, it is an engineering problem.
+- Draw order is the real difficulty, not geometry. Every wrong shear I tried produced a visible artefact I could name.
+- Pixel-exact checks against a CPU reference are what let me change the joins with confidence.
+- A blind test tells you whether it reads. It does not tell you whether it is good. For that, put it next to the original and measure.

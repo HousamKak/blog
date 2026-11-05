@@ -1,0 +1,139 @@
+---
+title: "Running the real Zero Hour engine inside GTA San Andreas"
+description: "I wanted to play C&C Generals Zero Hour inside San Andreas, with CJ driving my tanks. The first version looked right and ran none of Zero Hour's rules. So I put the actual Zero Hour engine inside the GTA process instead."
+pubDate: 2026-12-17
+heroImage: "/media/posts/zero-hour-inside-san-andreas/architecture.svg"
+tags: ["gamedev", "reverse-engineering", "zero-hour", "gta", "story"]
+draft: true
+---
+
+{/*
+  LEGAL REVIEW PENDING. Do not publish until it is done.
+  - This is a personal mod that runs on the player's own legally owned installs of GTA San Andreas and C&C Generals Zero Hour. Nothing is distributed: no binaries, no converted models, no world pack, no download link. Keep it that way in the post and in any replies.
+  - No EA or Rockstar assets are in this post: no screenshots, no textures, no cameos, no audio. The only image is a diagram drawn for this post (public/media/posts/zero-hour-inside-san-andreas/architecture.svg). If you add gameplay capture later, it needs its own review (screenshots contain game textures).
+  - EA's source release is GPLv3 with additional terms and requires a legally owned game; MTA is GPLv3; check both before publishing any code or a fork link. MTA's netc.dll (networking and anti-cheat) is a closed binary used as shipped; the post says the anti-cheat is never touched.
+  - The fork in D:/dev/mtasa-blue (branch generals-zh) is not linked. Decide whether it is ever public.
+
+  Facts for Housam to confirm before publishing:
+  - Authorship framing: the commits are co-authored with Claude. The post says you directed coding agents and made the calls. Adjust to whatever stance you settle on (backlog F7).
+  - Dates and numbers from MODLOG.md, ARCHITECTURE_REVIEW.md (2026-10-06), docs/mta-native.md and commits 2026-10-05 to 2026-10-11 in generals-in-sa and mtasa-blue (48 commits by you on generals-zh): boot 3 to 8 s, 533 objects, 2.5 ms update + 6 ms draw, 160 m of relief, world pack 7 s, 98.5% of 3.7 million points within 0.5 m, 877 tiles on the whole map, 1.2 km route, 0.000 m ridden bulldozer offset.
+  - Who wrote the architecture review (it reads like another agent's audit). The post calls it "an architecture review" without naming the author.
+  - Whether network battles over MTA have been played end to end by two people. The post says lockstep battles start; it does not claim a full match was played.
+  - Credits: gta-reversed is not referenced in this repository; it is not credited. Add it if you used it for addresses.
+  - EA released the Generals and Zero Hour source under the GPL in 2025 (the post says so). Confirm the year and the repository name you want cited.
+  - "Two games from my teenage years" is an assumption about your history with both games. Edit if it is not true.
+  - pubDate is a placeholder (week 7 of the launch rhythm).
+*/}
+
+The idea was a mashup of two games from my teenage years. Command & Conquer Generals: Zero Hour, the 2003 RTS, running inside GTA San Andreas. Generals bases on San Andreas ground. My army fighting across Los Santos. And CJ as a hero unit who can walk up to one of my tanks, get in, and drive it.
+
+This is a personal mod that runs on my own installs of both games. Nothing here is downloadable, and nothing from either game is in this post. It is a story about one engineering decision: the difference between something that looks like Zero Hour and something that *is* Zero Hour.
+
+I built this the way I build most things now: directing coding agents session by session, playtesting, and making the calls on what to keep and what to throw away. The biggest call came on day two.
+
+## Day one: a Zero Hour that was not Zero Hour
+
+The first version was a resource for Multi Theft Auto (MTA), the multiplayer mod for San Andreas, written in Lua. A pipeline read the BIG archives of my Zero Hour install, extracted the INI rule files, and converted the W3D models into GTA's DFF, TXD and COL formats. Then a Lua simulation ran the RTS on top: units, weapons, armour, economy, AI.
+
+It moved fast. In one day it had all three factions and all nine Zero Hour generals, Generals' control bar and command cards, construction with dozers, supply economy, upgrades, veterancy, promotions, superweapons, garrisons, jets landing and rearming on an airfield, and CJ as a durable hero who could press F next to a friendly vehicle and drive it with a mouse-aimed turret. A headless test bench ran over a hundred checks.
+
+It looked right. It played wrong. Units clipped through buildings, got stuck, and fired shells that landed somewhere other than where they visibly hit.
+
+## Day two: the review
+
+On 6 October I asked for an architecture review of the whole thing, and the verdict was blunt:
+
+> The current project is a Zero Hour-inspired Lua simulation running in the MTA client, with converted Generals models, effects, UI, and audio. It does not execute Zero Hour's game logic.
+
+Then it listed why the symptoms happened, and every one of them was the same root cause wearing a different hat:
+
+- **Pathing was an approximation.** Navigation sampled GTA collision in 2.5 m cells with downward rays, but collision only exists near the local player, and in command mode the camera could be kilometres from CJ. A missing cell was treated as walkable.
+- **The grid key broke negative coordinates.** `cx * 65536 + cy`, decoded with floor-divide and modulo, turns `(0, -1)` into `(-1, 65535)`. The default map mostly hid it. Battles anywhere in San Andreas exposed it everywhere.
+- **Movement ignored Zero Hour's locomotors.** A generic 90 degrees a second turn rate for every vehicle.
+- **Damage and visuals were two different things.** The Lua sim scheduled an impact by distance over weapon speed, and the client drew a separate projectile on a guessed arc. What you saw and what hit could disagree.
+- **No match authority.** Each client ran its own sim at its own frame rate. Fine for a toy, impossible for multiplayer.
+
+The line that mattered most: "the requested level of fidelity cannot be reached by importing more INI fields alone." I could keep porting rules into Lua forever and I would be writing a second, worse Zero Hour.
+
+And the real one was sitting right there. EA released the Generals and Zero Hour source under the GPL in 2025. TheSuperHackers' GeneralsGameCode project had already done the hard work of making it build with a modern toolchain. The rules authority existed. I just had to put it somewhere it was never meant to go.
+
+## The pivot: Zero Hour as a library, inside gta_sa.exe
+
+The plan we settled on: Zero Hour decides everything a Zero Hour unit does (orders, movement, weapons, actual projectiles, hits, production, powers, AI). San Andreas decides everything CJ and a GTA car does, plus the world, the camera and the renderer. A narrow bridge carries events between them, and every crossing has exactly one owner.
+
+<figure>
+  <img
+    src="/media/posts/zero-hour-inside-san-andreas/architecture.svg"
+    alt="A diagram of the architecture: the player's gta_sa.exe process contains a forked MTA client with a CZeroHour component that loads zhcore.dll. San Andreas owns the world, CJ, cars, camera and frame. zhcore.dll owns units, AI, weapons and pathfinding at 30 logic frames a second. An offline world pack feeds San Andreas collision to Zero Hour, and the MTA server relays the lockstep command stream."
+  />
+  <figcaption>
+    FIG. 1. WHO OWNS WHAT
+    <em>
+      One process, two games, one rulebook. Diagram drawn for this post; no
+      game assets.
+    </em>
+  </figcaption>
+</figure>
+
+I first tried two processes talking over localhost (a native Zero Hour build publishing snapshots over UDP). It proved the engine would take commands from outside: a Humvee ordered over the bridge drove 100 units and arrived. It also proved the network cost: a full 54 KB snapshot at 10 Hz is about half a megabyte a second per client. Deltas got that to about 1.3 KB per frame, but the direction was clear. The engine had to live *in* the game.
+
+So on 8 October it moved in, in phases:
+
+**Phase 0.** A plugin (`gensa.asi`, built on plugin-sdk) boots single-player GTA hands-free into a story-free sandbox at Verdant Meadows.
+
+**Phase 1.** `zhcore.dll`: GeneralsGameCode built as a library with a handful of exports (`zh_init`, `zh_step`, `zh_objects`, `zh_command`). It boots in-process in 3 to 8 seconds with 533 native objects, and a Chinook ordered from the plugin moved. Zero Hour's working directory had captured GTA's folder when the DLL loaded, so it needs to be pointed back at its own.
+
+**Phase 2.** Zero Hour draws its units into GTA's own frame. Zero Hour is a Direct3D 8 game and San Andreas is Direct3D 9, so Zero Hour renders through a vendored d3d8to9 in a "hosted" mode: no Present, no Clear, GTA's camera times a 0.25 m per unit transform, drawing only inside GTA's draw window. Some of the fun on the way:
+
+- GTA resets its device on every resize message and fed the window size back as the back buffer size. With Zero Hour's buffers alive, the reset failed and every later call returned an error. The size is now pinned.
+- GTA minimises itself on focus loss and opens its pause menu when it regains focus. The lab keeps it running in the background.
+- Zero Hour caches render states and sets depth testing only at device creation, so its units drew with no depth until it re-applied its state every frame.
+
+Cost: about 2.5 ms of Zero Hour update and 6 ms of draw per frame, and GTA holds its 30 fps.
+
+**Phase 3.** San Andreas ground under Zero Hour. Every heightmap Zero Hour reads is refilled from GTA's ground, with the height step turned into a runtime variable so it carries 160 m of relief. A second probe half a metre under each top surface tells a roof from a floor, and built cells become cliffs, so tanks stop driving up the hangar's curved roof.
+
+**Phase 4.** A real skirmish without menus, USA against a GLA AI, with start positions moved onto open, level San Andreas ground. TAB switches to commander mode: Zero Hour's own interface and cursor draw over GTA's frame, and GTA's keyboard feeds Zero Hour's.
+
+**Phase 5.** Combat across the two worlds. A hook where Zero Hour deals damage reports every hit, and big area hits become a silent GTA explosion at the same spot, so peds and cars react the GTA way. In the other direction, GTA's bullet impact and explosion functions are detoured: a bullet tests each Zero Hour object's cylinder and the first one hit takes the damage as small arms, through Zero Hour's own armour tables. CJ boards a Crusader with F and drives it through its own locomotor and pathfinding. Enemies shoot at an invisible Ranger that follows him, and its damage hurts CJ. Traffic near the army gets invisible stand-ins so Zero Hour's units steer around a GTA Infernus, and a tank that drives over one crushes it into flames.
+
+Along the way I hit a stock engine bug: a freshly spawned unit that fired before its model state was set wrote into an empty recoil table and crashed at address 0. Patched.
+
+## Moving into MTA, for multiplayer
+
+Single player proved the idea. Multiplayer is the point, and MTA gives a server-owned world. So the same modules moved into a fork of the MTA client as a `CZeroHour` component in the deathmatch client, called from MTA's existing hook handlers (bullet impacts, explosion creation, message processing) with no new detours. One class, `ZhHost`, is the only code that touches MTA's player, camera and controls. MTA's networking and anti-cheat ship as a closed binary; the fork uses it as shipped and never touches the anti-cheat.
+
+Zero Hour multiplayer is deterministic lockstep: every player runs the same simulation and only commands travel. That flips how San Andreas has to talk to it. A GTA bullet cannot simply apply damage locally; it has to become a command in the shared stream so every machine applies it on the same frame. The same goes for the ground: every seat needs the identical world, which is why network battles now check a hash of the world pack. Zero Hour's own CRC checks catch any desync.
+
+48 commits on the fork in four days, from "build with Visual Studio 2022" to convoys and traffic in network battles.
+
+## San Andreas' decks as pathfinding layers
+
+The hardest integration was terrain. Zero Hour's pathfinder thinks in its own map cells, with zones and a few bridge layers. San Andreas is streamed 3D geometry with freeways stacked over streets.
+
+So I stopped sampling GTA at runtime and wrote an offline builder (C++, about 7 seconds for the whole map) that reads the collision files of my own install and rasterises every collision mesh, box and sphere into 2.5 m columns on Zero Hour's grid. Each column knows its outdoor ground (the street *under* a freeway, not the deck), whether it is blocked or built, and the decks above. Checked against the game's own rays, the surface is within half a metre at 98.5 percent of 3.7 million points.
+
+Then the decks became real Zero Hour pathfinding layers, with joins where a ramp leads up from the street. The first verified run: a tank drives from a Los Santos plaza up onto the freeway deck. Kept as rectangles, those layers would have taken millions of cells, so they now live in 32 by 32 tiles only where decks exist: 877 tiles for all 10 deck layers on the whole map, at 30 logic frames a second.
+
+Whole-map battles brought the last scaling bugs. Placing a building rebuilt every pathfinding zone on the map, a 140 to 190 ms stall every half minute; removals now merge zones locally. A route longer than 300 m is now planned in legs along Zero Hour's coarse route, and a tank crosses 1.2 km of Los Santos to its goal.
+
+And my favourite small fix: a vehicle CJ rode shook more the faster it went, the bulldozer worst. Zero Hour was drawing it where the logic last placed it, 30 times a second, ignoring the smoothed position the host computed between logic frames. Now a ridden bulldozer draws 0.000 m from its chassis, down from 0.09 to 0.45 m.
+
+## What I took from it
+
+- **Looking right is not being right.** The Lua version had more features on day one than the native version had for a week. It was also a dead end, and the review saved me weeks by saying so in one sentence.
+- **Find the rules authority and do not reimplement it.** The real engine brought locomotors, projectiles, armour and AI for free, and every bug left was an integration bug, which is the kind you can actually finish.
+- **One owner per fact.** Every crossing between the games (a bullet, an explosion, a ride) is one event with one owner. Most of the bugs were two systems both believing they owned the same thing.
+- **Lockstep changes everything.** Anything from San Andreas that affects the battle has to become a command, or the machines drift apart.
+
+## Credits
+
+None of this exists without other people's work:
+
+- **Electronic Arts**, for releasing the Command & Conquer Generals and Zero Hour source code under the GPL.
+- **TheSuperHackers** and the GeneralsGameCode contributors, whose modern build of that source is what runs as `zhcore.dll`.
+- **Multi Theft Auto** (mtasa-blue) and its contributors, for the client this is forked from and the multiplayer world it runs in.
+- **plugin-sdk** and the San Andreas reverse-engineering community, whose decades of mapping the game's internals make hooking it possible.
+- **d3d8to9** by crosire, which lets a Direct3D 8 game draw on a Direct3D 9 device, and **safetyhook** for the detours.
+
+Command & Conquer and Generals are EA's; Grand Theft Auto and San Andreas are Rockstar's. This is a private mod on legally owned copies. No game files, converted assets or binaries are distributed.

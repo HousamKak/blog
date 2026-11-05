@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" font-family="Georgia, 'Times New Roman', serif" role="img" aria-labelledby="t d">
+  <title id="t">Zero Hour inside San Andreas: who owns what</title>
+  <desc id="d">The user's own GTA San Andreas process hosts a forked MTA client. Inside it, a Zero Hour component loads zhcore.dll, the community GeneralsGameCode engine built as a library. San Andreas supplies the world, CJ and the renderer; Zero Hour supplies the rules. An offline world pack turns San Andreas collision into Zero Hour ground, obstacles and deck layers. The MTA server relays the lockstep command stream between players.</desc>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#2a2620"/>
+    </marker>
+  </defs>
+  <rect width="960" height="600" fill="#f6f1e6"/>
+  <text x="480" y="38" text-anchor="middle" font-size="22" font-weight="bold" fill="#2a2620">One process, two games, one rulebook</text>
+
+  <!-- outer process -->
+  <rect x="30" y="62" width="600" height="420" rx="6" fill="none" stroke="#2a2620" stroke-width="2" stroke-dasharray="6 5"/>
+  <text x="46" y="86" font-size="15" font-weight="bold" fill="#2a2620">gta_sa.exe (the player's own install)</text>
+
+  <!-- San Andreas side -->
+  <rect x="54" y="104" width="260" height="170" rx="4" fill="#fffaf0" stroke="#2a2620" stroke-width="1.5"/>
+  <text x="70" y="130" font-size="16" font-weight="bold" fill="#2a2620">San Andreas owns</text>
+  <text x="70" y="156" font-size="14" fill="#2a2620">the streamed world</text>
+  <text x="70" y="178" font-size="14" fill="#2a2620">CJ, cars, traffic, physics</text>
+  <text x="70" y="200" font-size="14" fill="#2a2620">the camera and input</text>
+  <text x="70" y="222" font-size="14" fill="#2a2620">the D3D9 device and frame</text>
+  <text x="70" y="244" font-size="14" fill="#2a2620">bullets and explosions</text>
+
+  <!-- Zero Hour side -->
+  <rect x="346" y="104" width="260" height="170" rx="4" fill="#fffaf0" stroke="#2a2620" stroke-width="1.5"/>
+  <text x="362" y="130" font-size="16" font-weight="bold" fill="#2a2620">zhcore.dll owns</text>
+  <text x="362" y="156" font-size="14" fill="#2a2620">units, AI, production</text>
+  <text x="362" y="178" font-size="14" fill="#2a2620">weapons and real projectiles</text>
+  <text x="362" y="200" font-size="14" fill="#2a2620">locomotors, pathfinding</text>
+  <text x="362" y="222" font-size="14" fill="#2a2620">30 logic frames a second</text>
+  <text x="362" y="244" font-size="14" fill="#2a2620">its own draw pass, hosted</text>
+
+  <!-- bridge -->
+  <rect x="54" y="306" width="552" height="150" rx="4" fill="#ece4d2" stroke="#2a2620" stroke-width="1.5"/>
+  <text x="70" y="332" font-size="16" font-weight="bold" fill="#2a2620">CZeroHour, a component inside a forked MTA client</text>
+  <text x="70" y="358" font-size="14" fill="#2a2620">ZhHost: the only code that touches MTA's player, camera and controls</text>
+  <text x="70" y="380" font-size="14" fill="#2a2620">ZhWorld: ground, structures, placement on the map</text>
+  <text x="70" y="402" font-size="14" fill="#2a2620">ZhCombat: GTA hits become Zero Hour damage, and back</text>
+  <text x="70" y="424" font-size="14" fill="#2a2620">ZhCommander, ZhDriving: TAB to command, F to drive a unit</text>
+  <text x="70" y="446" font-size="14" fill="#2a2620">all called from MTA's existing hook handlers, no new detours</text>
+
+  <line x1="184" y1="274" x2="184" y2="304" stroke="#2a2620" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)"/>
+  <line x1="476" y1="274" x2="476" y2="304" stroke="#2a2620" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <!-- world pack -->
+  <rect x="668" y="104" width="262" height="170" rx="4" fill="#fffaf0" stroke="#2a2620" stroke-width="1.5"/>
+  <text x="684" y="130" font-size="16" font-weight="bold" fill="#2a2620">World pack (offline)</text>
+  <text x="684" y="156" font-size="14" fill="#2a2620">read from the player's own</text>
+  <text x="684" y="178" font-size="14" fill="#2a2620">collision files, 7 s, never shared</text>
+  <text x="684" y="200" font-size="14" fill="#2a2620">2.5 m columns: ground,</text>
+  <text x="684" y="222" font-size="14" fill="#2a2620">blocked, built, and decks</text>
+  <text x="684" y="244" font-size="14" fill="#2a2620">decks become pathfinding layers</text>
+  <line x1="668" y1="190" x2="608" y2="190" stroke="#2a2620" stroke-width="1.5" marker-end="url(#a)"/>
+
+  <!-- server -->
+  <rect x="668" y="330" width="262" height="126" rx="4" fill="#fffaf0" stroke="#2a2620" stroke-width="1.5"/>
+  <text x="684" y="356" font-size="16" font-weight="bold" fill="#2a2620">MTA server</text>
+  <text x="684" y="382" font-size="14" fill="#2a2620">relays Zero Hour's lockstep</text>
+  <text x="684" y="404" font-size="14" fill="#2a2620">command stream; San Andreas</text>
+  <text x="684" y="426" font-size="14" fill="#2a2620">events enter as commands</text>
+  <line x1="608" y1="390" x2="666" y2="390" stroke="#2a2620" stroke-width="1.5" marker-start="url(#a)" marker-end="url(#a)"/>
+
+  <text x="30" y="520" font-size="14" fill="#2a2620">Rule of the build: Zero Hour decides anything a Zero Hour unit does. San Andreas decides anything CJ or a GTA car does.</text>
+  <text x="30" y="544" font-size="14" fill="#2a2620">Every crossing (a bullet, an explosion, a ride) is one event with one owner.</text>
+  <text x="30" y="580" font-size="12" fill="#6b6357">Diagram by the author. No game assets.</text>
+</svg>
